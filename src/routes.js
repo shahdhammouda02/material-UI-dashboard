@@ -54,7 +54,7 @@ import NewProducts from "layouts/products/data/adding";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
-import CategoriesPage from "layouts/categories";
+import Categories from "layouts/categories";
 
 const routes = [
   {
@@ -87,8 +87,8 @@ const routes = [
     name: "Categories",
     key: "categories",
     icon: <CategoryIcon fontSize="small" />,
-    route: "/notifications",
-    component: <Notifications />,
+    route: "/categories",
+    component: <Categories />,
   },
   {
     type: "collapse",
