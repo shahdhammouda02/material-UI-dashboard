@@ -19,19 +19,19 @@ import test from "../../../assets/images/bg-profile.jpeg";
 
 export default function data() {
   const [columns, setColumns] = useState([
-    { Header: "Name", accessor: "author", align: "left" },
-    { Header: "Category", accessor: "Category", align: "center" },
-    { Header: "photo", accessor: "images", align: "center" },
-    { Header: "price", accessor: "price", align: "center" },
-    { Header: "Discount", accessor: "Discount", align: "center" },
-    { Header: "Description", accessor: "text", align: "center" },
-    { Header: "Actions", accessor: "Actions", align: "center" },
+    { Header: "الاسم", accessor: "author", align: "left" },
+    { Header: "الفئة", accessor: "Category", align: "center" },
+    { Header: "الصورة", accessor: "images", align: "center" },
+    { Header: "السعر", accessor: "price", align: "center" },
+    { Header: "الخصم", accessor: "Discount", align: "center" },
+    { Header: "الوصف", accessor: "text", align: "center" },
+    { Header: "الإجراءات", accessor: "Actions", align: "center" },
   ]);
 
   const [rows, setRows] = useState([
     {
       author: "John Michael",
-      Category: "man",
+      Category: "المنتجات الغذائية",
       images: (
         <MDBox ml={-1}>
           <img src={test} alt="image description" style={{ width: "100px", height: "100px" }} />
@@ -39,7 +39,7 @@ export default function data() {
       ),
       price: "$50",
       Discount: "10%",
-      text: "Girls pink blouse for girls",
+      text: "Foods and beverages",
       Actions: (
         <MDBox display="flex" justifyContent="center" alignItems="center">
           <MDIconButton color="primary">
@@ -54,7 +54,7 @@ export default function data() {
     },
     {
       author: "John Michael",
-      Category: "man",
+      Category: "الملابس والاكسسوارات",
       images: (
         <MDBox ml={-1}>
           <img src={test} alt="image description" style={{ width: "100px", height: "100px" }} />
@@ -62,7 +62,7 @@ export default function data() {
       ),
       price: "$50",
       Discount: "10%",
-      text: "Girls pink blouse for girls",
+      text: "Clothing items and Accessories",
       Actions: (
         <MDBox display="flex" justifyContent="center" alignItems="center">
           <MDIconButton color="primary">
@@ -77,7 +77,7 @@ export default function data() {
     },
     {
       author: "John Michael",
-      Category: "man",
+      Category: "الحرف اليدوية",
       images: (
         <MDBox ml={-1}>
           <img src={test} alt="image description" style={{ width: "100px", height: "100px" }} />
@@ -85,7 +85,7 @@ export default function data() {
       ),
       price: "$50",
       Discount: "10%",
-      text: "Girls pink blouse for girls",
+      text: "Handicrafts",
       Actions: (
         <MDBox display="flex" justifyContent="center" alignItems="center">
           <MDIconButton color="primary">
