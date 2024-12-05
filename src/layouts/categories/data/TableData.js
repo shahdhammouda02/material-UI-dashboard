@@ -9,9 +9,9 @@ import test from "../../../assets/images/bg-profile.jpeg"; // Sample image
 
 export default function TableData() {
   const [columns, setColumns] = useState([
-    { Header: "Category Name", accessor: "categoryName", align: "left" },
-    { Header: "Description", accessor: "description", align: "center" },
-    { Header: "Actions", accessor: "actions", align: "center" },
+    { Header: "اسم الفئة", accessor: "categoryName", align: "left" },
+    { Header: "الصنف", accessor: "description", align: "center" },
+    { Header: "الاجراءات", accessor: "actions", align: "center" },
   ]);
 
   const [rows, setRows] = useState([
