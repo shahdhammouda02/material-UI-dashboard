@@ -37,7 +37,7 @@ function Categories() {
                   coloredShadow="info"
                 >
                   <MDTypography variant="h6" color="white">
-                    Categories Table
+                    جدول الفئات
                   </MDTypography>
                 </MDBox>
                 <MDBox pt={3}>

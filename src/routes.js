@@ -59,7 +59,7 @@ import Categories from "layouts/categories";
 const routes = [
   {
     type: "collapse",
-    name: "Dashboard",
+    name: "لوحة التحكم",
     key: "dashboard",
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
@@ -67,24 +67,24 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Products",
+    name: "المنتجات",
     key: "products",
     icon: <ShoppingCartIcon fontSize="small" />,
     route: "/products",
     component: <Products />,
   },
 
+  // {
+  //   type: "collapse",
+  //   name: "RTL",
+  //   key: "rtl",
+  //   icon: <Icon fontSize="small">format_textdirection_r_to_l</Icon>,
+  //   route: "/rtl",
+  //   component: <RTL />,
+  // },
   {
     type: "collapse",
-    name: "RTL",
-    key: "rtl",
-    icon: <Icon fontSize="small">format_textdirection_r_to_l</Icon>,
-    route: "/rtl",
-    component: <RTL />,
-  },
-  {
-    type: "collapse",
-    name: "Categories",
+    name: "التصنيفات",
     key: "categories",
     icon: <CategoryIcon fontSize="small" />,
     route: "/categories",
@@ -92,7 +92,7 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Orders",
+    name: "الطلبات",
     key: "order",
     icon: <ShoppingBagIcon fontSize="small" />,
     route: "/profile",
@@ -100,7 +100,7 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Delivery",
+    name: "التوصيل",
     key: "delivery",
     icon: <DeliveryDiningIcon fontSize="small" />,
     route: "/billing",
@@ -108,7 +108,7 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Sign in",
+    name: "تسجيل دخول",
     key: "sign-in",
     icon: <Icon fontSize="small">login</Icon>,
     route: "/authentication/sign-in",
@@ -117,7 +117,7 @@ const routes = [
 
   {
     type: "collapse",
-    name: "Sign Up",
+    name: "إنشاء حساب جديد",
     key: "sign-up",
     icon: <Icon fontSize="small">assignment</Icon>,
     route: "/authentication/sign-up",

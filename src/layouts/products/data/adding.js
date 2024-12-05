@@ -71,26 +71,27 @@ function NewProducts() {
         bgcolor="#fbfbfb"
         color="#000"
       >
-        <Typography variant="h5" mb={2}>
-          Add New Product
-        </Typography>
+        {/* <Typography variant="h5" mb={2}>
+          اضافة منتج جديد
+        </Typography> */}
         <Button
           variant="contained"
-          startIcon={<AddIcon />}
+          // endIcon={<AddIcon />}
           onClick={handleDialogOpen}
-          sx={{ mb: 3, color: "#ffffff" }}
+          sx={{ mb: 3, color: "#ffffff", fontSize: "1rem" }}
         >
-          Add Product
+          اضافة منتج جديد
+          <AddIcon />
         </Button>
 
         {/* Dialog for product input */}
         <Dialog open={isDialogOpen} onClose={handleDialogClose}>
-          <DialogTitle>Add New Product</DialogTitle>
+          <DialogTitle>اضافة منتج جديد</DialogTitle>
           <DialogContent>
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
-                  label="Product Name"
+                  label="اسم المنتج"
                   name="name"
                   value={newProduct.name}
                   onChange={handleInputChange}
@@ -99,7 +100,7 @@ function NewProducts() {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  label="Category"
+                  label="الفئة"
                   name="category"
                   value={newProduct.category}
                   onChange={handleInputChange}
@@ -108,7 +109,7 @@ function NewProducts() {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  label="Image URL"
+                  label="الصورة"
                   name="image"
                   value={newProduct.image}
                   onChange={handleInputChange}
@@ -117,7 +118,7 @@ function NewProducts() {
               </Grid>
               <Grid item xs={6}>
                 <TextField
-                  label="Price"
+                  label="السعر"
                   name="price"
                   type="number"
                   value={newProduct.price}
@@ -127,7 +128,7 @@ function NewProducts() {
               </Grid>
               <Grid item xs={6}>
                 <TextField
-                  label="Discount (%)"
+                  label="التخفيض (%)"
                   name="discount"
                   type="number"
                   value={newProduct.discount}
@@ -137,7 +138,7 @@ function NewProducts() {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  label="Description"
+                  label="الوصف"
                   name="description"
                   value={newProduct.description}
                   onChange={handleInputChange}
@@ -154,9 +155,9 @@ function NewProducts() {
             </Grid>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleDialogClose}>Cancel</Button>
+            <Button onClick={handleDialogClose}>الغاء</Button>
             <Button variant="contained" sx={{ color: "#ffffff" }} onClick={handleSubmit}>
-              Save
+              حفظ
             </Button>
           </DialogActions>
         </Dialog>

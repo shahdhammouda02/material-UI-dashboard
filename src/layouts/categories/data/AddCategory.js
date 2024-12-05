@@ -68,26 +68,27 @@ function AddCategory() {
         bgcolor="#fbfbfb"
         color="#000"
       >
-        <Typography variant="h5" mb={2}>
-          Add New Category
-        </Typography>
+        {/* <Typography variant="h5" mb={2}>
+          اضافة فئة جديدة
+        </Typography> */}
         <Button
           variant="contained"
-          startIcon={<AddIcon />}
+          // startIcon={<AddIcon />}
           onClick={handleDialogOpen}
-          sx={{ mb: 3, color: "#ffffff" }}
+          sx={{ mb: 3, color: "#ffffff", fontSize: "1rem" }}
         >
-          Add Category
+          اضافة فئة جديدة
+          <AddIcon />
         </Button>
 
         {/* Dialog for category input */}
         <Dialog open={isDialogOpen} onClose={handleDialogClose}>
-          <DialogTitle>Add New Category</DialogTitle>
+          <DialogTitle>اضافة فئة جديدة</DialogTitle>
           <DialogContent>
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
-                  label="Category Name"
+                  label="اسم الصنف"
                   name="categoryName"
                   value={newCategory.categoryName}
                   onChange={handleInputChange}
@@ -96,7 +97,7 @@ function AddCategory() {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  label="Description"
+                  label="الوصف"
                   name="description"
                   value={newCategory.description}
                   onChange={handleInputChange}
@@ -113,9 +114,9 @@ function AddCategory() {
             </Grid>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleDialogClose}>Cancel</Button>
+            <Button onClick={handleDialogClose}>الغاء</Button>
             <Button variant="contained" sx={{ color: "#ffffff" }} onClick={handleSubmit}>
-              Save
+              حفظ
             </Button>
           </DialogActions>
         </Dialog>

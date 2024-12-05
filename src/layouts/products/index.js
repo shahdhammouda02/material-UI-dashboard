@@ -55,7 +55,7 @@ function Products() {
                   coloredShadow="info"
                 >
                   <MDTypography variant="h6" color="white">
-                    Products Table
+                    جدول المنتجات
                   </MDTypography>
                 </MDBox>
                 <MDBox pt={3}>
