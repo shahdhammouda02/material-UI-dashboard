@@ -4,13 +4,15 @@ import MDBox from "components/MDBox"; // Correct path for custom component
 import MDIconButton from "@mui/material/IconButton"; // Material UI IconButton
 import EditIcon from "@mui/icons-material/Edit"; // Material UI EditIcon
 import DeleteIcon from "@mui/icons-material/Delete"; // Material UI DeleteIcon
+import { Select, MenuItem } from "@mui/material";
 
 import test from "../../../assets/images/bg-profile.jpeg"; // Sample image
 
 export default function TableData() {
   const [columns, setColumns] = useState([
-    { Header: "اسم الفئة", accessor: "categoryName", align: "left" },
+    { Header: "الفئة الاساسية", accessor: "categoryName", align: "left" },
     { Header: "الصنف", accessor: "description", align: "center" },
+    { Header: "الفئة الفرعية", accessor: "subCategory", align: "center" },
     { Header: "الاجراءات", accessor: "actions", align: "center" },
   ]);
 
@@ -18,10 +20,11 @@ export default function TableData() {
     {
       categoryName: "المنتجات الغذائية",
       description: "Foods and beverages",
-      image: (
-        <MDBox ml={-1}>
-          <img src={test} alt="المنتجات الغذائية" style={{ width: "100px", height: "100px" }} />
-        </MDBox>
+      subCategory: (
+        <Select defaultValue="Food-Drinks" displayEmpty variant="outlined" sx={{ minWidth: 120 }}>
+          <MenuItem value="Foods">المأكولات</MenuItem>
+          <MenuItem value="Drinks">المشروبات</MenuItem>
+        </Select>
       ),
       actions: (
         <MDBox display="flex" justifyContent="center" alignItems="center">
@@ -36,33 +39,8 @@ export default function TableData() {
       ),
     },
     {
-      categoryName: "الملابس",
-      description: "Clothing items",
-      image: (
-        <MDBox ml={-1}>
-          <img src={test} alt="الملابس" style={{ width: "100px", height: "100px" }} />
-        </MDBox>
-      ),
-      actions: (
-        <MDBox display="flex" justifyContent="center" alignItems="center">
-          <MDIconButton color="primary">
-            <EditIcon />
-          </MDIconButton>
-          <MDBox mx={1} />
-          <MDIconButton color="error">
-            <DeleteIcon />
-          </MDIconButton>
-        </MDBox>
-      ),
-    },
-    {
-      categoryName: "الاكسسوارات",
-      description: "Accessories",
-      image: (
-        <MDBox ml={-1}>
-          <img src={test} alt="الاكسسوارات" style={{ width: "100px", height: "100px" }} />
-        </MDBox>
-      ),
+      categoryName: " الملابس والاكسسوارات",
+      description: "Clothing and Accessories",
       actions: (
         <MDBox display="flex" justifyContent="center" alignItems="center">
           <MDIconButton color="primary">
@@ -78,11 +56,6 @@ export default function TableData() {
     {
       categoryName: "الحرف اليدوية",
       description: "Handicrafts",
-      image: (
-        <MDBox ml={-1}>
-          <img src={test} alt="الحرف اليدوية" style={{ width: "100px", height: "100px" }} />
-        </MDBox>
-      ),
       actions: (
         <MDBox display="flex" justifyContent="center" alignItems="center">
           <MDIconButton color="primary">
@@ -96,13 +69,8 @@ export default function TableData() {
       ),
     },
     {
-      categoryName: "الكتب",
+      categoryName: "الكتب والمطبوعات",
       description: "Books",
-      image: (
-        <MDBox ml={-1}>
-          <img src={test} alt="الكتب" style={{ width: "100px", height: "100px" }} />
-        </MDBox>
-      ),
       actions: (
         <MDBox display="flex" justifyContent="center" alignItems="center">
           <MDIconButton color="primary">

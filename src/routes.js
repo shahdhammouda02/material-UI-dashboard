@@ -55,6 +55,8 @@ import NewProducts from "layouts/products/data/adding";
 // @mui icons
 import Icon from "@mui/material/Icon";
 import Categories from "layouts/categories";
+import BasicLayout from "layouts/authentication/components/BasicLayout";
+import CoverLayout from "layouts/authentication/components/CoverLayout";
 
 const routes = [
   {

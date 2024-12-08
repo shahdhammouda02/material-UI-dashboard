@@ -56,6 +56,7 @@ function Categories() {
                         <tr key={index}>
                           <CategoryBodyCell align="left">{row.categoryName}</CategoryBodyCell>
                           <CategoryBodyCell align="center">{row.description}</CategoryBodyCell>
+                          <CategoryBodyCell align="center">{row.subCategory}</CategoryBodyCell>
                           <CategoryBodyCell align="center">{row.actions}</CategoryBodyCell>
                         </tr>
                       ))}

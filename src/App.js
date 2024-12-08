@@ -1,5 +1,3 @@
-import { useTranslation } from "react-i18next";
-
 /**
 =========================================================
 * Material Dashboard 2 React - v2.2.0
