@@ -50,6 +50,7 @@ import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "co
 // Images
 import brandWhite from "assets/images/logo-ct.png";
 import brandDark from "assets/images/logo-ct-dark.png";
+import ZaytonaLogo from "assets/images/Artboard 1 copy.png";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -152,8 +153,9 @@ export default function App() {
           <>
             <Sidenav
               color={sidenavColor}
-              brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
-              brandName="زيتونة"
+              brand={ZaytonaLogo}
+              // brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
+              // brandName="زيتونة"
               routes={routes}
               onMouseEnter={handleOnMouseEnter}
               onMouseLeave={handleOnMouseLeave}

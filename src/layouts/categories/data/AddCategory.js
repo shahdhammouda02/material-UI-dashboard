@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   TextField,
   Button,
@@ -14,9 +14,9 @@ import AddIcon from "@mui/icons-material/Add";
 
 function AddCategory() {
   const [newCategory, setNewCategory] = useState({
+    id: "",
     categoryName: "",
     description: "",
-    image: "",
   });
 
   const [error, setError] = useState("");
@@ -29,15 +29,29 @@ function AddCategory() {
       [name]: value,
     }));
   };
+  const generateUniqueID = () => {
+    const timestamp = Date.now().toString();
+    const randomPart = Math.floor(Math.random() * 10000)
+      .toString()
+      .padStart(4, "0");
+    return `cat-${timestamp}-${randomPart}`;
+  };
 
   const handleSubmit = () => {
     if (!newCategory.categoryName || !newCategory.description) {
       setError("Please fill in all fields correctly.");
       return;
     }
+
+    const newCategoryWithID = {
+      id: generateUniqueID(), // Generate ID here
+      ...newCategory,
+    };
+
     setError("");
-    console.log("Category added successfully:", newCategory);
+    console.log("Category added successfully:", newCategoryWithID);
     setIsDialogOpen(false);
+    setNewCategory({ categoryName: "", description: "" });
   };
 
   const handleDialogOpen = () => {
@@ -46,6 +60,7 @@ function AddCategory() {
 
   const handleDialogClose = () => {
     setIsDialogOpen(false);
+    setNewCategory({ id: "", categoryName: "", description: "" });
   };
 
   return (
@@ -68,9 +83,6 @@ function AddCategory() {
         bgcolor="#fbfbfb"
         color="#000"
       >
-        {/* <Typography variant="h5" mb={2}>
-          اضافة فئة جديدة
-        </Typography> */}
         <Button
           variant="contained"
           // startIcon={<AddIcon />}
@@ -86,6 +98,9 @@ function AddCategory() {
           <DialogTitle>اضافة فئة جديدة</DialogTitle>
           <DialogContent>
             <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField disabled label="الرقم التعريفي" value={newCategory.id} fullWidth />
+              </Grid>
               <Grid item xs={12}>
                 <TextField
                   label="اسم الصنف"
@@ -116,7 +131,7 @@ function AddCategory() {
           <DialogActions>
             <Button onClick={handleDialogClose}>الغاء</Button>
             <Button variant="contained" sx={{ color: "#ffffff" }} onClick={handleSubmit}>
-              حفظ
+              إضافة
             </Button>
           </DialogActions>
         </Dialog>
