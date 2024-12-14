@@ -11,12 +11,12 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import AddCategory from "./data/AddCategory"; // Import the NewCategory component
-import TableData from "./data/TableData"; // Import the TableData function
+import TablesubData from "./data/TablesubData"; // Import the TablesubData function
 import CategoryBodyCell from "examples/Categories/CategoriesData/CategoryBodyCell"; // Import CategoryBodyCell
 import CategoryHeadCell from "examples/Categories/CategoriesData/CategoryHeadCell"; // Import CategoryHeadCell
 
-function Categories() {
-  const { columns, rows } = TableData(); // Fetch category data
+function SubCategories() {
+  const { columns, rows } = TablesubData(); // Fetch category data
 
   return (
     <div>
@@ -54,10 +54,11 @@ function Categories() {
                     <tbody>
                       {rows.map((row, index) => (
                         <tr key={index}>
-                          <CategoryBodyCell align="left">{row.id}</CategoryBodyCell>
-                          <CategoryBodyCell align="left">{row.categoryName}</CategoryBodyCell>
-                          <CategoryBodyCell align="center">{row.description}</CategoryBodyCell>
-                          <CategoryBodyCell align="center">{row.actions}</CategoryBodyCell>
+                          <CategoryBodyCell align="left">{row.author}</CategoryBodyCell>
+                          <CategoryBodyCell align="center">{row.Category}</CategoryBodyCell>
+                          <CategoryBodyCell align="center">{row.text}</CategoryBodyCell>
+                          <CategoryBodyCell align="center">{row.mainCategory}</CategoryBodyCell>
+                          <CategoryBodyCell align="center">{row.Actions}</CategoryBodyCell>
                         </tr>
                       ))}
                     </tbody>
@@ -74,4 +75,4 @@ function Categories() {
   );
 }
 
-export default Categories;
+export default SubCategories;

@@ -8,7 +8,7 @@
 
 Coded by www.creative-tim.com
 
- =========================================================
+=========================================================
 
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
@@ -34,14 +34,14 @@ Coded by www.creative-tim.com
   10. The `title` key is only for the item with the type of `title` and its used for the title text on the Sidenav.
   10. The `component` key is used to store the component of its route.
 */
+
 // @mui icons
 import DeliveryDiningIcon from "@mui/icons-material/DeliveryDining";
-
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import CategoryIcon from "@mui/icons-material/Category";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
-// Material Dashboard 2 React layouts
 
+// Material Dashboard 2 React layouts
 import Dashboard from "layouts/dashboard";
 import Products from "layouts/products";
 import Billing from "layouts/billing";
@@ -54,22 +54,22 @@ import NewProducts from "layouts/products/data/adding";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
-import Categories from "layouts/categories";
+import MainCategories from "layouts/categories/main-category";
+import SubCategories from "layouts/categories/sub-category";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import CoverLayout from "layouts/authentication/components/CoverLayout";
 
 const routes = [
   {
-    type: "collapse",
-    name: "لوحة التحكم",
     key: "dashboard",
-    icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
     component: <Dashboard />,
+    name: "Dashboard",
+    icon: "dashboard",
   },
   {
     type: "collapse",
-    name: "المنتجات",
+    name: "المنتجات", // "Products" in Arabic
     key: "products",
     icon: <ShoppingCartIcon fontSize="small" />,
     route: "/products",
@@ -77,15 +77,29 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "التصنيفات",
+    name: "التصنيفات", // "Categories" in Arabic
     key: "categories",
     icon: <CategoryIcon fontSize="small" />,
-    route: "/categories",
-    component: <Categories />,
+    collapse: [
+      {
+        type: "collapse",
+        name: "التصنيفات الاساسية", // "Main Categories" in Arabic
+        key: "MAINcategories",
+        route: "/categories/main-category",
+        component: <MainCategories />,
+      },
+      {
+        type: "collapse",
+        name: "التصنيفات الثانوية", // "Sub Categories" in Arabic
+        key: "subcategories",
+        route: "/categories/sub-category",
+        component: <SubCategories />,
+      },
+    ],
   },
   {
     type: "collapse",
-    name: "الطلبات",
+    name: "الطلبات", // "Orders" in Arabic
     key: "order",
     icon: <ShoppingBagIcon fontSize="small" />,
     route: "/profile",
@@ -93,7 +107,7 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "التوصيل",
+    name: "التوصيل", // "Delivery" in Arabic
     key: "delivery",
     icon: <DeliveryDiningIcon fontSize="small" />,
     route: "/billing",
@@ -101,16 +115,15 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "تسجيل دخول",
+    name: "تسجيل دخول", // "Sign In" in Arabic
     key: "sign-in",
     icon: <Icon fontSize="small">login</Icon>,
     route: "/authentication/sign-in",
     component: <SignIn />,
   },
-
   {
     type: "collapse",
-    name: "إنشاء حساب جديد",
+    name: "إنشاء حساب جديد", // "Sign Up" in Arabic
     key: "sign-up",
     icon: <Icon fontSize="small">assignment</Icon>,
     route: "/authentication/sign-up",
