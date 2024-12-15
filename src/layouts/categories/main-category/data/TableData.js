@@ -5,13 +5,13 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useNavigate } from "react-router-dom";
 
-export default function TableData() {
+export default function TableData(handleEdit) {
   const navigate = useNavigate();
 
   // Edit button handler
-  const handleEdit = (id) => {
+  const handleEditClick = (id) => {
     console.log(`Editing category with ID: ${id}`);
-    navigate(`/UpdateCategory/${id}`);
+    handleEdit(id); // Call the passed handleEdit function
   };
 
   const [columns] = useState([
@@ -49,7 +49,7 @@ export default function TableData() {
       ...row,
       actions: (
         <MDBox display="flex" justifyContent="center" alignItems="center">
-          <MDIconButton color="primary" onClick={() => handleEdit(index + 1)}>
+          <MDIconButton color="primary" onClick={() => handleEditClick(index + 1)}>
             <EditIcon />
           </MDIconButton>
           <MDBox mx={1} />

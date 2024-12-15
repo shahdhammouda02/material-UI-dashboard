@@ -64,7 +64,7 @@ const routes = [
     key: "dashboard",
     route: "/dashboard",
     component: <Dashboard />,
-    name: "Dashboard",
+    name: "لوحة التحكم",
     icon: "dashboard",
   },
   {

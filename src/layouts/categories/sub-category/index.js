@@ -64,7 +64,7 @@ function SubCategories() {
                     </tbody>
                   </table>
                 </MDBox>
-                <AddCategory /> {/* Render the NewCategory component */}
+                <AddCategory />
               </Card>
             </Grid>
           </Grid>
