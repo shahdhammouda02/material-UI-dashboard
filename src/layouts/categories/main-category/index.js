@@ -1,46 +1,68 @@
-// @mui material components
+import React, { useState, useEffect } from "react";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
-
-// Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
-
-// Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import AddCategory from "./data/AddCategory"; // Import the NewCategory component
-import TableData from "./data/TableData"; // Import the TableData function
-import CategoryBodyCell from "examples/Categories/CategoriesData/CategoryBodyCell"; // Import CategoryBodyCell
-import CategoryHeadCell from "examples/Categories/CategoriesData/CategoryHeadCell"; // Import CategoryHeadCell
+import AddCategory from "./data/AddCategory";
+import TableData from "./data/TableData";
+import UpdateCategory from "./data/UpdateCategory"; // Import UpdateCategory
+import CategoryBodyCell from "examples/Categories/CategoriesData/CategoryBodyCell";
+import CategoryHeadCell from "examples/Categories/CategoriesData/CategoryHeadCell";
 
 function MainCategories() {
-  const { columns, rows } = TableData(); // Fetch category data
+  const [editingId, setEditingId] = useState(null); // State to track the editing ID
+  const [categoryRows, setCategoryRows] = useState([]);
+
+  const handleEdit = (id) => {
+    setEditingId(id); // Set the ID to edit
+  };
+
+  const handleUpdate = (updatedCategory) => {
+    setCategoryRows((prevRows) =>
+      prevRows.map((row) => (row.id === updatedCategory.id ? updatedCategory : row))
+    );
+    setEditingId(null); // Close the edit dialog
+  };
+
+  const { columns, rows } = TableData(handleEdit); // Pass the handleEdit function
+
+  // Update categoryRows with the rows from TableData
+  useEffect(() => {
+    setCategoryRows(rows); // Set initial rows from TableData
+  }, [rows]);
 
   return (
-    <div>
-      <DashboardLayout>
-        <DashboardNavbar />
-        <MDBox pt={6} pb={3}>
-          <Grid container spacing={6}>
-            <Grid item xs={12}>
-              <Card>
-                <MDBox
-                  mx={2}
-                  mt={-3}
-                  py={3}
-                  px={2}
-                  variant="gradient"
-                  bgColor="info"
-                  borderRadius="lg"
-                  coloredShadow="info"
-                >
-                  <MDTypography variant="h6" color="white">
-                    جدول الفئات
-                  </MDTypography>
-                </MDBox>
-                <MDBox pt={3}>
+    <DashboardLayout>
+      <DashboardNavbar />
+      <MDBox pt={6} pb={3}>
+        <Grid container spacing={6}>
+          <Grid item xs={12}>
+            <Card>
+              <MDBox
+                mx={2}
+                mt={-3}
+                py={3}
+                px={2}
+                variant="gradient"
+                bgColor="info"
+                borderRadius="lg"
+                coloredShadow="info"
+              >
+                <MDTypography variant="h6" color="white">
+                  جدول الفئات
+                </MDTypography>
+              </MDBox>
+              <MDBox pt={3}>
+                {editingId ? (
+                  <UpdateCategory
+                    initialRows={categoryRows}
+                    categoryId={editingId}
+                    onUpdate={handleUpdate}
+                  />
+                ) : (
                   <table style={{ width: "100%" }}>
                     <thead>
                       <tr>
@@ -52,7 +74,7 @@ function MainCategories() {
                       </tr>
                     </thead>
                     <tbody>
-                      {rows.map((row, index) => (
+                      {categoryRows.map((row, index) => (
                         <tr key={index}>
                           <CategoryBodyCell align="left">{row.id}</CategoryBodyCell>
                           <CategoryBodyCell align="left">{row.categoryName}</CategoryBodyCell>
@@ -62,15 +84,15 @@ function MainCategories() {
                       ))}
                     </tbody>
                   </table>
-                </MDBox>
-                <AddCategory /> {/* Render the NewCategory component */}
-              </Card>
-            </Grid>
+                )}
+              </MDBox>
+              <AddCategory initialRows={categoryRows} />
+            </Card>
           </Grid>
-        </MDBox>
-        <Footer />
-      </DashboardLayout>
-    </div>
+        </Grid>
+      </MDBox>
+      <Footer />
+    </DashboardLayout>
   );
 }
 

@@ -11,67 +11,48 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
+import SaveIcon from "@mui/icons-material/Save";
 
-function AddCategory({ initialRows }) {
-  const [newCategory, setNewCategory] = useState({
-    id: "", // Start with null to indicate no ID is set
+function UpdateCategory({ initialRows, categoryId, onUpdate }) {
+  const [category, setCategory] = useState({
+    id: categoryId,
     categoryName: "",
     description: "",
   });
 
   const [error, setError] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(true); // Open dialog by default
 
   useEffect(() => {
-    // Set the initial ID based on existing data
-    const highestExistingId =
-      initialRows.length > 0 ? Math.max(...initialRows.map((row) => row.id)) : 0;
-    setNewCategory((prevCategory) => ({
-      ...prevCategory,
-      id: highestExistingId + 1, // Set ID to highest existing ID + 1
-    }));
-  }, [initialRows]); // Update ID when initialRows changes
+    const existingCategory = initialRows.find((row) => row.id === categoryId);
+    if (existingCategory) {
+      setCategory(existingCategory); // Update state with existing category data
+    } else {
+      console.error(`Category with ID ${categoryId} not found`);
+    }
+  }, [initialRows, categoryId]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewCategory((prevCategory) => ({
+    setCategory((prevCategory) => ({
       ...prevCategory,
       [name]: value,
     }));
   };
 
   const handleSubmit = () => {
-    if (!newCategory.categoryName || !newCategory.description) {
+    if (!category.categoryName || !category.description) {
       setError("Please fill in all fields correctly.");
       return;
     }
 
-    const newCategoryWithID = {
-      id: newCategory.id, // Use the incremented ID
-      categoryName: newCategory.categoryName,
-      description: newCategory.description,
-    };
-
     setError("");
-    console.log("Category added successfully:", newCategoryWithID);
-    setIsDialogOpen(false);
-
-    // Reset the form for the next entry
-    setNewCategory((prevCategory) => ({
-      id: prevCategory.id + 1, // Increment ID for next entry
-      categoryName: "",
-      description: "",
-    }));
-  };
-
-  const handleDialogOpen = () => {
-    setIsDialogOpen(true);
+    onUpdate(category); // Call the update function passed as a prop
+    setIsDialogOpen(false); // Close the dialog
   };
 
   const handleDialogClose = () => {
     setIsDialogOpen(false);
-    setNewCategory({ id: null, categoryName: "", description: "" }); // Reset ID to null
   };
 
   return (
@@ -81,7 +62,6 @@ function AddCategory({ initialRows }) {
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: "#eaeaea",
-        borderTop: "2px solid rgb(240 242 243)",
       }}
     >
       <Box
@@ -92,27 +72,16 @@ function AddCategory({ initialRows }) {
         alignItems="center"
         p={3}
         bgcolor="#fbfbfb"
-        color="#000"
       >
-        <Button
-          variant="contained"
-          onClick={handleDialogOpen}
-          sx={{ mb: 3, color: "#ffffff", fontSize: "1rem" }}
-        >
-          اضافة فئة جديدة
-          <AddIcon />
-        </Button>
-
-        {/* Dialog for category input */}
         <Dialog open={isDialogOpen} onClose={handleDialogClose}>
-          <DialogTitle>اضافة فئة جديدة</DialogTitle>
+          <DialogTitle>تحديث الفئة</DialogTitle>
           <DialogContent>
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
                   disabled
                   label="الرقم التعريفي"
-                  value={newCategory.id} // Display existing or generated ID
+                  value={category.id} // Display existing ID
                   fullWidth
                 />
               </Grid>
@@ -120,7 +89,7 @@ function AddCategory({ initialRows }) {
                 <TextField
                   label="اسم الصنف"
                   name="categoryName"
-                  value={newCategory.categoryName}
+                  value={category.categoryName} // Set existing category name
                   onChange={handleInputChange}
                   fullWidth
                 />
@@ -129,7 +98,7 @@ function AddCategory({ initialRows }) {
                 <TextField
                   label="الوصف"
                   name="description"
-                  value={newCategory.description}
+                  value={category.description} // Set existing description
                   onChange={handleInputChange}
                   fullWidth
                   multiline
@@ -146,7 +115,7 @@ function AddCategory({ initialRows }) {
           <DialogActions>
             <Button onClick={handleDialogClose}>الغاء</Button>
             <Button variant="contained" sx={{ color: "#ffffff" }} onClick={handleSubmit}>
-              إضافة
+              حفظ <SaveIcon />
             </Button>
           </DialogActions>
         </Dialog>
@@ -155,17 +124,16 @@ function AddCategory({ initialRows }) {
   );
 }
 
-AddCategory.propTypes = {
+UpdateCategory.propTypes = {
   initialRows: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
-      // ... other properties of your row object
+      categoryName: PropTypes.string.isRequired,
+      description: PropTypes.string.isRequired,
     })
-  ),
+  ).isRequired,
+  categoryId: PropTypes.number.isRequired,
+  onUpdate: PropTypes.func.isRequired, // Function to call when updating
 };
 
-AddCategory.defaultProps = {
-  initialRows: [],
-};
-
-export default AddCategory;
+export default UpdateCategory;

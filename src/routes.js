@@ -45,9 +45,8 @@ import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import Dashboard from "layouts/dashboard";
 import Products from "layouts/products";
 import Billing from "layouts/billing";
-import RTL from "layouts/rtl";
 import Notifications from "layouts/notifications";
-import Profile from "layouts/profile";
+import Order from "layouts/order";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import NewProducts from "layouts/products/data/adding";
@@ -64,7 +63,7 @@ const routes = [
     key: "dashboard",
     route: "/dashboard",
     component: <Dashboard />,
-    name: "Dashboard",
+    name: "لوحة التحكم",
     icon: "dashboard",
   },
   {
@@ -102,8 +101,8 @@ const routes = [
     name: "الطلبات", // "Orders" in Arabic
     key: "order",
     icon: <ShoppingBagIcon fontSize="small" />,
-    route: "/profile",
-    component: <Profile />,
+    route: "/order",
+    component: <Order />,
   },
   {
     type: "collapse",

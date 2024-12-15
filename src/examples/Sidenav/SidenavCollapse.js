@@ -17,6 +17,7 @@ import {
   collapseIcon,
   collapseText,
 } from "examples/Sidenav/styles/sidenavCollapse";
+import { colors } from "@mui/material";
 
 function SidenavCollapse({ icon, name, active, collapse, onClick, noCollapse, ...rest }) {
   const [openCollapse, setOpenCollapse] = useState(false); // حالة التحكم في الفتح والإغلاق
@@ -41,7 +42,14 @@ function SidenavCollapse({ icon, name, active, collapse, onClick, noCollapse, ..
       >
         <ListItemIcon sx={(theme) => collapseIconBox(theme, { active })}>
           {typeof icon === "string" ? (
-            <Icon sx={(theme) => collapseIcon(theme, { active })}>{icon}</Icon>
+            <Icon
+              sx={(theme) => ({
+                ...collapseIcon(theme, { active }), // استخدام دالة collapseIcon
+                color: "white !important", // تعيين اللون الأبيض مع تحديد أولوية باستخدام !important
+              })}
+            >
+              {icon}
+            </Icon>
           ) : (
             icon
           )}
