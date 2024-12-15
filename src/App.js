@@ -109,16 +109,20 @@ export default function App() {
   }, [pathname]);
 
   const getRoutes = (allRoutes) =>
-    allRoutes.map((route) => {
+    allRoutes.flatMap((route) => {
       if (route.collapse) {
-        return getRoutes(route.collapse);
+        // إذا كانت هناك عناصر فرعية
+        return route.collapse.map((subRoute) => (
+          <Route exact path={subRoute.route} element={subRoute.component} key={subRoute.key} />
+        ));
       }
 
       if (route.route) {
+        // إذا كانت رابطًا عاديًا
         return <Route exact path={route.route} element={route.component} key={route.key} />;
       }
 
-      return null;
+      return []; // إذا لم يكن هناك رابط أو عناصر فرعية
     });
 
   const configsButton = (

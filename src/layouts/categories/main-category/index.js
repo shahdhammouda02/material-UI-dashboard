@@ -11,7 +11,7 @@ import TableData from "./data/TableData";
 import CategoryBodyCell from "examples/Categories/CategoriesData/CategoryBodyCell";
 import CategoryHeadCell from "examples/Categories/CategoriesData/CategoryHeadCell";
 
-function Categories() {
+function MainCategories() {
   const { columns, rows } = TableData(); // Fetch category data
 
   return (
@@ -68,4 +68,4 @@ function Categories() {
   );
 }
 
-export default Categories;
+export default MainCategories;
