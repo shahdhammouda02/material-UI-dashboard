@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
@@ -28,6 +28,11 @@ function MainCategories() {
   };
 
   const { columns, rows } = TableData(handleEdit); // Pass the handleEdit function
+
+  // Update categoryRows with the rows from TableData
+  useEffect(() => {
+    setCategoryRows(rows); // Set initial rows from TableData
+  }, [rows]);
 
   return (
     <DashboardLayout>
@@ -69,7 +74,7 @@ function MainCategories() {
                       </tr>
                     </thead>
                     <tbody>
-                      {rows.map((row, index) => (
+                      {categoryRows.map((row, index) => (
                         <tr key={index}>
                           <CategoryBodyCell align="left">{row.id}</CategoryBodyCell>
                           <CategoryBodyCell align="left">{row.categoryName}</CategoryBodyCell>

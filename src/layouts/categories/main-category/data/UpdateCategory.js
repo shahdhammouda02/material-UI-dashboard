@@ -24,10 +24,11 @@ function UpdateCategory({ initialRows, categoryId, onUpdate }) {
   const [isDialogOpen, setIsDialogOpen] = useState(true); // Open dialog by default
 
   useEffect(() => {
-    // Find the category to update based on the provided ID
     const existingCategory = initialRows.find((row) => row.id === categoryId);
     if (existingCategory) {
-      setCategory(existingCategory); // Set the category state to the existing category
+      setCategory(existingCategory); // Update state with existing category data
+    } else {
+      console.error(`Category with ID ${categoryId} not found`);
     }
   }, [initialRows, categoryId]);
 
