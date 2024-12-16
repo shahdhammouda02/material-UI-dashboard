@@ -14,6 +14,11 @@ export default function TableData(handleEdit) {
     handleEdit(id); // Call the passed handleEdit function
   };
 
+  const handleDeleteClick = (id) => {
+    setInitialRows((prevRows) => prevRows.filter((_, index) => index + 1 !== id));
+    console.log(`Deleted category with ID: ${id}`);
+  };
+
   const [columns] = useState([
     { Header: "الرقم التعريفي", accessor: "id", align: "left" },
     { Header: "الفئة الاساسية", accessor: "categoryName", align: "left" },
@@ -21,7 +26,7 @@ export default function TableData(handleEdit) {
     { Header: "الاجراءات", accessor: "actions", align: "center" },
   ]);
 
-  const [initialRows] = useState([
+  const [initialRows, setInitialRows] = useState([
     {
       categoryName: "المنتجات الغذائية",
       description:
@@ -53,7 +58,7 @@ export default function TableData(handleEdit) {
             <EditIcon />
           </MDIconButton>
           <MDBox mx={1} />
-          <MDIconButton color="error">
+          <MDIconButton color="error" onClick={() => handleDeleteClick(index + 1)}>
             <DeleteIcon />
           </MDIconButton>
         </MDBox>

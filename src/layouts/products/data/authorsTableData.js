@@ -24,7 +24,6 @@ export default function data() {
     { Header: "الصورة", accessor: "images", align: "center" },
     { Header: "السعر", accessor: "price", align: "center" },
     { Header: "الخصم", accessor: "Discount", align: "center" },
-    { Header: "الوصف", accessor: "text", align: "center" },
     { Header: "الإجراءات", accessor: "Actions", align: "center" },
   ]);
 
@@ -39,7 +38,6 @@ export default function data() {
       ),
       price: "$50",
       Discount: "10%",
-      text: "Foods and beverages",
       Actions: (
         <MDBox display="flex" justifyContent="center" alignItems="center">
           <MDIconButton color="primary">
@@ -62,7 +60,6 @@ export default function data() {
       ),
       price: "$50",
       Discount: "10%",
-      text: "Clothing items and Accessories",
       Actions: (
         <MDBox display="flex" justifyContent="center" alignItems="center">
           <MDIconButton color="primary">
@@ -85,7 +82,6 @@ export default function data() {
       ),
       price: "$50",
       Discount: "10%",
-      text: "Handicrafts",
       Actions: (
         <MDBox display="flex" justifyContent="center" alignItems="center">
           <MDIconButton color="primary">
@@ -98,12 +94,9 @@ export default function data() {
         </MDBox>
       ),
     },
-    // Add other products here...
   ]);
   return {
-    columns, // Ensure columns is correctly set here
+    columns,
     rows,
-    // Ensure rows is correctly set here
-    // other states and functions
   };
 }
