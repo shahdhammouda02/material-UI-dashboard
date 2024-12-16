@@ -10,7 +10,10 @@ export default function TableData(handleEdit) {
 
   // Edit button handler
   const handleEditClick = (id) => {
+<<<<<<< HEAD
+=======
     console.log(`Editing category with ID: ${id}`);
+>>>>>>> d4156e5a1e565af72db920bc1bc6bebad331441d
     handleEdit(id); // Call the passed handleEdit function
   };
 

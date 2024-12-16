@@ -8,6 +8,10 @@ import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import Dashboard from "layouts/dashboard";
 import Products from "layouts/products";
 import Billing from "layouts/billing";
+<<<<<<< HEAD
+=======
+import Notifications from "layouts/notifications";
+>>>>>>> 3f912fd042bc052f7a9c72e8b8a4022a7d245608
 import Order from "layouts/order";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
@@ -60,7 +64,11 @@ const routes = [
     name: "الطلبات",
     key: "order",
     icon: <ShoppingBagIcon fontSize="small" />,
+<<<<<<< HEAD
     route: "/orders",
+=======
+    route: "/order",
+>>>>>>> 3f912fd042bc052f7a9c72e8b8a4022a7d245608
     component: <Order />,
   },
   {

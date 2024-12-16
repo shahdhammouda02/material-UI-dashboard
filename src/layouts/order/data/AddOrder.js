@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+=======
+import React, { useState } from "react";
+>>>>>>> 3f912fd042bc052f7a9c72e8b8a4022a7d245608
 import {
   TextField,
   Button,
@@ -10,12 +14,25 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+<<<<<<< HEAD
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
 function AddOrder({ initialRows }) {
   const [newOrder, setNewOrder] = useState({
     id: "", // Start with null to indicate no ID is set
+=======
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+
+function AddOrder() {
+  const [newOrder, setNewOrder] = useState({
+    orderId: "",
+>>>>>>> 3f912fd042bc052f7a9c72e8b8a4022a7d245608
     customerName: "",
     product: "",
     productNumber: "",
@@ -27,6 +44,7 @@ function AddOrder({ initialRows }) {
   const [error, setError] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+<<<<<<< HEAD
   useEffect(() => {
     // Set the initial ID based on existing data
     const highestExistingId =
@@ -37,6 +55,8 @@ function AddOrder({ initialRows }) {
     }));
   }, [initialRows]); // Update ID when initialRows changes
 
+=======
+>>>>>>> 3f912fd042bc052f7a9c72e8b8a4022a7d245608
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewOrder((prevOrder) => ({
@@ -45,6 +65,17 @@ function AddOrder({ initialRows }) {
     }));
   };
 
+<<<<<<< HEAD
+=======
+  const generateUniqueOrderID = () => {
+    const timestamp = Date.now().toString();
+    const randomPart = Math.floor(Math.random() * 10000)
+      .toString()
+      .padStart(4, "0");
+    return `order-${timestamp}-${randomPart}`;
+  };
+
+>>>>>>> 3f912fd042bc052f7a9c72e8b8a4022a7d245608
   const handleSubmit = () => {
     if (
       !newOrder.customerName ||
@@ -59,6 +90,7 @@ function AddOrder({ initialRows }) {
     }
 
     const newOrderWithID = {
+<<<<<<< HEAD
       id: newOrder.id, // Use the incremented ID
       customerName: newOrder.customerName,
       product: newOrder.product,
@@ -66,22 +98,34 @@ function AddOrder({ initialRows }) {
       quantity: newOrder.quantity,
       totalAmount: newOrder.totalAmount,
       status: newOrder.status,
+=======
+      orderId: generateUniqueOrderID(), // Generate Order ID
+      ...newOrder,
+>>>>>>> 3f912fd042bc052f7a9c72e8b8a4022a7d245608
     };
 
     setError("");
     console.log("Order added successfully:", newOrderWithID);
     setIsDialogOpen(false);
+<<<<<<< HEAD
 
     // Reset the form for the next entry
     setNewOrder((prevOrder) => ({
       id: prevOrder.id + 1, // Increment ID for next entry
+=======
+    setNewOrder({
+>>>>>>> 3f912fd042bc052f7a9c72e8b8a4022a7d245608
       customerName: "",
       product: "",
       productNumber: "",
       quantity: "",
       totalAmount: "",
       status: "",
+<<<<<<< HEAD
     }));
+=======
+    });
+>>>>>>> 3f912fd042bc052f7a9c72e8b8a4022a7d245608
   };
 
   const handleDialogOpen = () => {
@@ -91,14 +135,22 @@ function AddOrder({ initialRows }) {
   const handleDialogClose = () => {
     setIsDialogOpen(false);
     setNewOrder({
+<<<<<<< HEAD
       id: null,
+=======
+      orderId: "",
+>>>>>>> 3f912fd042bc052f7a9c72e8b8a4022a7d245608
       customerName: "",
       product: "",
       productNumber: "",
       quantity: "",
       totalAmount: "",
       status: "",
+<<<<<<< HEAD
     }); // Reset ID to null
+=======
+    });
+>>>>>>> 3f912fd042bc052f7a9c72e8b8a4022a7d245608
   };
 
   return (
@@ -136,12 +188,16 @@ function AddOrder({ initialRows }) {
           <DialogContent>
             <Grid container spacing={2}>
               <Grid item xs={12}>
+<<<<<<< HEAD
                 <TextField
                   disabled
                   label="الرقم التعريفي"
                   value={newOrder.id} // Display existing or generated ID
                   fullWidth
                 />
+=======
+                <TextField disabled label="الرقم التعريفي" value={newOrder.orderId} fullWidth />
+>>>>>>> 3f912fd042bc052f7a9c72e8b8a4022a7d245608
               </Grid>
               <Grid item xs={12}>
                 <TextField
@@ -190,6 +246,7 @@ function AddOrder({ initialRows }) {
                 />
               </Grid>
               <Grid item xs={12}>
+<<<<<<< HEAD
                 <TextField
                   label="الحالة"
                   name="status"
@@ -197,6 +254,26 @@ function AddOrder({ initialRows }) {
                   onChange={handleInputChange}
                   fullWidth
                 />
+=======
+                <FormControl fullWidth>
+                  <Select
+                    name="status"
+                    value={newOrder.status}
+                    onChange={handleInputChange}
+                    fullWidth
+                    displayEmpty
+                    sx={{ minWidth: 200 }}
+                  >
+                    <MenuItem value="" disabled>
+                      اختر الحالة
+                    </MenuItem>
+                    <MenuItem value="pending">قيد الانتظار</MenuItem>
+                    <MenuItem value="completed">مكتمل</MenuItem>
+                    <MenuItem value="shipped">تم الشحن</MenuItem>
+                    <MenuItem value="canceled">ملغى</MenuItem>
+                  </Select>
+                </FormControl>
+>>>>>>> 3f912fd042bc052f7a9c72e8b8a4022a7d245608
               </Grid>
               {error && (
                 <Grid item xs={12}>
@@ -217,6 +294,7 @@ function AddOrder({ initialRows }) {
   );
 }
 
+<<<<<<< HEAD
 AddOrder.propTypes = {
   initialRows: PropTypes.arrayOf(
     PropTypes.shape({
@@ -230,4 +308,6 @@ AddOrder.defaultProps = {
   initialRows: [],
 };
 
+=======
+>>>>>>> 3f912fd042bc052f7a9c72e8b8a4022a7d245608
 export default AddOrder;

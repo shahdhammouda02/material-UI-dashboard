@@ -26,12 +26,13 @@ import {
 
 function Sidenav({ color, brand, routes, ...rest }) {
   const [controller, dispatch] = useMaterialUIController();
-  const { miniSidenav, transparentSidenav, whiteSidenav, darkMode, sidenavColor } = controller;
+  const { miniSidenav, transparentSidenav, whiteSidenav, darkMode } = controller;
   const location = useLocation();
   const collapseName = location.pathname.replace("/", "");
 
   // State to manage open/close of collapsible categories
   const [openCollapse, setOpenCollapse] = useState({});
+  const [selectedRoute, setSelectedRoute] = useState(location.pathname); // Track selected route
 
   useEffect(() => {
     const initialCollapseState = routes.reduce((acc, route) => {
@@ -52,13 +53,13 @@ function Sidenav({ color, brand, routes, ...rest }) {
   // Determine text color based on sidenav state
   let textColor = "white";
   if (transparentSidenav) {
-    textColor = "dark"; // Transparent sidenav, dark text
+    textColor = "dark";
   } else if (whiteSidenav && !darkMode) {
-    textColor = "dark"; // White sidenav with light mode, dark text
+    textColor = "dark";
   } else if (whiteSidenav && darkMode) {
-    textColor = "inherit"; // White sidenav with dark mode, inherit text color
+    textColor = "inherit";
   } else if (darkMode) {
-    textColor = "white"; // Dark mode, white text
+    textColor = "white";
   }
 
   // Close sidenav function
@@ -73,14 +74,22 @@ function Sidenav({ color, brand, routes, ...rest }) {
       setWhiteSidenav(dispatch, !isSmallScreen && whiteSidenav);
     };
 
-    handleResize(); // Initial check
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, [dispatch, transparentSidenav, whiteSidenav]);
 
+  // Handle route selection
+  const handleRouteSelect = (route) => {
+    setSelectedRoute(route);
+  };
+
   // Render navigation routes
   const renderRoutes = (routes) =>
     routes.map((route) => {
+      const isSelected = selectedRoute === route.route;
+      const routeColor = isSelected ? "green" : "transparent";
+
       if (route.collapse) {
         return (
           <div key={route.key}>
@@ -88,27 +97,63 @@ function Sidenav({ color, brand, routes, ...rest }) {
               display="flex"
               alignItems="center"
               onClick={() => handleCollapseToggle(route.key)}
-              sx={{ cursor: "pointer", padding: "8px 16px" }}
+              sx={{
+                cursor: "pointer",
+                padding: "8px 16px",
+                backgroundColor: routeColor,
+                borderRadius: "4px",
+              }}
               aria-expanded={openCollapse[route.key]}
               aria-controls={`collapse-${route.key}`}
             >
-              {route.icon && <Icon sx={{ color: "white !important" }}>{route.icon}</Icon>}
-              <MDTypography variant="body1" color={textColor} ml={2} sx={{ color: textColor }}>
+              {route.icon && (
+                <Icon
+                  sx={{
+                    color: isSelected ? "white !important" : textColor,
+                    marginRight: "8px",
+                    color: "white !important",
+                  }}
+                >
+                  {route.icon}
+                </Icon>
+              )}
+              <MDTypography variant="body1" color={isSelected ? "white" : textColor} ml={2}>
                 {route.name}
               </MDTypography>
             </MDBox>
             <Collapse in={openCollapse[route.key]} timeout="auto" unmountOnExit>
               {route.collapse.map((subRoute) => (
-                <NavLink to={subRoute.route} key={subRoute.key} style={{ textDecoration: "none" }}>
-                  <MDBox display="flex" alignItems="center" pl={4} py={1}>
+                <NavLink
+                  to={subRoute.route}
+                  key={subRoute.key}
+                  style={{ textDecoration: "none" }}
+                  onClick={() => handleRouteSelect(subRoute.route)}
+                >
+                  <MDBox
+                    display="flex"
+                    alignItems="center"
+                    pl={4}
+                    py={1}
+                    sx={{
+                      backgroundColor: selectedRoute === subRoute.route ? "green" : "transparent",
+                      borderRadius: "4px",
+                    }}
+                  >
                     {subRoute.icon && (
-                      <Icon sx={{ color: "white !important" }}>{subRoute.icon}</Icon>
+                      <Icon
+                        sx={{
+                          color: selectedRoute === subRoute.route ? "white !important" : textColor,
+                          marginRight: "8px",
+                          color: "white !important",
+                        }}
+                      >
+                        {subRoute.icon}
+                      </Icon>
                     )}
                     <MDTypography
                       variant="body2"
-                      color={textColor}
+                      color={selectedRoute === subRoute.route ? "white" : textColor}
                       ml={2}
-                      sx={{ color: textColor }}
                     >
                       {subRoute.name}
                     </MDTypography>
@@ -121,10 +166,34 @@ function Sidenav({ color, brand, routes, ...rest }) {
       }
 
       return (
-        <NavLink to={route.route} key={route.key} style={{ textDecoration: "none" }}>
-          <MDBox display="flex" alignItems="center" px={2} py={1}>
-            {route.icon && <Icon sx={{ color: "white !important" }}>{route.icon}</Icon>}
-            <MDTypography variant="body1" color={textColor} ml={2} sx={{ color: textColor }}>
+        <NavLink
+          to={route.route}
+          key={route.key}
+          style={{ textDecoration: "none" }}
+          onClick={() => handleRouteSelect(route.route)}
+        >
+          <MDBox
+            display="flex"
+            alignItems="center"
+            px={2}
+            py={1}
+            sx={{
+              backgroundColor: isSelected ? "green" : "transparent",
+              borderRadius: "4px",
+            }}
+          >
+            {route.icon && (
+              <Icon
+                sx={{
+                  color: isSelected ? "white !important" : textColor,
+                  marginRight: "8px",
+                  color: "white !important",
+                }}
+              >
+                {route.icon}
+              </Icon>
+            )}
+            <MDTypography variant="body1" color={isSelected ? "white" : textColor} ml={2}>
               {route.name}
             </MDTypography>
           </MDBox>
@@ -157,9 +226,7 @@ function Sidenav({ color, brand, routes, ...rest }) {
           <MDBox sx={(theme) => sidenavLogoLabel(theme, { miniSidenav })}></MDBox>
         </MDBox>
       </MDBox>
-      <Divider
-        light={(!darkMode && !whiteSidenav && !transparentSidenav) || (darkMode && whiteSidenav)}
-      />
+      <Divider light={!darkMode && !whiteSidenav} />
       <List>{renderRoutes(routes)}</List>
       <MDBox p={2} mt="auto">
         <MDButton
@@ -168,7 +235,7 @@ function Sidenav({ color, brand, routes, ...rest }) {
           target="_blank"
           rel="noreferrer"
           variant="gradient"
-          color={sidenavColor}
+          color={color}
           fullWidth
         >
           Upgrade to PRO
