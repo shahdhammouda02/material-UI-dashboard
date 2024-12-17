@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import {
   TextField,
   Button,
@@ -12,35 +13,56 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
-function NewProducts() {
-  const [newProduct, setNewProduct] = useState({
-    name: "",
-    category: "",
-    image: "",
-    price: 0,
-    discount: 0,
+function Addproduct({ initialRows }) {
+  const [newproduct, setNewproduct] = useState({
+    id: "", // Start with null to indicate no ID is set
+    productName: "",
     description: "",
   });
 
   const [error, setError] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  useEffect(() => {
+    // Set the initial ID based on existing data
+    const highestExistingId =
+      initialRows.length > 0 ? Math.max(...initialRows.map((row) => row.id)) : 0;
+    setNewproduct((prevproduct) => ({
+      ...prevproduct,
+      id: highestExistingId + 1, // Set ID to highest existing ID + 1
+    }));
+  }, [initialRows]); // Update ID when initialRows changes
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewProduct((prevProduct) => ({
-      ...prevProduct,
+    setNewproduct((prevproduct) => ({
+      ...prevproduct,
       [name]: value,
     }));
   };
 
   const handleSubmit = () => {
-    if (!newProduct.name || !newProduct.category || newProduct.price <= 0) {
+    if (!newproduct.productName || !newproduct.description) {
       setError("Please fill in all fields correctly.");
       return;
     }
+
+    const newproductWithID = {
+      id: newproduct.id, // Use the incremented ID
+      productName: newproduct.productName,
+      description: newproduct.description,
+    };
+
     setError("");
-    console.log("Product added successfully:", newProduct);
+    console.log("product added successfully:", newproductWithID);
     setIsDialogOpen(false);
+
+    // Reset the form for the next entry
+    setNewproduct((prevproduct) => ({
+      id: prevproduct.id + 1, // Increment ID for next entry
+      productName: "",
+      description: "",
+    }));
   };
 
   const handleDialogOpen = () => {
@@ -49,6 +71,7 @@ function NewProducts() {
 
   const handleDialogClose = () => {
     setIsDialogOpen(false);
+    setNewproduct({ id: null, productName: "", description: "" }); // Reset ID to null
   };
 
   return (
@@ -71,67 +94,33 @@ function NewProducts() {
         bgcolor="#fbfbfb"
         color="#000"
       >
-        {/* <Typography variant="h5" mb={2}>
-          اضافة منتج جديد
-        </Typography> */}
         <Button
           variant="contained"
-          // endIcon={<AddIcon />}
           onClick={handleDialogOpen}
           sx={{ mb: 3, color: "#ffffff", fontSize: "1rem" }}
         >
-          اضافة منتج جديد
+          اضافة فئة جديدة
           <AddIcon />
         </Button>
 
         {/* Dialog for product input */}
         <Dialog open={isDialogOpen} onClose={handleDialogClose}>
-          <DialogTitle>اضافة منتج جديد</DialogTitle>
+          <DialogTitle>اضافة فئة جديدة</DialogTitle>
           <DialogContent>
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
-                  label="اسم المنتج"
-                  name="name"
-                  value={newProduct.name}
-                  onChange={handleInputChange}
+                  disabled
+                  label="الرقم التعريفي"
+                  value={newproduct.id} // Display existing or generated ID
                   fullWidth
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  label="الفئة"
-                  name="category"
-                  value={newProduct.category}
-                  onChange={handleInputChange}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="الصورة"
-                  name="image"
-                  value={newProduct.image}
-                  onChange={handleInputChange}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  label="السعر"
-                  name="price"
-                  type="number"
-                  value={newProduct.price}
-                  onChange={handleInputChange}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  label="التخفيض (%)"
-                  name="discount"
-                  type="number"
-                  value={newProduct.discount}
+                  label="اسم الصنف"
+                  name="productName"
+                  value={newproduct.productName}
                   onChange={handleInputChange}
                   fullWidth
                 />
@@ -140,7 +129,7 @@ function NewProducts() {
                 <TextField
                   label="الوصف"
                   name="description"
-                  value={newProduct.description}
+                  value={newproduct.description}
                   onChange={handleInputChange}
                   fullWidth
                   multiline
@@ -157,7 +146,7 @@ function NewProducts() {
           <DialogActions>
             <Button onClick={handleDialogClose}>الغاء</Button>
             <Button variant="contained" sx={{ color: "#ffffff" }} onClick={handleSubmit}>
-              حفظ
+              إضافة
             </Button>
           </DialogActions>
         </Dialog>
@@ -166,4 +155,17 @@ function NewProducts() {
   );
 }
 
-export default NewProducts;
+Addproduct.propTypes = {
+  initialRows: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      // ... other properties of your row object
+    })
+  ),
+};
+
+Addproduct.defaultProps = {
+  initialRows: [],
+};
+
+export default Addproduct;

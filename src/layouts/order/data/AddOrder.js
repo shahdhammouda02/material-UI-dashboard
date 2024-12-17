@@ -15,7 +15,7 @@ import AddIcon from "@mui/icons-material/Add";
 
 function AddOrder({ initialRows }) {
   const [newOrder, setNewOrder] = useState({
-    orderId: "", // Start with empty to indicate no ID is set
+    id: "", // Start with null to indicate no ID is set
     customerName: "",
     product: "",
     productNumber: "",
@@ -28,14 +28,14 @@ function AddOrder({ initialRows }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
-    // Set the initial orderId based on existing data
+    // Set the initial ID based on existing data
     const highestExistingId =
       initialRows.length > 0 ? Math.max(...initialRows.map((row) => row.orderId)) : 0;
     setNewOrder((prevOrder) => ({
       ...prevOrder,
-      orderId: highestExistingId + 1, // Set ID to highest existing ID + 1
+      id: highestExistingId + 1, // Set ID to highest existing ID + 1
     }));
-  }, [initialRows]); // Update ID when initialRows changes
+  }, [initialRows]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -46,6 +46,7 @@ function AddOrder({ initialRows }) {
   };
 
   const handleSubmit = () => {
+    // Form validation: ensure no empty fields
     if (
       !newOrder.customerName ||
       !newOrder.product ||
@@ -56,29 +57,24 @@ function AddOrder({ initialRows }) {
       return;
     }
 
-    const newOrderData = {
-      orderId: newOrder.orderId, // Use the incremented ID
+    const newOrderWithID = {
+      id: newOrder.id, // Use the incremented ID
       customerName: newOrder.customerName,
       product: newOrder.product,
       productNumber: newOrder.productNumber,
-      quantity: parseInt(newOrder.quantity, 10),
+      quantity: newOrder.quantity,
       totalAmount: newOrder.totalAmount,
-      status: "قيد المعالجة", // Default status
-      actions: (
-        <Box display="flex" justifyContent="center" alignItems="center">
-          <Button color="primary">Edit</Button>
-          <Button color="error">Delete</Button>
-        </Box>
-      ),
+      status: newOrder.status,
     };
 
     setError("");
-    console.log("Order added successfully:", newOrderData);
+    console.log("Order added successfully:", newOrderWithID);
     setIsDialogOpen(false);
 
-    // Reset the form for the next entry
+    // Reset form for new entry, with new incremented ID
     setNewOrder((prevOrder) => ({
-      orderId: prevOrder.orderId + 1, // Increment ID for next entry
+      id: prevOrder.id + 1, // Increment ID for next entry
+    setNewOrder({
       customerName: "",
       product: "",
       productNumber: "",
@@ -95,14 +91,14 @@ function AddOrder({ initialRows }) {
   const handleDialogClose = () => {
     setIsDialogOpen(false);
     setNewOrder({
-      orderId: null,
+      id: null,
       customerName: "",
       product: "",
       productNumber: "",
       quantity: "",
       totalAmount: "",
       status: "",
-    }); // Reset form
+    }); // Reset ID to null
   };
 
   return (
@@ -134,7 +130,6 @@ function AddOrder({ initialRows }) {
           <AddIcon />
         </Button>
 
-        {/* Dialog for order input */}
         <Dialog open={isDialogOpen} onClose={handleDialogClose}>
           <DialogTitle>إضافة طلب جديد</DialogTitle>
           <DialogContent>
@@ -142,8 +137,8 @@ function AddOrder({ initialRows }) {
               <Grid item xs={12}>
                 <TextField
                   disabled
-                  label="رقم الطلب"
-                  value={newOrder.orderId} // Display existing or generated ID
+                  label="الرقم التعريفي"
+                  value={newOrder.id} // Display existing or generated ID
                   fullWidth
                 />
               </Grid>
@@ -193,6 +188,15 @@ function AddOrder({ initialRows }) {
                   fullWidth
                 />
               </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  label="الحالة"
+                  name="status"
+                  value={newOrder.status}
+                  onChange={handleInputChange}
+                  fullWidth
+                />
+              </Grid>
               {error && (
                 <Grid item xs={12}>
                   <Typography color="error">{error}</Typography>
@@ -215,7 +219,7 @@ function AddOrder({ initialRows }) {
 AddOrder.propTypes = {
   initialRows: PropTypes.arrayOf(
     PropTypes.shape({
-      orderId: PropTypes.number.isRequired,
+      id: PropTypes.number.isRequired,
       // ... other properties of your row object
     })
   ),

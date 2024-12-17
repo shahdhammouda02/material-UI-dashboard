@@ -11,7 +11,7 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import AddOrder from "./data/AddOrder";
-import OrdersTable from "./data/orderTable";
+import OrdersTable from "./data/orderTabel";
 
 function Order() {
   const { columns, rows } = OrdersTable();
@@ -23,16 +23,7 @@ function Order() {
         <Grid container spacing={6}>
           <Grid item xs={12}>
             <Card>
-              <MDBox
-                mx={2}
-                mt={-3}
-                py={3}
-                px={2}
-                variant="gradient"
-                bgColor="info"
-                borderRadius="lg"
-                coloredShadow="info"
-              >
+              <MDBox mx={2} mt={-3} py={3} px={2} bgColor="info" borderRadius="lg">
                 <MDTypography variant="h6" color="white">
                   جدول الطلبات
                 </MDTypography>
