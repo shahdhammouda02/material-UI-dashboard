@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import React from "react";
-=======
-// @mui material components
->>>>>>> 3f912fd042bc052f7a9c72e8b8a4022a7d245608
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 
@@ -14,19 +10,11 @@ import MDTypography from "components/MDTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-<<<<<<< HEAD
 import AddOrder from "./data/AddOrder";
-import OrdersTable from "./data/orderTabel";
+import OrdersTable from "./data/orderTable";
 
 function Order() {
   const { columns, rows } = OrdersTable();
-=======
-import AddOrder from "./data/AddOrder"; // استبدال AddCategory بـ AddOrder
-import OrdersTable from "./data/orderTabel"; // يجب التأكد من صحة الاستيراد
-
-function Order() {
-  const { columns, rows } = OrdersTable(); // جلب الأعمدة والصفوف
->>>>>>> 3f912fd042bc052f7a9c72e8b8a4022a7d245608
 
   return (
     <DashboardLayout>
@@ -78,12 +66,8 @@ function Order() {
                   </tbody>
                 </table>
               </MDBox>
-<<<<<<< HEAD
               {/* Pass rows as initialRows to AddOrder */}
               <AddOrder initialRows={rows} />
-=======
-              <AddOrder /> {/* تغيير AddCategory إلى AddOrder */}
->>>>>>> 3f912fd042bc052f7a9c72e8b8a4022a7d245608
             </Card>
           </Grid>
         </Grid>
