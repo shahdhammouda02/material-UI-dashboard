@@ -1,4 +1,4 @@
-// @mui material components
+import React from "react";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 
@@ -10,11 +10,11 @@ import MDTypography from "components/MDTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import AddOrder from "./data/AddOrder"; // استبدال AddCategory بـ AddOrder
-import OrdersTable from "./data/orderTabel"; // يجب التأكد من صحة الاستيراد
+import AddOrder from "./data/AddOrder"; // Corrected import for AddOrder
+import OrdersTable from "./data/orderTabel"; // Corrected import for OrdersTable
 
 function Order() {
-  const { columns, rows } = OrdersTable(); // جلب الأعمدة والصفوف
+  const { columns, rows } = OrdersTable(); // Fetch columns and rows from OrdersTable
 
   return (
     <DashboardLayout>
@@ -23,16 +23,7 @@ function Order() {
         <Grid container spacing={6}>
           <Grid item xs={12}>
             <Card>
-              <MDBox
-                mx={2}
-                mt={-3}
-                py={3}
-                px={2}
-                variant="gradient"
-                bgColor="info"
-                borderRadius="lg"
-                coloredShadow="info"
-              >
+              <MDBox mx={2} mt={-3} py={3} px={2} bgColor="info" borderRadius="lg">
                 <MDTypography variant="h6" color="white">
                   جدول الطلبات
                 </MDTypography>
@@ -66,7 +57,8 @@ function Order() {
                   </tbody>
                 </table>
               </MDBox>
-              <AddOrder /> {/* تغيير AddCategory إلى AddOrder */}
+              <AddOrder initialRows={rows} />{" "}
+              {/* Corrected to pass rows as initialRows to AddOrder */}
             </Card>
           </Grid>
         </Grid>

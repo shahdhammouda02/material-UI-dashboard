@@ -4,60 +4,54 @@ import MDIconButton from "@mui/material/IconButton"; // أيقونات Material 
 import EditIcon from "@mui/icons-material/Edit"; // أيقونة التعديل
 import DeleteIcon from "@mui/icons-material/Delete"; // أيقونة الحذف
 
-export default function DataTable() {
-  const [columns, setColumns] = useState([
-    { Header: "ID", accessor: "author", align: "left" },
+export default function DataTable(handleEdit) {
+  const [columns] = useState([
+    { Header: "ID", accessor: "id", align: "left" },
     { Header: "الفئة", accessor: "Category", align: "center" },
     { Header: "الوصف", accessor: "text", align: "center" },
     { Header: "الفئة الاساسية", accessor: "mainCategory", align: "center" },
     { Header: "الإجراءات", accessor: "Actions", align: "center" },
   ]);
 
-  const handleEdit = (id) => {
-    alert(`تعديل العنصر ذو المعرف: ${id}`);
+  const handleEditClick = (id) => {
+    console.log(`Editing subcategory with ID: ${id}`);
+    handleEdit(id); // Call the passed handleEdit function
   };
 
-  const handleDelete = (id) => {
-    alert(`حذف العنصر ذو المعرف: ${id}`);
+  const handleDeleteClick = (index) => {
+    setRows((prevRows) => prevRows.filter((_, idx) => idx !== index));
+    console.log(`Deleted category at index: ${index + 1}`);
   };
-
-  // عداد لرقم ID يبدأ من 1
-  let idCounter = 1;
 
   const [rows, setRows] = useState([
     {
-      author: idCounter++, // يتم توليد ID تلقائيًا
       Category: "ملابس نسائية",
       text: "ملابس وأزياء متنوعة",
       mainCategory: "ملابس واكسسوارات",
-      Actions: null, // سيتم تحديث الإجراءات لاحقًا
     },
     {
-      author: idCounter++, // يتم توليد ID تلقائيًا
       Category: "أحذية",
       text: "أحذية رياضية وكلاسيكية",
       mainCategory: "ملابس واكسسوارات",
-      Actions: null, // سيتم تحديث الإجراءات لاحقًا
     },
     {
-      author: idCounter++, // يتم توليد ID تلقائيًا
-      Category: "أحذية",
-      text: "أحذية رياضية وكلاسيكية",
-      mainCategory: "ملابس واكسسوارات",
-      Actions: null, // سيتم تحديث الإجراءات لاحقًا
+      Category: "فخار",
+      text: "تراث فلسطيني",
+      mainCategory: "حرف يدوية",
     },
   ]);
 
   // إضافة الإجراءات بعد توليد البيانات
-  const updatedRows = rows.map((row) => ({
+  const updatedRows = rows.map((row, index) => ({
+    id: index + 1,
     ...row,
     Actions: (
       <MDBox display="flex" justifyContent="center" alignItems="center">
-        <MDIconButton color="primary" onClick={() => handleEdit(row.author)}>
+        <MDIconButton color="primary" onClick={() => handleEditClick(index + 1)}>
           <EditIcon />
         </MDIconButton>
         <MDBox mx={1} />
-        <MDIconButton color="error" onClick={() => handleDelete(row.author)}>
+        <MDIconButton color="error" onClick={() => handleDeleteClick(index)}>
           <DeleteIcon />
         </MDIconButton>
       </MDBox>

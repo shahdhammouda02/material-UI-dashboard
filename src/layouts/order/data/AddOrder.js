@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import {
   TextField,
   Button,
@@ -11,14 +12,13 @@ import {
   DialogActions,
   MenuItem,
   Select,
-  InputLabel,
   FormControl,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
-function AddOrder() {
+function AddOrder({ initialRows }) {
   const [newOrder, setNewOrder] = useState({
-    orderId: "",
+    id: "",
     customerName: "",
     product: "",
     productNumber: "",
@@ -30,6 +30,16 @@ function AddOrder() {
   const [error, setError] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  useEffect(() => {
+    // Automatically set the ID based on the highest existing ID from initialRows
+    const highestExistingId =
+      initialRows.length > 0 ? Math.max(...initialRows.map((row) => row.id)) : 0;
+    setNewOrder((prevOrder) => ({
+      ...prevOrder,
+      id: highestExistingId + 1, // Increment from highest existing ID
+    }));
+  }, [initialRows]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewOrder((prevOrder) => ({
@@ -38,15 +48,8 @@ function AddOrder() {
     }));
   };
 
-  const generateUniqueOrderID = () => {
-    const timestamp = Date.now().toString();
-    const randomPart = Math.floor(Math.random() * 10000)
-      .toString()
-      .padStart(4, "0");
-    return `order-${timestamp}-${randomPart}`;
-  };
-
   const handleSubmit = () => {
+    // Form validation: ensure no empty fields
     if (
       !newOrder.customerName ||
       !newOrder.product ||
@@ -60,21 +63,25 @@ function AddOrder() {
     }
 
     const newOrderWithID = {
-      orderId: generateUniqueOrderID(), // Generate Order ID
       ...newOrder,
     };
 
-    setError("");
     console.log("Order added successfully:", newOrderWithID);
+
+    // Clear error and close dialog
+    setError("");
     setIsDialogOpen(false);
-    setNewOrder({
+
+    // Reset form for new entry, with new incremented ID
+    setNewOrder((prevOrder) => ({
+      id: prevOrder.id + 1, // Increment ID for next entry
       customerName: "",
       product: "",
       productNumber: "",
       quantity: "",
       totalAmount: "",
       status: "",
-    });
+    }));
   };
 
   const handleDialogOpen = () => {
@@ -83,15 +90,15 @@ function AddOrder() {
 
   const handleDialogClose = () => {
     setIsDialogOpen(false);
-    setNewOrder({
-      orderId: "",
+    setNewOrder((prevOrder) => ({
+      id: prevOrder.id, // Keep the same ID when closing the dialog
       customerName: "",
       product: "",
       productNumber: "",
       quantity: "",
       totalAmount: "",
       status: "",
-    });
+    }));
   };
 
   return (
@@ -123,13 +130,12 @@ function AddOrder() {
           <AddIcon />
         </Button>
 
-        {/* Dialog for order input */}
         <Dialog open={isDialogOpen} onClose={handleDialogClose}>
           <DialogTitle>اضافة طلب جديد</DialogTitle>
           <DialogContent>
             <Grid container spacing={2}>
               <Grid item xs={12}>
-                <TextField disabled label="الرقم التعريفي" value={newOrder.orderId} fullWidth />
+                <TextField disabled label="الرقم التعريفي" value={newOrder.id} fullWidth />
               </Grid>
               <Grid item xs={12}>
                 <TextField
@@ -183,9 +189,7 @@ function AddOrder() {
                     name="status"
                     value={newOrder.status}
                     onChange={handleInputChange}
-                    fullWidth
                     displayEmpty
-                    sx={{ minWidth: 200 }}
                   >
                     <MenuItem value="" disabled>
                       اختر الحالة
@@ -215,5 +219,17 @@ function AddOrder() {
     </div>
   );
 }
+
+AddOrder.propTypes = {
+  initialRows: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+    })
+  ),
+};
+
+AddOrder.defaultProps = {
+  initialRows: [],
+};
 
 export default AddOrder;

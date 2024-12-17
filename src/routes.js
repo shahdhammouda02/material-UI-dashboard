@@ -49,7 +49,6 @@ import Notifications from "layouts/notifications";
 import Order from "layouts/order";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
-import NewProducts from "layouts/products/data/adding";
 
 // @mui icons
 import Icon from "@mui/material/Icon";

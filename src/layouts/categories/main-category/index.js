@@ -41,16 +41,7 @@ function MainCategories() {
         <Grid container spacing={6}>
           <Grid item xs={12}>
             <Card>
-              <MDBox
-                mx={2}
-                mt={-3}
-                py={3}
-                px={2}
-                variant="gradient"
-                bgColor="info"
-                borderRadius="lg"
-                coloredShadow="info"
-              >
+              <MDBox mx={2} mt={-3} py={3} px={2} bgColor="info" borderRadius="lg">
                 <MDTypography variant="h6" color="white">
                   جدول الفئات
                 </MDTypography>

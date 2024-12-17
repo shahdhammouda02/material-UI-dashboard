@@ -1,80 +1,101 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
-// @mui material components
+import React, { useState, useEffect } from "react";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
-
-// Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
-
-// Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import Dataproduct from "examples/products/Dataproduct";
-import NewProducts from "./data/adding";
-// Data
-import authorsTableData from "layouts/products/data/authorsTableData";
-
+import Addproduct from "./data/Addproduct";
+import TableData from "./data/TableData";
+import UpdateProduct from "./data/UpdateProduct"; // Import UpdateProduct
+import DataproductBodyCell from "../../examples/products/Dataproduct/DataproductBodyCell";
+import DataproductHeadCell from "../../examples/products/Dataproduct/DataproductHeadCell";
 function Products() {
-  const { columns = [], rows = [] } = authorsTableData();
+  const [editingId, setEditingId] = useState(null); // State to track the editing ID
+  const [productRows, setproductRows] = useState([]);
 
-  console.log("Columns: ", columns); // التحقق من الأعمدة
-  console.log("Rows: ", rows); // التحقق من الصفوف
+  const handleEdit = (id) => {
+    setEditingId(id); // Set the ID to edit
+  };
+
+  const handleUpdate = (updatedProduct) => {
+    setproductRows((prevRows) =>
+      prevRows.map((row) => (row.id === updatedProduct.id ? updatedProduct : row))
+    );
+    setEditingId(null); // Close the edit dialog
+  };
+
+  const { columns, rows } = TableData(handleEdit); // Pass the handleEdit function
+
+  // Update productRows with the rows from TableData
+  useEffect(() => {
+    setproductRows(rows); // Set initial rows from TableData
+  }, [rows]);
 
   return (
-    <div>
-      <DashboardLayout>
-        <DashboardNavbar />
-        <MDBox pt={6} pb={3}>
-          <Grid container spacing={6}>
-            <Grid item xs={12}>
-              <Card>
-                <MDBox
-                  mx={2}
-                  mt={-3}
-                  py={3}
-                  px={2}
-                  variant="gradient"
-                  bgColor="info"
-                  borderRadius="lg"
-                  coloredShadow="info"
-                >
-                  <MDTypography variant="h6" color="white">
-                    جدول المنتجات
-                  </MDTypography>
-                </MDBox>
-                <MDBox pt={3}>
-                  <Dataproduct
-                    table={{ columns, rows }}
-                    isSorted={false}
-                    entriesPerPage={false}
-                    showTotalEntries={false}
-                    noEndBorder
+    <DashboardLayout>
+      <DashboardNavbar />
+      <MDBox pt={6} pb={3}>
+        <Grid container spacing={6}>
+          <Grid item xs={12}>
+            <Card>
+              <MDBox
+                mx={2}
+                mt={-3}
+                py={3}
+                px={2}
+                bgColor="info"
+                borderRadius="lg"
+                // coloredShadow="info"
+              >
+                <MDTypography variant="h6" color="white">
+                  جدول المنتجات
+                </MDTypography>
+              </MDBox>
+              <MDBox pt={3}>
+                {editingId ? (
+                  <UpdateProduct
+                    initialRows={productRows}
+                    productId={editingId}
+                    onUpdate={handleUpdate}
                   />
-                </MDBox>
-                <NewProducts />
-              </Card>
-            </Grid>
+                ) : (
+                  <table style={{ width: "100%" }}>
+                    <thead>
+                      <tr>
+                        {columns.map((column, index) => (
+                          <DataproductHeadCell key={index} align={column.align}>
+                            {column.Header}
+                          </DataproductHeadCell>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {productRows.map((row, index) => (
+                        <tr key={index}>
+                          <DataproductBodyCell align="center">{row.id}</DataproductBodyCell>
+                          <DataproductBodyCell align="center">{row.author}</DataproductBodyCell>
+                          <DataproductBodyCell align="center">{row.Category}</DataproductBodyCell>
+                          <DataproductBodyCell align="center">{row.images}</DataproductBodyCell>
+                          <DataproductBodyCell align="center">{row.price}</DataproductBodyCell>
+                          <DataproductBodyCell align="center">{row.Discount}</DataproductBodyCell>
+                          <DataproductBodyCell align="center">{row.text}</DataproductBodyCell>
+                          <DataproductBodyCell align="center">{row.actions}</DataproductBodyCell>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </MDBox>
+              <Addproduct initialRows={productRows} />
+            </Card>
           </Grid>
-        </MDBox>
-        <Footer />
-      </DashboardLayout>
-    </div>
+        </Grid>
+      </MDBox>
+      <Footer />
+    </DashboardLayout>
   );
 }
+
 export default Products;
