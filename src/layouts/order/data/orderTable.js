@@ -1,12 +1,11 @@
 import React, { useState, useMemo } from "react";
-import MDBox from "components/MDBox"; // Assuming correct path for custom component
-import MDIconButton from "@mui/material/IconButton"; // Material UI IconButton
-import EditIcon from "@mui/icons-material/Edit"; // Material UI EditIcon
-import DeleteIcon from "@mui/icons-material/Delete"; // Material UI DeleteIcon
-import VisibilityIcon from "@mui/icons-material/Visibility"; // Material UI View Icon
+import MDBox from "components/MDBox";
+import MDIconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
-export default function OrdersTable() {
-  const [columns, setColumns] = useState([
+export default function OrdersTable(handleEdit) {
+  const [columns] = useState([
     { Header: "رقم الطلب", accessor: "orderId", align: "center" },
     { Header: "اسم العميل", accessor: "customerName", align: "center" },
     { Header: "المنتج", accessor: "product", align: "center" },
@@ -25,18 +24,6 @@ export default function OrdersTable() {
       quantity: 1,
       totalAmount: "$20",
       status: "قيد المعالجة",
-      actions: (
-        <MDBox display="flex" justifyContent="center" alignItems="center">
-          <MDBox mx={1} />
-          <MDIconButton color="primary">
-            <EditIcon />
-          </MDIconButton>
-          <MDBox mx={1} />
-          <MDIconButton color="error">
-            <DeleteIcon />
-          </MDIconButton>
-        </MDBox>
-      ),
     },
     {
       customerName: "سارة خالد",
@@ -45,18 +32,6 @@ export default function OrdersTable() {
       quantity: 1,
       totalAmount: "$500",
       status: "تم التسليم",
-      actions: (
-        <MDBox display="flex" justifyContent="center" alignItems="center">
-          <MDBox mx={1} />
-          <MDIconButton color="primary">
-            <EditIcon />
-          </MDIconButton>
-          <MDBox mx={1} />
-          <MDIconButton color="error">
-            <DeleteIcon />
-          </MDIconButton>
-        </MDBox>
-      ),
     },
     {
       customerName: "أحمد علي",
@@ -65,18 +40,6 @@ export default function OrdersTable() {
       quantity: 2,
       totalAmount: "$40",
       status: "تم الشحن",
-      actions: (
-        <MDBox display="flex" justifyContent="center" alignItems="center">
-          <MDBox mx={1} />
-          <MDIconButton color="primary">
-            <EditIcon />
-          </MDIconButton>
-          <MDBox mx={1} />
-          <MDIconButton color="error">
-            <DeleteIcon />
-          </MDIconButton>
-        </MDBox>
-      ),
     },
     {
       customerName: "خالد محمود",
@@ -85,18 +48,6 @@ export default function OrdersTable() {
       quantity: 3,
       totalAmount: "$150",
       status: "قيد المعالجة",
-      actions: (
-        <MDBox display="flex" justifyContent="center" alignItems="center">
-          <MDBox mx={1} />
-          <MDIconButton color="primary">
-            <EditIcon />
-          </MDIconButton>
-          <MDBox mx={1} />
-          <MDIconButton color="error">
-            <DeleteIcon />
-          </MDIconButton>
-        </MDBox>
-      ),
     },
   ]);
 
@@ -104,12 +55,31 @@ export default function OrdersTable() {
     return initialRows.map((row, index) => ({
       orderId: index + 1, // Assign sequential order ID
       ...row,
+      actions: (
+        <MDBox display="flex" justifyContent="center" alignItems="center">
+          <MDIconButton color="primary" onClick={() => handleEditClick(index + 1)}>
+            <EditIcon />
+          </MDIconButton>
+          <MDBox mx={1} />
+          <MDIconButton color="error" onClick={() => handleDeleteClick(index + 1)}>
+            <DeleteIcon />
+          </MDIconButton>
+        </MDBox>
+      ),
     }));
   }, [initialRows]);
 
+  const handleEditClick = (id) => {
+    handleEdit(id);
+  };
+
+  const handleDeleteClick = (id) => {
+    setInitialRows((prevRows) => prevRows.filter((_, index) => index + 1 !== id));
+    console.log(`Deleted order with ID: ${id}`);
+  };
+
   return {
-    columns, // Ensure columns are set correctly
-    rows, // Ensure rows are set correctly
-    // Other states and functions can be added as needed
+    columns,
+    rows,
   };
 }

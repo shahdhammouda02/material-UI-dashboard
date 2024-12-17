@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 
@@ -11,10 +11,30 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import AddOrder from "./data/AddOrder";
-import OrdersTable from "./data/orderTabel";
+import OrdersTable from "./data/orderTable";
+import UpdateOrder from "./data/UpdateOrder";
 
 function Order() {
-  const { columns, rows } = OrdersTable();
+  const [editingId, setEditingId] = useState(null); // State to track the editing order ID
+  const [orderRows, setOrderRows] = useState([]);
+
+  const handleEdit = (id) => {
+    setEditingId(id); // Set the ID to edit
+  };
+
+  const handleUpdate = (updatedOrder) => {
+    setOrderRows((prevRows) =>
+      prevRows.map((row) => (row.orderId === updatedOrder.orderId ? updatedOrder : row))
+    );
+    setEditingId(null);
+  };
+
+  const { columns, rows } = OrdersTable(handleEdit);
+
+  // Update orderRows with the rows from OrdersTable
+  useEffect(() => {
+    setOrderRows(rows); // Set initial rows from OrdersTable
+  }, [rows]);
 
   return (
     <DashboardLayout>
@@ -29,35 +49,46 @@ function Order() {
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
-                <table style={{ width: "100%" }}>
-                  <thead>
-                    <tr>
-                      {columns.map((column, index) => (
-                        <th key={index} style={{ textAlign: column.align, padding: "10px" }}>
-                          {column.Header}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rows.map((row, index) => (
-                      <tr key={index}>
-                        <td style={{ textAlign: "center", padding: "10px" }}>{row.orderId}</td>
-                        <td style={{ textAlign: "center", padding: "10px" }}>{row.customerName}</td>
-                        <td style={{ textAlign: "center", padding: "10px" }}>{row.product}</td>
-                        <td style={{ textAlign: "center", padding: "10px" }}>
-                          {row.productNumber}
-                        </td>
-                        <td style={{ textAlign: "center", padding: "10px" }}>{row.quantity}</td>
-                        <td style={{ textAlign: "center", padding: "10px" }}>{row.totalAmount}</td>
-                        <td style={{ textAlign: "center", padding: "10px" }}>{row.status}</td>
-                        <td style={{ textAlign: "center", padding: "10px" }}>{row.actions}</td>
+                {editingId ? (
+                  <UpdateOrder
+                    initialRows={orderRows}
+                    orderId={editingId}
+                    onUpdate={handleUpdate}
+                  />
+                ) : (
+                  <table style={{ width: "100%" }}>
+                    <thead>
+                      <tr>
+                        {columns.map((column, index) => (
+                          <th key={index} style={{ textAlign: column.align, padding: "10px" }}>
+                            {column.Header}
+                          </th>
+                        ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {orderRows.map((row, index) => (
+                        <tr key={index}>
+                          <td style={{ textAlign: "center", padding: "10px" }}>{row.orderId}</td>
+                          <td style={{ textAlign: "center", padding: "10px" }}>
+                            {row.customerName}
+                          </td>
+                          <td style={{ textAlign: "center", padding: "10px" }}>{row.product}</td>
+                          <td style={{ textAlign: "center", padding: "10px" }}>
+                            {row.productNumber}
+                          </td>
+                          <td style={{ textAlign: "center", padding: "10px" }}>{row.quantity}</td>
+                          <td style={{ textAlign: "center", padding: "10px" }}>
+                            {row.totalAmount}
+                          </td>
+                          <td style={{ textAlign: "center", padding: "10px" }}>{row.status}</td>
+                          <td style={{ textAlign: "center", padding: "10px" }}>{row.actions}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
               </MDBox>
-              {/* Pass rows as initialRows to AddOrder */}
               <AddOrder initialRows={rows} />
             </Card>
           </Grid>
