@@ -10,70 +10,78 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  FormControl,
+  InputLabel,
+  Select,
   MenuItem,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
-function Addproduct({ initialRows }) {
-  const [newproduct, setNewproduct] = useState({
-    id: null,
-    author: "",
-    Category: "",
-    images: "",
+function Addshipping({ initialRows }) {
+  const [shipping, setshipping] = useState({
+    id: "", // Start with an empty ID
+    userid: "",
+    proid: "",
+    shipping: "",
     price: "",
-    Discount: "",
-    text: "",
+    adress: "",
   });
 
   const [error, setError] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
+    // Set the initial ID based on existing data
     const highestExistingId =
       initialRows.length > 0 ? Math.max(...initialRows.map((row) => row.id)) : 0;
-    setNewproduct((prev) => ({
-      ...prev,
-      id: highestExistingId + 1,
+    setshipping((prevshipping) => ({
+      ...prevshipping,
+      id: highestExistingId + 1, // Set ID to highest existing ID + 1
     }));
-  }, [initialRows]);
+  }, [initialRows]); // Update ID when initialRows changes
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewproduct((prev) => ({
-      ...prev,
+    setshipping((prevshipping) => ({
+      ...prevshipping,
       [name]: value,
     }));
   };
 
   const handleSubmit = () => {
-    const { author, Category, images, price, Discount, text } = newproduct;
     if (
-      !author.trim() ||
-      !Category.trim() ||
-      !images.trim() ||
-      !price.trim() ||
-      !Discount.trim() ||
-      !text.trim()
+      !shipping.userid ||
+      !shipping.proid ||
+      !shipping.shipping ||
+      !shipping.price ||
+      !shipping.adress
     ) {
-      setError("Please fill in all fields correctly.");
+      setError("من فضلك قم بملء جميع الحقول بشكل صحيح.");
       return;
     }
 
-    console.log("Product added successfully:", newproduct);
-
-    // Reset form
-    setNewproduct((prev) => ({
-      id: prev.id + 1,
-      author: "",
-      Category: "",
-      images: "",
-      price: "",
-      Discount: "",
-      text: "",
-    }));
+    const shippingWithID = {
+      id: shipping.id, // Use the incremented ID
+      userid: shipping.userid,
+      proid: shipping.proid,
+      shipping: shipping.shipping,
+      price: shipping.price,
+      adress: shipping.adress,
+    };
 
     setError("");
+    console.log("تم إضافة الشحنة بنجاح:", shippingWithID);
     setIsDialogOpen(false);
+
+    // Reset the form for the next entry, keeping the id increment logic
+    setshipping({
+      id: shipping.id + 1, // Increment ID for next entry
+      userid: "",
+      proid: "",
+      shipping: "",
+      price: "",
+      adress: "",
+    });
   };
 
   const handleDialogOpen = () => {
@@ -82,16 +90,14 @@ function Addproduct({ initialRows }) {
 
   const handleDialogClose = () => {
     setIsDialogOpen(false);
-    setError("");
-    setNewproduct((prev) => ({
-      id: prev.id,
-      author: "",
-      Category: "",
-      images: "",
+    setshipping({
+      id: "", // Reset ID to empty on close
+      userid: "",
+      proid: "",
+      shipping: "",
       price: "",
-      Discount: "",
-      text: "",
-    }));
+      adress: "",
+    });
   };
 
   return (
@@ -117,89 +123,83 @@ function Addproduct({ initialRows }) {
         <Button
           variant="contained"
           onClick={handleDialogOpen}
-          sx={{
-            mb: 3,
-            color: "#ffffff",
-            fontSize: "1rem",
-            gap: "8px",
-          }}
+          sx={{ mb: 3, color: "#ffffff", fontSize: "1rem" }}
         >
+          اضافة شحنة جديدة
           <AddIcon />
-          اضافة منتج جديد
         </Button>
 
-        {/* Dialog for product input */}
+        {/* Dialog for shipping input */}
         <Dialog open={isDialogOpen} onClose={handleDialogClose}>
-          <DialogTitle>اضافة فئة جديدة</DialogTitle>
+          <DialogTitle>اضافة شحنة جديدة</DialogTitle>
           <DialogContent>
             <Grid container spacing={2}>
               <Grid item xs={12}>
-                <TextField disabled label="الرقم التعريفي" value={newproduct.id || ""} fullWidth />
-              </Grid>
-              <Grid item xs={12}>
                 <TextField
-                  label="الاسم"
-                  name="author"
-                  value={newproduct.author}
-                  onChange={handleInputChange}
+                  disabled
+                  label="رقم الشحنة"
+                  value={shipping.id} // Display existing or generated ID
                   fullWidth
-                  required
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  label="الفئة"
-                  name="Category"
-                  value={newproduct.Category}
+                  label="رقم الزبون"
+                  name="userid"
+                  value={shipping.userid}
                   onChange={handleInputChange}
                   fullWidth
-                  required
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  label="الصورة (الرابط)"
-                  name="images"
-                  value={newproduct.images}
+                  label="رقم المنتج"
+                  name="proid"
+                  value={shipping.proid}
                   onChange={handleInputChange}
                   fullWidth
-                  required
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12}>
+                {/* قائمة منسدلة لاختيار الفئة الأساسية */}
+                <FormControl fullWidth>
+                  <InputLabel>نوع الشحن</InputLabel>
+                  <Select
+                    label="نوع الشحن"
+                    name="shipping"
+                    value={shipping.shipping}
+                    onChange={handleInputChange}
+                    fullWidth
+                    displayEmpty
+                    sx={{ minWidth: 200, height: 40 }}
+                  >
+                    <MenuItem value="fast">سريع</MenuItem>
+                    <MenuItem value="normal">عادي</MenuItem>
+                    <MenuItem value="free">مجاني</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12}>
                 <TextField
                   label="السعر"
                   name="price"
-                  type="number"
-                  value={newproduct.price}
+                  value={shipping.price}
                   onChange={handleInputChange}
                   fullWidth
-                  required
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  label="الخصم"
-                  name="Discount"
-                  type="number"
-                  value={newproduct.Discount}
-                  onChange={handleInputChange}
-                  fullWidth
-                  required
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  label="الوصف"
-                  name="text"
-                  value={newproduct.text}
+                  label="العنوان"
+                  name="adress"
+                  value={shipping.adress}
                   onChange={handleInputChange}
                   fullWidth
                   multiline
                   rows={4}
-                  required
                 />
               </Grid>
+
               {error && (
                 <Grid item xs={12}>
                   <Typography color="error">{error}</Typography>
@@ -219,16 +219,17 @@ function Addproduct({ initialRows }) {
   );
 }
 
-Addproduct.propTypes = {
+Addshipping.propTypes = {
   initialRows: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
+      // other properties of your row object
     })
   ),
 };
 
-Addproduct.defaultProps = {
+Addshipping.defaultProps = {
   initialRows: [],
 };
 
-export default Addproduct;
+export default Addshipping;

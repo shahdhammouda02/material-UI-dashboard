@@ -25,6 +25,7 @@ import BasicLayout from "layouts/authentication/components/BasicLayout";
 
 // Images
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
+import { colors } from "@mui/material";
 
 function Basic() {
   const [rememberMe, setRememberMe] = useState(false);
@@ -33,18 +34,8 @@ function Basic() {
 
   return (
     <BasicLayout image={bgImage}>
-      <Card>
-        <MDBox
-          variant="gradient"
-          bgColor="info"
-          borderRadius="lg"
-          coloredShadow="info"
-          mx={2}
-          mt={-3}
-          p={2}
-          mb={1}
-          textAlign="center"
-        >
+      <Card sx={{ width: "300px", bgcolor: "#333338" }}>
+        <MDBox bgColor="info" borderRadius="lg" mx={2} mt={-3} p={2} mb={1} textAlign="center">
           <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
             تسجيل دخول
           </MDTypography>
@@ -69,10 +60,28 @@ function Basic() {
         <MDBox pt={4} pb={3} px={3}>
           <MDBox component="form" role="form">
             <MDBox mb={2}>
-              <MDInput type="email" label="البريد الإلكتروني" fullWidth />
+              <MDInput
+                type="email"
+                label="البريد الإلكتروني"
+                fullWidth
+                sx={{
+                  color: "white",
+                  input: { color: "white !important" },
+                  label: { color: "white !important" },
+                }}
+              />
             </MDBox>
             <MDBox mb={2}>
-              <MDInput type="password" label="كلمة المرور" fullWidth />
+              <MDInput
+                type="password"
+                label="كلمة المرور"
+                fullWidth
+                sx={{
+                  color: "white",
+                  input: { color: "white !important" },
+                  label: { color: "white !important" },
+                }}
+              />
             </MDBox>
             <MDBox display="flex" alignItems="center" ml={-1}>
               <Switch checked={rememberMe} onChange={handleSetRememberMe} />
@@ -81,18 +90,18 @@ function Basic() {
                 fontWeight="regular"
                 color="text"
                 onClick={handleSetRememberMe}
-                sx={{ cursor: "pointer", userSelect: "none", ml: -1 }}
+                sx={{ cursor: "pointer", userSelect: "none", ml: -1, color: "white !important" }}
               >
                 &nbsp;&nbsp;تذكرني
               </MDTypography>
             </MDBox>
             <MDBox mt={4} mb={1}>
-              <MDButton variant="gradient" color="info" fullWidth>
+              <MDButton color="info" fullWidth>
                 تسجيل دخول
               </MDButton>
             </MDBox>
             <MDBox mt={3} mb={1} textAlign="center">
-              <MDTypography variant="button" color="text">
+              <MDTypography variant="button" color="white">
                 ليس لديك حساب؟{" "}
                 <MDTypography
                   component={Link}
@@ -100,7 +109,6 @@ function Basic() {
                   variant="button"
                   color="info"
                   fontWeight="medium"
-                  textGradient
                 >
                   إنشاء حساب جديد
                 </MDTypography>

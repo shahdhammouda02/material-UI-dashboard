@@ -7,15 +7,16 @@ import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 // Material Dashboard 2 React layouts
 import Dashboard from "layouts/dashboard";
 import Products from "layouts/products";
-import Billing from "layouts/billing";
+import Delivery from "layouts/delivery";
 import Order from "layouts/order";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
+import MainCategories from "layouts/categories/main-category";
+import SubCategories from "layouts/categories/sub-category";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
-import MainCategories from "layouts/categories/main-category";
-import SubCategories from "layouts/categories/sub-category";
+
 const routes = [
   {
     key: "dashboard",
@@ -40,7 +41,7 @@ const routes = [
     collapse: [
       {
         type: "collapse",
-        name: "التصنيفات الاساسية",
+        name: "التصنيفات الأساسية",
         key: "MAINcategories",
         route: "/categories/main-category",
         component: <MainCategories />,
@@ -67,8 +68,8 @@ const routes = [
     name: "التوصيل",
     key: "delivery",
     icon: <DeliveryDiningIcon fontSize="small" />,
-    route: "/billing",
-    component: <Billing />,
+    route: "/delivery",
+    component: <Delivery />,
   },
   {
     type: "collapse",

@@ -10,6 +10,10 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
@@ -21,7 +25,7 @@ function AddOrder({ initialRows }) {
     productNumber: "",
     quantity: "",
     totalAmount: "",
-    status: "",
+    status: "", // Add a field for status
   });
 
   const [error, setError] = useState("");
@@ -45,14 +49,27 @@ function AddOrder({ initialRows }) {
     }));
   };
 
+  const handleStatusChange = (e) => {
+    setNewOrder((prevOrder) => ({
+      ...prevOrder,
+      status: e.target.value,
+    }));
+  };
+
   const handleSubmit = () => {
+    // Enhanced validation
     if (
       !newOrder.customerName ||
       !newOrder.product ||
       !newOrder.quantity ||
-      !newOrder.totalAmount
+      !newOrder.totalAmount ||
+      !newOrder.status || // Ensure status is selected
+      isNaN(newOrder.quantity) ||
+      isNaN(newOrder.totalAmount) ||
+      newOrder.quantity <= 0 ||
+      newOrder.totalAmount <= 0
     ) {
-      setError("Please fill in all fields correctly.");
+      setError("Please fill in all fields correctly with positive numbers.");
       return;
     }
 
@@ -63,7 +80,7 @@ function AddOrder({ initialRows }) {
       productNumber: newOrder.productNumber,
       quantity: parseInt(newOrder.quantity, 10),
       totalAmount: newOrder.totalAmount,
-      status: "قيد المعالجة", // Default status
+      status: newOrder.status, // Use the selected status
       actions: (
         <Box display="flex" justifyContent="center" alignItems="center">
           <Button color="primary">Edit</Button>
@@ -84,7 +101,7 @@ function AddOrder({ initialRows }) {
       productNumber: "",
       quantity: "",
       totalAmount: "",
-      status: "",
+      status: "", // Reset the status field
     }));
   };
 
@@ -101,7 +118,7 @@ function AddOrder({ initialRows }) {
       productNumber: "",
       quantity: "",
       totalAmount: "",
-      status: "",
+      status: "", // Reset the status field
     }); // Reset form
   };
 
@@ -137,7 +154,9 @@ function AddOrder({ initialRows }) {
         {/* Dialog for order input */}
         <Dialog open={isDialogOpen} onClose={handleDialogClose}>
           <DialogTitle>إضافة طلب جديد</DialogTitle>
-          <DialogContent>
+          <DialogContent dir="rtl">
+            {" "}
+            {/* Ensure correct text direction */}
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
@@ -154,6 +173,7 @@ function AddOrder({ initialRows }) {
                   value={newOrder.customerName}
                   onChange={handleInputChange}
                   fullWidth
+                  error={error}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -163,6 +183,7 @@ function AddOrder({ initialRows }) {
                   value={newOrder.product}
                   onChange={handleInputChange}
                   fullWidth
+                  error={error}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -172,6 +193,7 @@ function AddOrder({ initialRows }) {
                   value={newOrder.productNumber}
                   onChange={handleInputChange}
                   fullWidth
+                  error={error}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -182,6 +204,8 @@ function AddOrder({ initialRows }) {
                   value={newOrder.quantity}
                   onChange={handleInputChange}
                   fullWidth
+                  inputProps={{ min: 0 }} // Ensure non-negative input
+                  error={error}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -191,7 +215,24 @@ function AddOrder({ initialRows }) {
                   value={newOrder.totalAmount}
                   onChange={handleInputChange}
                   fullWidth
+                  error={error}
                 />
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl fullWidth>
+                  <InputLabel>الحالة</InputLabel>
+                  <Select
+                    label="الحالة"
+                    value={newOrder.status}
+                    onChange={handleStatusChange}
+                    sx={{ height: 50 }}
+                  >
+                    <MenuItem value="قيد المعالجة">قيد المعالجة</MenuItem>
+                    <MenuItem value="تم التنفيذ">تم التنفيذ</MenuItem>
+                    <MenuItem value="ملغى">ملغى</MenuItem>
+                    {/* Add more statuses as required */}
+                  </Select>
+                </FormControl>
               </Grid>
               {error && (
                 <Grid item xs={12}>

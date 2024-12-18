@@ -6,32 +6,34 @@ import MDTypography from "components/MDTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import AddOrder from "./data/AddOrder";
-import OrdersTable from "./data/orderTable";
-import UpdateOrder from "./data/UpdateOrder";
+import Addshipping from "./data/Addshipping";
+import TableData from "./data/TableData";
+import UpdateShipping from "./data/UpdateShipping"; // Import UpdateShipping component
 import DataproductBodyCell from "../../examples/products/Dataproduct/DataproductBodyCell";
 import DataproductHeadCell from "../../examples/products/Dataproduct/DataproductHeadCell";
 
-function Order() {
-  const [editingId, setEditingId] = useState(null); // State to track the editing order ID
-  const [orderRows, setOrderRows] = useState([]); // State to hold order rows
+function Delivery() {
+  const [editingId, setEditingId] = useState(null); // State to track the editing ID
+  const [DeliveryRows, setDeliveryRows] = useState([]); // State to hold delivery rows
 
+  // Function to handle the edit action
   const handleEdit = (id) => {
     setEditingId(id); // Set the ID to edit
   };
 
-  const handleUpdate = (updatedOrder) => {
-    setOrderRows((prevRows) =>
-      prevRows.map((row) => (row.orderId === updatedOrder.orderId ? updatedOrder : row))
+  // Function to handle the update action
+  const handleUpdate = (updatedShipping) => {
+    setDeliveryRows((prevRows) =>
+      prevRows.map((row) => (row.id === updatedShipping.id ? updatedShipping : row))
     );
-    setEditingId(null);
+    setEditingId(null); // Close the edit dialog
   };
 
-  const { columns, rows } = OrdersTable(handleEdit); // Pass handleEdit to get column and row data
+  const { columns, rows } = TableData(handleEdit); // Pass the handleEdit function
 
-  // Update orderRows with the rows from OrdersTable
+  // Update DeliveryRows with the rows from TableData
   useEffect(() => {
-    setOrderRows(rows); // Set initial rows from OrdersTable
+    setDeliveryRows(rows); // ✅ Correct function name to setDeliveryRows
   }, [rows]);
 
   return (
@@ -43,14 +45,14 @@ function Order() {
             <Card>
               <MDBox mx={2} mt={-3} py={3} px={2} bgColor="info" borderRadius="lg">
                 <MDTypography variant="h6" color="white">
-                  جدول الطلبات
+                  جدول التوصيل
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
                 {editingId ? (
-                  <UpdateOrder
-                    initialRows={orderRows}
-                    orderId={editingId}
+                  <UpdateShipping
+                    initialRows={DeliveryRows} // Pass the correct rows here
+                    ShippingId={editingId}
                     onUpdate={handleUpdate}
                   />
                 ) : (
@@ -65,21 +67,14 @@ function Order() {
                       </tr>
                     </thead>
                     <tbody>
-                      {orderRows.map((row, index) => (
+                      {DeliveryRows.map((row, index) => (
                         <tr key={index}>
-                          <DataproductBodyCell align="center">{row.orderId}</DataproductBodyCell>
-                          <DataproductBodyCell align="center">
-                            {row.customerName}
-                          </DataproductBodyCell>
-                          <DataproductBodyCell align="center">{row.product}</DataproductBodyCell>
-                          <DataproductBodyCell align="center">
-                            {row.productNumber}
-                          </DataproductBodyCell>
-                          <DataproductBodyCell align="center">{row.quantity}</DataproductBodyCell>
-                          <DataproductBodyCell align="center">
-                            {row.totalAmount}
-                          </DataproductBodyCell>
-                          <DataproductBodyCell align="center">{row.status}</DataproductBodyCell>
+                          <DataproductBodyCell align="center">{row.id}</DataproductBodyCell>
+                          <DataproductBodyCell align="center">{row.userid}</DataproductBodyCell>
+                          <DataproductBodyCell align="center">{row.proid}</DataproductBodyCell>
+                          <DataproductBodyCell align="center">{row.shipping}</DataproductBodyCell>
+                          <DataproductBodyCell align="center">{row.price}</DataproductBodyCell>
+                          <DataproductBodyCell align="center">{row.adress}</DataproductBodyCell>
                           <DataproductBodyCell align="center">{row.actions}</DataproductBodyCell>
                         </tr>
                       ))}
@@ -87,7 +82,7 @@ function Order() {
                   </table>
                 )}
               </MDBox>
-              <AddOrder initialRows={rows} />
+              <Addshipping initialRows={DeliveryRows} />
             </Card>
           </Grid>
         </Grid>
@@ -97,4 +92,4 @@ function Order() {
   );
 }
 
-export default Order;
+export default Delivery;

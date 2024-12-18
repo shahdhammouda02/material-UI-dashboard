@@ -49,12 +49,12 @@ function Dashboard() {
               <ComplexStatisticsCard
                 color="dark"
                 icon="person_add"
-                title="Total Users "
+                title="عدد المستخدمين "
                 count={281}
                 percentage={{
                   color: "success",
                   amount: "+55%",
-                  label: "than lask week",
+                  label: "من الأسبوع الماضي",
                 }}
               />
             </MDBox>
@@ -63,12 +63,12 @@ function Dashboard() {
             <MDBox mb={1.5}>
               <ComplexStatisticsCard
                 icon="leaderboard"
-                title="Total Products"
+                title="مجموع المنتجات"
                 count="2,300"
                 percentage={{
                   color: "success",
                   amount: "+3%",
-                  label: "than last month",
+                  label: "من الشهر الماضي",
                 }}
               />
             </MDBox>
@@ -78,12 +78,12 @@ function Dashboard() {
               <ComplexStatisticsCard
                 color="success"
                 icon="store"
-                title="Total Orders"
+                title="مجموع الطلبات"
                 count="34k"
                 percentage={{
                   color: "success",
                   amount: "+1%",
-                  label: "than yesterday",
+                  label: "من الامس",
                 }}
               />
             </MDBox>
@@ -93,12 +93,12 @@ function Dashboard() {
               <ComplexStatisticsCard
                 color="primary"
                 icon={<DeliveryDiningIcon />}
-                title="delivery"
+                title="التوصيل"
                 count="+91"
                 percentage={{
                   color: "success",
                   amount: "",
-                  label: "Just updated",
+                  label: "تم الان",
                 }}
               />
             </MDBox>

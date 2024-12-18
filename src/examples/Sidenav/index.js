@@ -228,19 +228,6 @@ function Sidenav({ color, brand, routes, ...rest }) {
       </MDBox>
       <Divider light={!darkMode && !whiteSidenav} />
       <List>{renderRoutes(routes)}</List>
-      <MDBox p={2} mt="auto">
-        <MDButton
-          component="a"
-          href="https://www.creative-tim.com/product/material-dashboard-pro-react"
-          target="_blank"
-          rel="noreferrer"
-          variant="gradient"
-          color={color}
-          fullWidth
-        >
-          Upgrade to PRO
-        </MDButton>
-      </MDBox>
     </SidenavRoot>
   );
 }

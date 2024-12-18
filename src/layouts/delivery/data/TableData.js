@@ -15,28 +15,22 @@ export default function TableData(handleEdit) {
   };
 
   const [columns] = useState([
-    { Header: "الرقم التعريفي", accessor: "id", align: "center" },
-    { Header: "الاسم", accessor: "author", align: "center" },
-    { Header: "الفئة", accessor: "Category", align: "center" },
-    { Header: "الصورة", accessor: "images", align: "center" },
-    { Header: "السعر", accessor: "price", align: "center" },
-    { Header: "الخصم", accessor: "Discount", align: "center" },
-    { Header: "الوصف", accessor: "text", align: "center" },
+    { Header: "كود الشحنة", accessor: "id", align: "center" },
+    { Header: "رقم الزبون", accessor: "userid", align: "center" },
+    { Header: "رقم المنتج", accessor: "proid", align: "center" },
+    { Header: "نوع الشحن", accessor: "shipping", align: "center" },
+    { Header: "التكلفة", accessor: "price", align: "center" },
+    { Header: "العنوان", accessor: "adress", align: "center" },
     { Header: "الإجراءات", accessor: "actions", align: "center" },
   ]);
 
   const [initialRows] = useState([
     {
-      author: "John Michael",
-      Category: "المنتجات الغذائية",
-      images: (
-        <MDBox ml={-1}>
-          <img src={test} alt="image description" style={{ width: "100px", height: "100px" }} />
-        </MDBox>
-      ),
+      userid: "4",
+      proid: "10",
+      shipping: "عادي",
       price: "$50",
-      Discount: "10%",
-      text: "Foods and beverages",
+      adress: "مصر/مدينة نصر/شارع عباس العقاد",
       Actions: (
         <MDBox display="flex" justifyContent="center" alignItems="center">
           <MDIconButton color="primary">
@@ -50,16 +44,11 @@ export default function TableData(handleEdit) {
       ),
     },
     {
-      author: "John Michael",
-      Category: "الملابس والاكسسوارات",
-      images: (
-        <MDBox ml={-1}>
-          <img src={test} alt="image description" style={{ width: "100px", height: "100px" }} />
-        </MDBox>
-      ),
+      userid: "4",
+      proid: "10",
+      shipping: "عادي",
       price: "$50",
-      Discount: "10%",
-      text: "Clothing items and Accessories",
+      adress: "مصر/مدينة نصر/شارع عباس العقاد",
       Actions: (
         <MDBox display="flex" justifyContent="center" alignItems="center">
           <MDIconButton color="primary">
@@ -73,16 +62,11 @@ export default function TableData(handleEdit) {
       ),
     },
     {
-      author: "John Michael",
-      Category: "الحرف اليدوية",
-      images: (
-        <MDBox ml={-1}>
-          <img src={test} alt="image description" style={{ width: "100px", height: "100px" }} />
-        </MDBox>
-      ),
+      userid: "4",
+      proid: "10",
+      shipping: "عادي",
       price: "$50",
-      Discount: "10%",
-      text: "Handicrafts",
+      adress: "مصر/مدينة نصر/شارع عباس العقاد",
       Actions: (
         <MDBox display="flex" justifyContent="center" alignItems="center">
           <MDIconButton color="primary">

@@ -15,23 +15,13 @@ import MDButton from "components/MDButton";
 import CoverLayout from "layouts/authentication/components/CoverLayout";
 
 // Images
-import bgImage from "assets/images/bg-sign-up-cover.jpeg";
+import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 
 function Cover() {
   return (
     <CoverLayout image={bgImage}>
-      <Card>
-        <MDBox
-          variant="gradient"
-          bgColor="info"
-          borderRadius="lg"
-          coloredShadow="success"
-          mx={2}
-          mt={-3}
-          p={3}
-          mb={1}
-          textAlign="center"
-        >
+      <Card sx={{ bgcolor: "#333338" }}>
+        <MDBox bgColor="info" borderRadius="lg" mx={2} mt={-3} p={3} mb={1} textAlign="center">
           <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
             انضم إلينا اليوم
           </MDTypography>
@@ -42,42 +32,69 @@ function Cover() {
         <MDBox pt={4} pb={3} px={3}>
           <MDBox component="form" role="form">
             <MDBox mb={2}>
-              <MDInput type="text" label="الاسم" variant="standard" fullWidth />
+              <MDInput
+                type="text"
+                label="الاسم"
+                variant="standard"
+                fullWidth
+                sx={{
+                  color: "white",
+                  input: { color: "white !important" },
+                  label: { color: "white !important" },
+                }}
+              />
             </MDBox>
             <MDBox mb={2}>
-              <MDInput type="email" label="البريد الإلكتروني" variant="standard" fullWidth />
+              <MDInput
+                type="email"
+                label="البريد الإلكتروني"
+                variant="standard"
+                fullWidth
+                sx={{
+                  color: "white",
+                  input: { color: "white !important" },
+                  label: { color: "white !important" },
+                }}
+              />
             </MDBox>
             <MDBox mb={2}>
-              <MDInput type="password" label="كلمة المرور" variant="standard" fullWidth />
+              <MDInput
+                type="password"
+                label="كلمة المرور"
+                variant="standard"
+                fullWidth
+                sx={{
+                  color: "white",
+                  input: { color: "white !important" },
+                  label: { color: "white !important" },
+                }}
+              />
             </MDBox>
             <MDBox display="flex" alignItems="center" ml={-1}>
               <Checkbox />
               <MDTypography
                 variant="button"
                 fontWeight="regular"
-                color="text"
-                sx={{ cursor: "pointer", userSelect: "none", ml: -1 }}
+                sx={{
+                  cursor: "pointer",
+                  userSelect: "none",
+                  ml: -1,
+                  color: "white !important",
+                }}
               >
                 &nbsp;&nbsp;أوافق على&nbsp;
               </MDTypography>
-              <MDTypography
-                component="a"
-                href="#"
-                variant="button"
-                fontWeight="bold"
-                color="info"
-                textGradient
-              >
+              <MDTypography component="a" href="#" variant="button" fontWeight="bold" color="info">
                 الشروط والأحكام
               </MDTypography>
             </MDBox>
             <MDBox mt={4} mb={1}>
-              <MDButton variant="gradient" color="info" fullWidth>
+              <MDButton color="info" fullWidth>
                 تسجيل الدخول
               </MDButton>
             </MDBox>
             <MDBox mt={3} mb={1} textAlign="center">
-              <MDTypography variant="button" color="text">
+              <MDTypography variant="button" sx={{ color: "white !important" }}>
                 لديك حساب بالفعل؟{" "}
                 <MDTypography
                   component={Link}
@@ -85,7 +102,6 @@ function Cover() {
                   variant="button"
                   color="info"
                   fontWeight="medium"
-                  textGradient
                 >
                   تسجيل الدخول
                 </MDTypography>
