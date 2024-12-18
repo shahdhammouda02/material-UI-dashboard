@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation, NavLink } from "react-router-dom";
+import { useLocation, NavLink, useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 
 // MUI Components
@@ -28,7 +28,10 @@ function Sidenav({ color, brand, routes, ...rest }) {
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, transparentSidenav, whiteSidenav, darkMode } = controller;
   const location = useLocation();
+  const navigate = useNavigate();
   const collapseName = location.pathname.replace("/", "");
+
+  const IsSignIn = location.pathname === "/";
 
   // State to manage open/close of collapsible categories
   const [openCollapse, setOpenCollapse] = useState({});
@@ -202,33 +205,37 @@ function Sidenav({ color, brand, routes, ...rest }) {
     });
 
   return (
-    <SidenavRoot
-      {...rest}
-      variant="permanent"
-      ownerState={{ transparentSidenav, whiteSidenav, miniSidenav, darkMode }}
-    >
-      <MDBox pt={3} pb={1} px={4} textAlign="center">
-        <MDBox
-          display={{ xs: "block", xl: "none" }}
-          position="absolute"
-          top={0}
-          right={0}
-          p={1.625}
-          onClick={closeSidenav}
-          sx={{ cursor: "pointer" }}
+    <>
+      {!IsSignIn && (
+        <SidenavRoot
+          {...rest}
+          variant="permanent"
+          ownerState={{ transparentSidenav, whiteSidenav, miniSidenav, darkMode }}
         >
-          <MDTypography variant="h6" color="secondary">
-            <Icon sx={{ fontWeight: "bold", color: "white !important" }}>close</Icon>
-          </MDTypography>
-        </MDBox>
-        <MDBox component={NavLink} to="/" display="flex" alignItems="center">
-          {brand && <MDBox component="img" src={brand} alt="Brand" width="10rem" />}
-          <MDBox sx={(theme) => sidenavLogoLabel(theme, { miniSidenav })}></MDBox>
-        </MDBox>
-      </MDBox>
-      <Divider light={!darkMode && !whiteSidenav} />
-      <List>{renderRoutes(routes)}</List>
-    </SidenavRoot>
+          <MDBox pt={3} pb={1} px={4} textAlign="center">
+            <MDBox
+              display={{ xs: "block", xl: "none" }}
+              position="absolute"
+              top={0}
+              right={0}
+              p={1.625}
+              onClick={closeSidenav}
+              sx={{ cursor: "pointer" }}
+            >
+              <MDTypography variant="h6" color="secondary">
+                <Icon sx={{ fontWeight: "bold", color: "white !important" }}>close</Icon>
+              </MDTypography>
+            </MDBox>
+            <MDBox component={NavLink} to="/" display="flex" alignItems="center">
+              {brand && <MDBox component="img" src={brand} alt="Brand" width="10rem" />}
+              <MDBox sx={(theme) => sidenavLogoLabel(theme, { miniSidenav })}></MDBox>
+            </MDBox>
+          </MDBox>
+          <Divider light={!darkMode && !whiteSidenav} />
+          <List>{renderRoutes(routes)}</List>
+        </SidenavRoot>
+      )}
+    </>
   );
 }
 

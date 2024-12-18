@@ -3,6 +3,7 @@ import DeliveryDiningIcon from "@mui/icons-material/DeliveryDining";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import CategoryIcon from "@mui/icons-material/Category";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 
 // Material Dashboard 2 React layouts
 import Dashboard from "layouts/dashboard";
@@ -71,11 +72,19 @@ const routes = [
     route: "/delivery",
     component: <Delivery />,
   },
+  // {
+  //   type: "collapse",
+  //   name: "تسجيل دخول",
+  //   key: "sign-in",
+  //   icon: <Icon fontSize="small">login</Icon>,
+  //   route: "/authentication/sign-in",
+  //   component: <SignIn />,
+  // },
   {
     type: "collapse",
-    name: "تسجيل دخول",
-    key: "sign-in",
-    icon: <Icon fontSize="small">login</Icon>,
+    name: "تسجيل خروج",
+    key: "log-out",
+    icon: <ExitToAppIcon fontSize="small">Logout</ExitToAppIcon>,
     route: "/authentication/sign-in",
     component: <SignIn />,
   },

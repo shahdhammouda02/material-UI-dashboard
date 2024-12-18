@@ -1,7 +1,5 @@
-import { useState } from "react";
-
-// react-router-dom components
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom"; // Import useNavigate for navigation
 
 // @mui material components
 import Card from "@mui/material/Card";
@@ -25,12 +23,44 @@ import BasicLayout from "layouts/authentication/components/BasicLayout";
 
 // Images
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
-import { colors } from "@mui/material";
 
 function Basic() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [storedEmail, setStoredEmail] = useState("");
+  const navigate = useNavigate(); // Utilize useNavigate for programmatic navigation
+
+  // Define the allowed email address
+  const allowedEmail = "shahd2@gmail.com"; // Replace with your desired email
+  const allowedPassword = "123456";
+  useEffect(() => {
+    const retrievedEmail = localStorage.getItem("userEmail"); // Simulate retrieving email
+    setStoredEmail(retrievedEmail);
+  }, []); // Run only on component mount
 
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
+
+  const handleSignIn = async (event) => {
+    event.preventDefault();
+
+    // Check if the provided credentials match the allowed ones
+    if (email === allowedEmail && password === allowedPassword) {
+      // Simulate successful authentication
+      const token = "your_generated_token"; // Replace with your actual token generation logic
+      localStorage.setItem("token", token);
+
+      if (rememberMe) {
+        localStorage.setItem("userEmail", email);
+      } else {
+        localStorage.removeItem("userEmail");
+      }
+
+      navigate("/dashboard");
+    } else {
+      alert("Invalid credentials. Please try again.");
+    }
+  };
 
   return (
     <BasicLayout image={bgImage}>
@@ -58,12 +88,14 @@ function Basic() {
           </Grid>
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>
-          <MDBox component="form" role="form">
+          <MDBox component="form" role="form" onSubmit={handleSignIn}>
             <MDBox mb={2}>
               <MDInput
                 type="email"
                 label="البريد الإلكتروني"
                 fullWidth
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 sx={{
                   color: "white",
                   input: { color: "white !important" },
@@ -76,6 +108,8 @@ function Basic() {
                 type="password"
                 label="كلمة المرور"
                 fullWidth
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 sx={{
                   color: "white",
                   input: { color: "white !important" },
@@ -96,7 +130,7 @@ function Basic() {
               </MDTypography>
             </MDBox>
             <MDBox mt={4} mb={1}>
-              <MDButton color="info" fullWidth>
+              <MDButton color="info" fullWidth type="submit">
                 تسجيل دخول
               </MDButton>
             </MDBox>

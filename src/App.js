@@ -34,6 +34,10 @@ import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "co
 
 // Images
 import ZaytonaLogo from "assets/images/Artboard 1 copy.png";
+import ProtectedRoute from "./ProtectedRoute";
+import SignIn from "./layouts/authentication/sign-in";
+import BasicLayout from "layouts/authentication/components/BasicLayout";
+import Dashboard from "layouts/dashboard";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -127,6 +131,17 @@ export default function App() {
     <CacheProvider value={rtlCache}>
       <ThemeProvider theme={darkMode ? themeDarkRTL : themeRTL}>
         <CssBaseline />
+        <Routes>
+          <Route path="/" element={<SignIn />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
         {layout === "dashboard" && (
           <>
             <Sidenav
@@ -138,7 +153,7 @@ export default function App() {
             />
             <Routes>
               {getRoutes(routes)}
-              <Route path="*" element={<Navigate to="/dashboard" />} />
+              <Route path="*" element={<Navigate to="/" />} />
             </Routes>
             <Configurator />
             {configsButton}
