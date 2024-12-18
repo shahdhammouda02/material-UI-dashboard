@@ -3,15 +3,15 @@ import MDBox from "components/MDBox";
 import MDIconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useNavigate } from "react-router-dom";
-import test from "../../../assets/images/bg-profile.jpeg";
 export default function TableData(handleEdit) {
-  const navigate = useNavigate();
-
   // Edit button handler
   const handleEditClick = (id) => {
     console.log(`Editing product with ID: ${id}`);
     handleEdit(id); // Call the passed handleEdit function
+  };
+
+  const handleDeleteClick = (id) => {
+    setInitialRows((prevRows) => prevRows.filter((_, index) => index + 1 !== id));
   };
 
   const [columns] = useState([
@@ -24,24 +24,13 @@ export default function TableData(handleEdit) {
     { Header: "الإجراءات", accessor: "actions", align: "center" },
   ]);
 
-  const [initialRows] = useState([
+  const [initialRows, setInitialRows] = useState([
     {
       userid: "4",
       proid: "10",
       shipping: "عادي",
       price: "$50",
       adress: "مصر/مدينة نصر/شارع عباس العقاد",
-      Actions: (
-        <MDBox display="flex" justifyContent="center" alignItems="center">
-          <MDIconButton color="primary">
-            <EditIcon />
-          </MDIconButton>
-          <MDBox mx={1} />
-          <MDIconButton color="error">
-            <DeleteIcon />
-          </MDIconButton>
-        </MDBox>
-      ),
     },
     {
       userid: "4",
@@ -49,17 +38,6 @@ export default function TableData(handleEdit) {
       shipping: "عادي",
       price: "$50",
       adress: "مصر/مدينة نصر/شارع عباس العقاد",
-      Actions: (
-        <MDBox display="flex" justifyContent="center" alignItems="center">
-          <MDIconButton color="primary">
-            <EditIcon />
-          </MDIconButton>
-          <MDBox mx={1} />
-          <MDIconButton color="error">
-            <DeleteIcon />
-          </MDIconButton>
-        </MDBox>
-      ),
     },
     {
       userid: "4",
@@ -67,17 +45,6 @@ export default function TableData(handleEdit) {
       shipping: "عادي",
       price: "$50",
       adress: "مصر/مدينة نصر/شارع عباس العقاد",
-      Actions: (
-        <MDBox display="flex" justifyContent="center" alignItems="center">
-          <MDIconButton color="primary">
-            <EditIcon />
-          </MDIconButton>
-          <MDBox mx={1} />
-          <MDIconButton color="error">
-            <DeleteIcon />
-          </MDIconButton>
-        </MDBox>
-      ),
     },
   ]);
 
@@ -91,7 +58,7 @@ export default function TableData(handleEdit) {
             <EditIcon />
           </MDIconButton>
           <MDBox mx={1} />
-          <MDIconButton color="error">
+          <MDIconButton color="error" onClick={() => handleDeleteClick(index + 1)}>
             <DeleteIcon />
           </MDIconButton>
         </MDBox>

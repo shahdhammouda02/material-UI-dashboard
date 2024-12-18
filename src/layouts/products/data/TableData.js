@@ -3,15 +3,16 @@ import MDBox from "components/MDBox";
 import MDIconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useNavigate } from "react-router-dom";
 import test from "../../../assets/images/bg-profile.jpeg";
 export default function TableData(handleEdit) {
-  const navigate = useNavigate();
-
   // Edit button handler
   const handleEditClick = (id) => {
     console.log(`Editing product with ID: ${id}`);
     handleEdit(id); // Call the passed handleEdit function
+  };
+
+  const handleDeleteClick = (id) => {
+    setInitialRows((prevRows) => prevRows.filter((_, index) => index + 1 !== id));
   };
 
   const [columns] = useState([
@@ -25,9 +26,9 @@ export default function TableData(handleEdit) {
     { Header: "الإجراءات", accessor: "actions", align: "center" },
   ]);
 
-  const [initialRows] = useState([
+  const [initialRows, setInitialRows] = useState([
     {
-      author: "John Michael",
+      author: "سارة خالد",
       Category: "المنتجات الغذائية",
       images: (
         <MDBox ml={-1}>
@@ -36,21 +37,10 @@ export default function TableData(handleEdit) {
       ),
       price: "$50",
       Discount: "10%",
-      text: "Foods and beverages",
-      Actions: (
-        <MDBox display="flex" justifyContent="center" alignItems="center">
-          <MDIconButton color="primary">
-            <EditIcon />
-          </MDIconButton>
-          <MDBox mx={1} />
-          <MDIconButton color="error">
-            <DeleteIcon />
-          </MDIconButton>
-        </MDBox>
-      ),
+      text: "الاكل الفلسطيني له طعم مميز",
     },
     {
-      author: "John Michael",
+      author: "مرح علي",
       Category: "الملابس والاكسسوارات",
       images: (
         <MDBox ml={-1}>
@@ -59,21 +49,10 @@ export default function TableData(handleEdit) {
       ),
       price: "$50",
       Discount: "10%",
-      text: "Clothing items and Accessories",
-      Actions: (
-        <MDBox display="flex" justifyContent="center" alignItems="center">
-          <MDIconButton color="primary">
-            <EditIcon />
-          </MDIconButton>
-          <MDBox mx={1} />
-          <MDIconButton color="error">
-            <DeleteIcon />
-          </MDIconButton>
-        </MDBox>
-      ),
+      text: "الملابس الفلسطينية لها طابع تراثي اصيل",
     },
     {
-      author: "John Michael",
+      author: "احمد علي",
       Category: "الحرف اليدوية",
       images: (
         <MDBox ml={-1}>
@@ -82,18 +61,7 @@ export default function TableData(handleEdit) {
       ),
       price: "$50",
       Discount: "10%",
-      text: "Handicrafts",
-      Actions: (
-        <MDBox display="flex" justifyContent="center" alignItems="center">
-          <MDIconButton color="primary">
-            <EditIcon />
-          </MDIconButton>
-          <MDBox mx={1} />
-          <MDIconButton color="error">
-            <DeleteIcon />
-          </MDIconButton>
-        </MDBox>
-      ),
+      text: "الحرف اليدوية تمثل التاريخ الفلسطيني القديم المميز",
     },
   ]);
 
@@ -107,7 +75,7 @@ export default function TableData(handleEdit) {
             <EditIcon />
           </MDIconButton>
           <MDBox mx={1} />
-          <MDIconButton color="error">
+          <MDIconButton color="error" onClick={() => handleDeleteClick(index + 1)}>
             <DeleteIcon />
           </MDIconButton>
         </MDBox>
