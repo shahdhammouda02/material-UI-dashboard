@@ -9,6 +9,7 @@ const Logout = () => {
           navigate("/"); // Redirect to the login page
         } else {
           localStorage.removeItem("token"); // Remove token on logout
+          localStorage.setItem("isLoggedIn", "false");
           navigate("/"); // Redirect to the login page (optional)
         }
       }, []);

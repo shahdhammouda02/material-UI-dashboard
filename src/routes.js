@@ -20,7 +20,6 @@ import SubCategories from "layouts/categories/sub-category";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
-import icon from "assets/theme/components/icon";
 
 const routes = [
   {
@@ -97,7 +96,7 @@ const routes = [
     name: "تسجيل خروج",
     key: "log-out",
     icon: <ExitToAppIcon fontSize="small">Logout</ExitToAppIcon>,
-    route: "/authentication/sign-in",
+    route: "/",
     component: <SignIn />,
   },
   {
