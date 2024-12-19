@@ -47,11 +47,11 @@ export default function DataTable(handleEdit) {
     ...row,
     Actions: (
       <MDBox display="flex" justifyContent="center" alignItems="center">
-        <MDIconButton color="primary" onClick={() => handleEditClick(index + 1)}>
+        <MDIconButton color="success" onClick={() => handleEditClick(index + 1)}>
           <EditIcon />
         </MDIconButton>
         <MDBox mx={1} />
-        <MDIconButton color="error" onClick={() => handleDeleteClick(index)}>
+        <MDIconButton color="success" onClick={() => handleDeleteClick(index)}>
           <DeleteIcon />
         </MDIconButton>
       </MDBox>

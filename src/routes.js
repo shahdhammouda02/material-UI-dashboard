@@ -2,6 +2,9 @@
 import DeliveryDiningIcon from "@mui/icons-material/DeliveryDining";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import CategoryIcon from "@mui/icons-material/Category";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+// import FolderIcon from "@mui/icons-material/Folder";
+// import SubdirectoryArrowRightIcon from "@mui/icons-material/SubdirectoryArrowRight";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 
@@ -17,6 +20,7 @@ import SubCategories from "layouts/categories/sub-category";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
+import icon from "assets/theme/components/icon";
 
 const routes = [
   {
@@ -28,23 +32,22 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "المنتجات",
-    key: "products",
-    icon: <ShoppingCartIcon fontSize="small" />,
-    route: "/products",
-    component: <Products />,
-  },
-  {
-    type: "collapse",
     name: "التصنيفات",
     key: "categories",
-    icon: <CategoryIcon fontSize="small" />,
+    // icon: <ExpandMoreIcon fontSize="small" />,
+    icon: (
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <ExpandMoreIcon fontSize="small" />
+        <CategoryIcon fontSize="small" />
+      </div>
+    ),
     collapse: [
       {
         type: "collapse",
         name: "التصنيفات الأساسية",
         key: "MAINcategories",
         route: "/categories/main-category",
+        // icon: <FolderIcon fontSize="small" />,
         component: <MainCategories />,
       },
       {
@@ -52,9 +55,18 @@ const routes = [
         name: "التصنيفات الثانوية",
         key: "subcategories",
         route: "/categories/sub-category",
+        // icon: <SubdirectoryArrowRightIcon fontSize="small" />,
         component: <SubCategories />,
       },
     ],
+  },
+  {
+    type: "collapse",
+    name: "المنتجات",
+    key: "products",
+    icon: <ShoppingCartIcon fontSize="small" />,
+    route: "/products",
+    component: <Products />,
   },
   {
     type: "collapse",
