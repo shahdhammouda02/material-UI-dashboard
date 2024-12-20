@@ -47,11 +47,15 @@ function Products() {
                 px={2}
                 bgColor="info"
                 borderRadius="lg"
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
                 // coloredShadow="info"
               >
                 <MDTypography variant="h6" color="white">
                   جدول المنتجات
                 </MDTypography>
+                <Addproduct initialRows={productRows} />
               </MDBox>
               <MDBox pt={3}>
                 {editingId ? (
@@ -88,7 +92,6 @@ function Products() {
                   </table>
                 )}
               </MDBox>
-              <Addproduct initialRows={productRows} />
             </Card>
           </Grid>
         </Grid>

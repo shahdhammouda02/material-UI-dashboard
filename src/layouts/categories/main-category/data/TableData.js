@@ -19,8 +19,8 @@ export default function TableData(handleEdit) {
   };
 
   const [columns] = useState([
-    { Header: "الرقم التعريفي", accessor: "id", align: "left" },
-    { Header: "الفئة الاساسية", accessor: "categoryName", align: "left" },
+    { Header: "الرقم التعريفي", accessor: "id", align: "center" },
+    { Header: "الفئة الاساسية", accessor: "categoryName", align: "center" },
     { Header: "الصنف", accessor: "description", align: "center" },
     { Header: "الاجراءات", accessor: "actions", align: "center" },
   ]);

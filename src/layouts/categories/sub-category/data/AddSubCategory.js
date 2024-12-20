@@ -90,27 +90,31 @@ function AddSubCategory({ initialRows }) {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#eaeaea",
-        borderTop: "2px solid rgb(240 242 243)",
       }}
     >
       <Box
         flexDirection="column"
-        width="100%"
+        // width="100%"
         display="flex"
         justifyContent="center"
         alignItems="center"
-        p={3}
-        bgcolor="#fbfbfb"
-        color="#000"
+        // p={3}
+        // bgcolor="#fbfbfb"
+        // color="#000"
       >
         <Button
-          variant="contained"
-          startIcon={<AddIcon />}
           onClick={handleDialogOpen}
-          sx={{ mb: 3, color: "#ffffff", fontSize: "1rem" }}
+          sx={{
+            bgcolor: "#ffffff",
+            "&:hover": {
+              bgcolor: "#000000",
+              color: "#ffffff", // لون أغمق عند التمرير
+            },
+            transition: "all 0.3s ease-in-out",
+          }}
         >
           اضافة صنف جديد
+          <AddIcon />
         </Button>
 
         {/* Dialog for subcategory input */}

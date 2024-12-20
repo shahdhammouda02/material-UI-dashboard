@@ -41,10 +41,21 @@ function MainCategories() {
         <Grid container spacing={6}>
           <Grid item xs={12}>
             <Card>
-              <MDBox mx={2} mt={-3} py={3} px={2} bgColor="info" borderRadius="lg">
+              <MDBox
+                mx={2}
+                mt={-3}
+                py={3}
+                px={2}
+                bgColor="info"
+                borderRadius="lg"
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+              >
                 <MDTypography variant="h6" color="white">
                   جدول الفئات
                 </MDTypography>
+                <AddCategory initialRows={categoryRows} />
               </MDBox>
               <MDBox pt={3}>
                 {editingId ? (
@@ -67,8 +78,8 @@ function MainCategories() {
                     <tbody>
                       {categoryRows.map((row, index) => (
                         <tr key={index}>
-                          <CategoryBodyCell align="left">{row.id}</CategoryBodyCell>
-                          <CategoryBodyCell align="left">{row.categoryName}</CategoryBodyCell>
+                          <CategoryBodyCell align="center">{row.id}</CategoryBodyCell>
+                          <CategoryBodyCell align="center">{row.categoryName}</CategoryBodyCell>
                           <CategoryBodyCell align="center">{row.description}</CategoryBodyCell>
                           <CategoryBodyCell align="center">{row.actions}</CategoryBodyCell>
                         </tr>
@@ -77,7 +88,6 @@ function MainCategories() {
                   </table>
                 )}
               </MDBox>
-              <AddCategory initialRows={categoryRows} />
             </Card>
           </Grid>
         </Grid>

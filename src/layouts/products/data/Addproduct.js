@@ -100,32 +100,23 @@ function Addproduct({ initialRows }) {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#eaeaea",
-        borderTop: "2px solid rgb(240 242 243)",
       }}
     >
-      <Box
-        flexDirection="column"
-        width="100%"
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        p={3}
-        bgcolor="#fbfbfb"
-        color="#000"
-      >
+      <Box flexDirection="column" display="flex" justifyContent="center" alignItems="center">
         <Button
-          variant="contained"
           onClick={handleDialogOpen}
           sx={{
-            mb: 3,
-            color: "#ffffff",
-            fontSize: "1rem",
-            gap: "8px",
+            bgcolor: "#ffffff",
+            color: "#1e8234",
+            "&:hover": {
+              bgcolor: "#000000",
+              color: "#ffffff", // لون أغمق عند التمرير
+            },
+            transition: "all 0.3s ease-in-out",
           }}
         >
-          <AddIcon />
           اضافة منتج جديد
+          <AddIcon />
         </Button>
 
         {/* Dialog for product input */}

@@ -43,10 +43,21 @@ function Delivery() {
         <Grid container spacing={6}>
           <Grid item xs={12}>
             <Card>
-              <MDBox mx={2} mt={-3} py={3} px={2} bgColor="info" borderRadius="lg">
+              <MDBox
+                mx={2}
+                mt={-3}
+                py={3}
+                px={2}
+                bgColor="info"
+                borderRadius="lg"
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+              >
                 <MDTypography variant="h6" color="white">
                   جدول التوصيل
                 </MDTypography>
+                <Addshipping initialRows={DeliveryRows} />
               </MDBox>
               <MDBox pt={3}>
                 {editingId ? (
@@ -82,7 +93,6 @@ function Delivery() {
                   </table>
                 )}
               </MDBox>
-              <Addshipping initialRows={DeliveryRows} />
             </Card>
           </Grid>
         </Grid>
