@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom"; // Import useNavigate for navigation
+import CryptoJS from "crypto-js"; // Import crypto-js for encryption
 
 // @mui material components
 import Card from "@mui/material/Card";
@@ -24,6 +25,9 @@ import BasicLayout from "layouts/authentication/components/BasicLayout";
 // Images
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 
+// Encryption key (keep this secret)
+const ENCRYPTION_KEY = "your_secret_key_123"; // Replace with a secure key
+
 function Basic() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -34,12 +38,22 @@ function Basic() {
   // Define the allowed email address
   const allowedEmail = "shahd2@gmail.com"; // Replace with your desired email
   const allowedPassword = "123456";
+
   useEffect(() => {
     const retrievedEmail = localStorage.getItem("userEmail"); // Simulate retrieving email
     setStoredEmail(retrievedEmail);
   }, []); // Run only on component mount
 
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
+
+  const encryptToken = (token) => {
+    return CryptoJS.AES.encrypt(token, ENCRYPTION_KEY).toString();
+  };
+
+  const decryptToken = (encryptedToken) => {
+    const bytes = CryptoJS.AES.decrypt(encryptedToken, ENCRYPTION_KEY);
+    return bytes.toString(CryptoJS.enc.Utf8);
+  };
 
   const handleSignIn = async (event) => {
     event.preventDefault();
@@ -48,7 +62,10 @@ function Basic() {
     if (email === allowedEmail && password === allowedPassword) {
       // Simulate successful authentication
       const token = "your_generated_token"; // Replace with your actual token generation logic
-      localStorage.setItem("token", token);
+
+      // Encrypt the token before storing it
+      const encryptedToken = encryptToken(token);
+      localStorage.setItem("token", encryptedToken);
 
       if (rememberMe) {
         localStorage.setItem("userEmail", email);

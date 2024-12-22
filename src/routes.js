@@ -17,6 +17,7 @@ import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import MainCategories from "layouts/categories/main-category";
 import SubCategories from "layouts/categories/sub-category";
+import Profile from "layouts/profile";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
@@ -66,6 +67,14 @@ const routes = [
     icon: <ShoppingCartIcon fontSize="small" />,
     route: "/products",
     component: <Products />,
+  },
+  {
+    type: "collapse",
+    name: "الملف الشخصي",
+    key: "profile",
+    route: "/profile",
+    icon: <Icon fontSize="small">person</Icon>,
+    component: <Profile />,
   },
   {
     type: "collapse",

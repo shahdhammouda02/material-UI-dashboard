@@ -1,18 +1,3 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
 // react-routers components
 import { Link } from "react-router-dom";
 
@@ -39,20 +24,16 @@ function ProfileInfoCard({ title, description, info, social, action, shadow }) {
   const { socialMediaColors } = colors;
   const { size } = typography;
 
-  // Convert this form `objectKey` of the object key in to this `object key`
-  Object.keys(info).forEach((el) => {
-    if (el.match(/[A-Z\s]+/)) {
-      const uppercaseLetter = Array.from(el).find((i) => i.match(/[A-Z]+/));
-      const newElement = el.replace(uppercaseLetter, ` ${uppercaseLetter.toLowerCase()}`);
+  // Handle undefined info
+  if (info) {
+    // Convert `objectKey` to `object key`
+    Object.keys(info).forEach((el) => {
+      labels.push(el.replace(/([A-Z])/g, " $1").toLowerCase());
+    });
 
-      labels.push(newElement);
-    } else {
-      labels.push(el);
-    }
-  });
-
-  // Push the object values into the values array
-  Object.values(info).forEach((el) => values.push(el));
+    // Push the object values into the values array
+    Object.values(info).forEach((el) => values.push(el));
+  }
 
   // Render the card info items
   const renderItems = labels.map((label, key) => (
@@ -66,23 +47,25 @@ function ProfileInfoCard({ title, description, info, social, action, shadow }) {
     </MDBox>
   ));
 
-  // Render the card social media icons
-  const renderSocial = social.map(({ link, icon, color }) => (
-    <MDBox
-      key={color}
-      component="a"
-      href={link}
-      target="_blank"
-      rel="noreferrer"
-      fontSize={size.lg}
-      color={socialMediaColors[color].main}
-      pr={1}
-      pl={0.5}
-      lineHeight={1}
-    >
-      {icon}
-    </MDBox>
-  ));
+  // Handle undefined social
+  const renderSocial = social
+    ? social.map(({ link, icon, color }) => (
+        <MDBox
+          key={color}
+          component="a"
+          href={link}
+          target="_blank"
+          rel="noreferrer"
+          fontSize={size.lg}
+          color={socialMediaColors[color].main}
+          pr={1}
+          pl={0.5}
+          lineHeight={1}
+        >
+          {icon}
+        </MDBox>
+      ))
+    : null;
 
   return (
     <Card sx={{ height: "100%", boxShadow: !shadow && "none" }}>
@@ -90,11 +73,13 @@ function ProfileInfoCard({ title, description, info, social, action, shadow }) {
         <MDTypography variant="h6" fontWeight="medium" textTransform="capitalize">
           {title}
         </MDTypography>
-        <MDTypography component={Link} to={action.route} variant="body2" color="secondary">
-          <Tooltip title={action.tooltip} placement="top">
-            <Icon>edit</Icon>
-          </Tooltip>
-        </MDTypography>
+        {action && (
+          <MDTypography component={Link} to={action.route} variant="body2" color="secondary">
+            <Tooltip title={action.tooltip} placement="top">
+              <Icon>edit</Icon>
+            </Tooltip>
+          </MDTypography>
+        )}
       </MDBox>
       <MDBox p={2}>
         <MDBox mb={2} lineHeight={1}>
@@ -107,12 +92,14 @@ function ProfileInfoCard({ title, description, info, social, action, shadow }) {
         </MDBox>
         <MDBox>
           {renderItems}
-          <MDBox display="flex" py={1} pr={2}>
-            <MDTypography variant="button" fontWeight="bold" textTransform="capitalize">
-              social: &nbsp;
-            </MDTypography>
-            {renderSocial}
-          </MDBox>
+          {renderSocial && (
+            <MDBox display="flex" py={1} pr={2}>
+              <MDTypography variant="button" fontWeight="bold" textTransform="capitalize">
+                social: &nbsp;
+              </MDTypography>
+              {renderSocial}
+            </MDBox>
+          )}
         </MDBox>
       </MDBox>
     </Card>
@@ -122,18 +109,20 @@ function ProfileInfoCard({ title, description, info, social, action, shadow }) {
 // Setting default props for the ProfileInfoCard
 ProfileInfoCard.defaultProps = {
   shadow: true,
+  social: [], // Default empty array for social
+  action: null, // Default null for action
 };
 
 // Typechecking props for the ProfileInfoCard
 ProfileInfoCard.propTypes = {
   title: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
-  info: PropTypes.objectOf(PropTypes.string).isRequired,
-  social: PropTypes.arrayOf(PropTypes.object).isRequired,
+  info: PropTypes.objectOf(PropTypes.string), // Optional info
+  social: PropTypes.arrayOf(PropTypes.object), // Optional social
   action: PropTypes.shape({
-    route: PropTypes.string.isRequired,
-    tooltip: PropTypes.string.isRequired,
-  }).isRequired,
+    route: PropTypes.string,
+    tooltip: PropTypes.string,
+  }),
   shadow: PropTypes.bool,
 };
 
