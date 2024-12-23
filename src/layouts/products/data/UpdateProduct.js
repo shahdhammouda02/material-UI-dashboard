@@ -28,7 +28,7 @@ import SaveIcon from "@mui/icons-material/Save";
 function UpdateProduct({ initialRows, productId, onUpdate }) {
   const [product, setProduct] = useState({
     id: productId,
-    author: "",
+    name: "",
     Category: "",
     images: "",
     price: "",
@@ -58,7 +58,7 @@ function UpdateProduct({ initialRows, productId, onUpdate }) {
 
   const handleSubmit = () => {
     if (
-      !product.author ||
+      !product.name ||
       !product.Category ||
       !product.images ||
       !product.price ||
@@ -111,7 +111,7 @@ function UpdateProduct({ initialRows, productId, onUpdate }) {
               <Grid item xs={12}>
                 <TextField
                   label="اسم المنتج"
-                  name="author" // Corrected: match the state key
+                  name="name" // Corrected: match the state key
                   value={product.author} // Set existing author
                   onChange={handleInputChange}
                   fullWidth

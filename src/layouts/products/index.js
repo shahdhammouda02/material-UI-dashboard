@@ -79,7 +79,7 @@ function Products() {
                       {productRows.map((row, index) => (
                         <tr key={index}>
                           <DataproductBodyCell align="center">{row.id}</DataproductBodyCell>
-                          <DataproductBodyCell align="center">{row.author}</DataproductBodyCell>
+                          <DataproductBodyCell align="center">{row.name}</DataproductBodyCell>
                           <DataproductBodyCell align="center">{row.Category}</DataproductBodyCell>
                           <DataproductBodyCell align="center">{row.images}</DataproductBodyCell>
                           <DataproductBodyCell align="center">{row.price}</DataproductBodyCell>

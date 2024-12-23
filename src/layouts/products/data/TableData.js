@@ -4,6 +4,10 @@ import MDIconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import test from "../../../assets/images/bg-profile.jpeg";
+import clothes from "assets/images/clothes.jpg";
+import handcraft from "assets/images/handcraft.jpg";
+import food from "assets/images/food.jpg";
+
 export default function TableData(handleEdit) {
   // Edit button handler
   const handleEditClick = (id) => {
@@ -17,7 +21,7 @@ export default function TableData(handleEdit) {
 
   const [columns] = useState([
     { Header: "الرقم التعريفي", accessor: "id", align: "center" },
-    { Header: "الاسم", accessor: "author", align: "center" },
+    { Header: "اسم المنتج", accessor: "name", align: "center" },
     { Header: "الفئة", accessor: "Category", align: "center" },
     { Header: "الصورة", accessor: "images", align: "center" },
     { Header: "السعر", accessor: "price", align: "center" },
@@ -28,12 +32,12 @@ export default function TableData(handleEdit) {
 
   const [initialRows, setInitialRows] = useState([
     {
-      author: "سارة خالد",
+      name: "زيت زيتون",
       Category: "المنتجات الغذائية",
       images: (
         <MDBox ml={-1}>
           <img
-            src={test}
+            src={food}
             alt="image description"
             style={{
               width: "100px",
@@ -48,12 +52,12 @@ export default function TableData(handleEdit) {
       text: "الاكل الفلسطيني له طعم مميز",
     },
     {
-      author: "مرح علي",
+      name: "ثوب فلاحي",
       Category: "الملابس والاكسسوارات",
       images: (
         <MDBox ml={-1}>
           <img
-            src={test}
+            src={clothes}
             alt="image description"
             style={{
               width: "100px",
@@ -68,12 +72,12 @@ export default function TableData(handleEdit) {
       text: "الملابس الفلسطينية لها طابع تراثي اصيل",
     },
     {
-      author: "احمد علي",
+      name: "فخار",
       Category: "الحرف اليدوية",
       images: (
         <MDBox ml={-1}>
           <img
-            src={test}
+            src={handcraft}
             alt="image description"
             style={{
               width: "100px",

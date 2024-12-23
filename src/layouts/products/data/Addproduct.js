@@ -17,7 +17,7 @@ import AddIcon from "@mui/icons-material/Add";
 function Addproduct({ initialRows }) {
   const [newproduct, setNewproduct] = useState({
     id: null,
-    author: "",
+    name: "",
     Category: "",
     images: "",
     price: "",
@@ -46,9 +46,9 @@ function Addproduct({ initialRows }) {
   };
 
   const handleSubmit = () => {
-    const { author, Category, images, price, Discount, text } = newproduct;
+    const { name, Category, images, price, Discount, text } = newproduct;
     if (
-      !author.trim() ||
+      !name.trim() ||
       !Category.trim() ||
       !images.trim() ||
       !price.trim() ||
@@ -64,7 +64,7 @@ function Addproduct({ initialRows }) {
     // Reset form
     setNewproduct((prev) => ({
       id: prev.id + 1,
-      author: "",
+      name: "",
       Category: "",
       images: "",
       price: "",
@@ -85,7 +85,7 @@ function Addproduct({ initialRows }) {
     setError("");
     setNewproduct((prev) => ({
       id: prev.id,
-      author: "",
+      name: "",
       Category: "",
       images: "",
       price: "",
@@ -129,8 +129,8 @@ function Addproduct({ initialRows }) {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  label="الاسم"
-                  name="author"
+                  label="اسم المنتج"
+                  name="name"
                   value={newproduct.author}
                   onChange={handleInputChange}
                   fullWidth
