@@ -11,13 +11,13 @@ import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 // Material Dashboard 2 React layouts
 import Dashboard from "layouts/dashboard";
 import Products from "layouts/products";
+import Customers from "layouts/customers";
 import Delivery from "layouts/delivery";
 import Order from "layouts/order";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import MainCategories from "layouts/categories/main-category";
 import SubCategories from "layouts/categories/sub-category";
-import Profile from "layouts/profile";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
@@ -70,11 +70,11 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "الملف الشخصي",
-    key: "profile",
-    route: "/profile",
+    name: "العملاء",
+    key: "customers",
     icon: <Icon fontSize="small">person</Icon>,
-    component: <Profile />,
+    route: "/customers",
+    component: <Customers />,
   },
   {
     type: "collapse",
