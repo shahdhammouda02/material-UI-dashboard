@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Routes, Route, useNavigate, Outlet } from "react-router-dom"; // Import Outlet
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
@@ -11,9 +12,11 @@ import TableData from "./data/TableData";
 import UpdateProduct from "./data/UpdateProduct"; // Import UpdateProduct
 import DataproductBodyCell from "../../examples/products/Dataproduct/DataproductBodyCell";
 import DataproductHeadCell from "../../examples/products/Dataproduct/DataproductHeadCell";
+
 function Products() {
   const [editingId, setEditingId] = useState(null); // State to track the editing ID
   const [productRows, setproductRows] = useState([]);
+  const navigate = useNavigate(); // For navigation
 
   const handleEdit = (id) => {
     setEditingId(id); // Set the ID to edit
@@ -50,7 +53,6 @@ function Products() {
                 display="flex"
                 justifyContent="space-between"
                 alignItems="center"
-                // coloredShadow="info"
               >
                 <MDTypography variant="h6" color="white">
                   جدول المنتجات
@@ -97,6 +99,8 @@ function Products() {
         </Grid>
       </MDBox>
       <Footer />
+      {/* Render nested routes */}
+      <Outlet context={productRows} />
     </DashboardLayout>
   );
 }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
@@ -7,19 +8,39 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import CustomerTable from "./data/CustomersTable";
-import UpdateCustomer from "./data/UpdateCustomer"; // Assuming you have an UpdateCustomer component
-import AddCustomer from "./data/AddCustomer"; // Import the AddCustomer component
+import UpdateCustomer from "./data/UpdateCustomer";
+import AddCustomer from "./data/AddCustomer";
 import DataproductBodyCell from "../../examples/products/Dataproduct/DataproductBodyCell";
 import DataproductHeadCell from "../../examples/products/Dataproduct/DataproductHeadCell";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Typography,
+  Box,
+} from "@mui/material";
 
 function Customers() {
   const [editingId, setEditingId] = useState(null); // State to track the editing ID
   const [customerRows, setCustomerRows] = useState([]);
+  const navigate = useNavigate(); // For navigation
 
   // Function to handle editing a customer
   const handleEdit = (id) => {
     setEditingId(id); // Set the ID to edit
   };
+
+  // Function to handle viewing product details
+  const handleViewProductDetails = (id) => {
+    console.log("Navigating to product with ID:", id); // Debugging log
+    navigate(`/products/${id}`); // Navigate to the product details page with the ID
+  };
+
+  // Get columns, rows, and modal state from the CustomerTable component
+  const { columns, rows, selectedProducts, isProductModalOpen, setIsProductModalOpen } =
+    CustomerTable({ handleEdit, handleViewProductDetails });
 
   // Function to handle updating a customer
   const handleUpdate = (updatedCustomer) => {
@@ -35,12 +56,10 @@ function Customers() {
       ...prevRows,
       {
         ...newCustomer,
+        id: prevRows.length + 1, // Assign a new ID to the customer
       },
     ]);
   };
-
-  // Get columns and rows from the CustomerTable component
-  const { columns, rows } = CustomerTable(handleEdit); // Pass the handleEdit function
 
   // Update customerRows with the rows from CustomerTable
   useEffect(() => {
@@ -78,24 +97,78 @@ function Customers() {
                     onUpdate={handleUpdate}
                   />
                 ) : (
-                  <table style={{ width: "100%" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
                     <thead>
                       <tr>
-                        {columns.map((column, index) => (
-                          <DataproductHeadCell key={index} align={column.align}>
-                            {column.Header}
-                          </DataproductHeadCell>
-                        ))}
+                        {columns.map((column, index) => {
+                          if (column.subColumns) {
+                            return (
+                              <th
+                                key={index}
+                                colSpan={column.subColumns.length}
+                                align="center"
+                                style={{ fontSize: "12px" }}
+                              >
+                                {column.Header}
+                              </th>
+                            );
+                          } else {
+                            return (
+                              <th key={index} align="center" style={{ fontSize: "12px" }}>
+                                {column.Header}
+                              </th>
+                            );
+                          }
+                        })}
+                      </tr>
+                      <tr>
+                        {columns.map((column, index) => {
+                          if (column.subColumns) {
+                            return column.subColumns.map((subColumn, subIndex) => (
+                              <th
+                                key={`${index}-${subIndex}`}
+                                align="center"
+                                style={{ fontSize: "12px" }}
+                              >
+                                {subColumn.Header}
+                              </th>
+                            ));
+                          } else {
+                            return <th key={index}></th>;
+                          }
+                        })}
                       </tr>
                     </thead>
                     <tbody>
                       {customerRows.map((row, index) => (
                         <tr key={index}>
-                          <DataproductBodyCell align="center">{row.id}</DataproductBodyCell>
-                          <DataproductBodyCell align="center">{row.name}</DataproductBodyCell>
-                          <DataproductBodyCell align="center">{row.email}</DataproductBodyCell>
-                          <DataproductBodyCell align="center">{row.products}</DataproductBodyCell>
-                          <DataproductBodyCell align="center">{row.actions}</DataproductBodyCell>
+                          <DataproductBodyCell align="center" style={{ fontSize: "12px" }}>
+                            {row.id}
+                          </DataproductBodyCell>
+                          <DataproductBodyCell align="center" style={{ fontSize: "12px" }}>
+                            {row.name}
+                          </DataproductBodyCell>
+                          <DataproductBodyCell align="center" style={{ fontSize: "12px" }}>
+                            {row.gender}
+                          </DataproductBodyCell>
+                          <DataproductBodyCell align="center" style={{ fontSize: "12px" }}>
+                            {row.mobile}
+                          </DataproductBodyCell>
+                          <DataproductBodyCell align="center" style={{ fontSize: "12px" }}>
+                            {row.email}
+                          </DataproductBodyCell>
+                          <DataproductBodyCell align="center" style={{ fontSize: "12px" }}>
+                            {row.dateOfBirth}
+                          </DataproductBodyCell>
+                          <DataproductBodyCell align="center" style={{ fontSize: "12px" }}>
+                            {row.products.productCount}
+                          </DataproductBodyCell>
+                          <DataproductBodyCell align="center" style={{ fontSize: "12px" }}>
+                            {row.products.viewProducts}
+                          </DataproductBodyCell>
+                          <DataproductBodyCell align="center" style={{ fontSize: "12px" }}>
+                            {row.actions}
+                          </DataproductBodyCell>
                         </tr>
                       ))}
                     </tbody>
@@ -106,6 +179,34 @@ function Customers() {
           </Grid>
         </Grid>
       </MDBox>
+
+      {/* Modal for displaying product details */}
+      <Dialog open={isProductModalOpen} onClose={() => setIsProductModalOpen(false)}>
+        <DialogTitle>تفاصيل المنتجات</DialogTitle>
+        <DialogContent>
+          {selectedProducts.map((product) => (
+            <Box key={product.id} mb={2}>
+              <Typography>
+                <strong>ID:</strong> {product.id}
+              </Typography>
+              <Typography>
+                <strong>اسم المنتج:</strong> {product.name}
+              </Typography>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => handleViewProductDetails(product.id)}
+              >
+                عرض التفاصيل
+              </Button>
+            </Box>
+          ))}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsProductModalOpen(false)}>إغلاق</Button>
+        </DialogActions>
+      </Dialog>
+
       <Footer />
     </DashboardLayout>
   );

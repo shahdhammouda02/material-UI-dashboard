@@ -21,6 +21,7 @@ import SubCategories from "layouts/categories/sub-category";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
+import ProductDetails from "layouts/products/data/ProductDetails";
 
 const routes = [
   {
@@ -67,6 +68,12 @@ const routes = [
     icon: <ShoppingCartIcon fontSize="small" />,
     route: "/products",
     component: <Products />,
+    children: [
+      {
+        path: ":id",
+        element: <ProductDetails />,
+      },
+    ],
   },
   {
     type: "collapse",
