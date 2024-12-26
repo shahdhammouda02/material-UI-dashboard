@@ -58,7 +58,7 @@ export default function TableData(handleEdit) {
             <EditIcon />
           </MDIconButton>
           <MDBox mx={1} />
-          <MDIconButton color="success" onClick={() => handleDeleteClick(index + 1)}>
+          <MDIconButton color="error" onClick={() => handleDeleteClick(index + 1)}>
             <DeleteIcon />
           </MDIconButton>
         </MDBox>

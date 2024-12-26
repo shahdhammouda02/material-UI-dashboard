@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
@@ -34,13 +34,30 @@ function Customers() {
 
   // Function to handle viewing product details
   const handleViewProductDetails = (id) => {
-    console.log("Navigating to product with ID:", id); // Debugging log
-    navigate(`/products/${id}`); // Navigate to the product details page with the ID
+    console.log("Navigating to product with ID:", id);
+    navigate(`/products/${id}`);
+  };
+
+  // Function to highlight the clicked row
+  const handleHighlightRow = (rowIndex) => {
+    setCustomerRows((prevRows) =>
+      prevRows.map((row, index) => (index === rowIndex ? { ...row, isHighlighted: true } : row))
+    );
+  };
+
+  // Function to remove highlight from all rows
+  const removeHighlight = () => {
+    setCustomerRows((prevRows) => prevRows.map((row) => ({ ...row, isHighlighted: false })));
   };
 
   // Get columns, rows, and modal state from the CustomerTable component
   const { columns, rows, selectedProducts, isProductModalOpen, setIsProductModalOpen } =
-    CustomerTable({ handleEdit, handleViewProductDetails });
+    CustomerTable({
+      handleEdit,
+      handleViewProductDetails,
+      handleHighlightRow,
+      removeHighlight,
+    });
 
   // Function to handle updating a customer
   const handleUpdate = (updatedCustomer) => {
@@ -141,7 +158,10 @@ function Customers() {
                     </thead>
                     <tbody>
                       {customerRows.map((row, index) => (
-                        <tr key={index}>
+                        <tr
+                          key={index}
+                          style={row.isHighlighted ? { background: "lightgreen" } : {}}
+                        >
                           <DataproductBodyCell align="center" style={{ fontSize: "12px" }}>
                             {row.id}
                           </DataproductBodyCell>

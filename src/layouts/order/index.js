@@ -6,7 +6,7 @@ import MDTypography from "components/MDTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import AddOrder from "./data/AddOrder";
+// import AddOrder from "./data/AddOrder";
 import OrdersTable from "./data/orderTable";
 import UpdateOrder from "./data/UpdateOrder";
 import DataproductBodyCell from "../../examples/products/Dataproduct/DataproductBodyCell";
@@ -55,7 +55,7 @@ function Order() {
                 <MDTypography variant="h6" color="white">
                   جدول الطلبات
                 </MDTypography>
-                <AddOrder initialRows={rows} />
+                {/* <AddOrder initialRows={rows} /> */}
               </MDBox>
               <MDBox pt={3}>
                 {editingId ? (

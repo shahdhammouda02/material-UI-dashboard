@@ -51,7 +51,7 @@ export default function DataTable(handleEdit) {
           <EditIcon />
         </MDIconButton>
         <MDBox mx={1} />
-        <MDIconButton color="success" onClick={() => handleDeleteClick(index)}>
+        <MDIconButton color="error" onClick={() => handleDeleteClick(index)}>
           <DeleteIcon />
         </MDIconButton>
       </MDBox>

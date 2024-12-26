@@ -19,6 +19,7 @@ function Addproduct({ initialRows }) {
     id: null,
     name: "",
     Category: "",
+    subCategory: "",
     images: "",
     price: "",
     Discount: "",
@@ -46,10 +47,11 @@ function Addproduct({ initialRows }) {
   };
 
   const handleSubmit = () => {
-    const { name, Category, images, price, Discount, text } = newproduct;
+    const { name, Category, subCategory, images, price, Discount, text } = newproduct;
     if (
       !name.trim() ||
       !Category.trim() ||
+      !subCategory.trim() ||
       !images.trim() ||
       !price.trim() ||
       !Discount.trim() ||
@@ -66,6 +68,7 @@ function Addproduct({ initialRows }) {
       id: prev.id + 1,
       name: "",
       Category: "",
+      subCategory: "",
       images: "",
       price: "",
       Discount: "",
@@ -87,6 +90,7 @@ function Addproduct({ initialRows }) {
       id: prev.id,
       name: "",
       Category: "",
+      subCategory: "",
       images: "",
       price: "",
       Discount: "",
@@ -142,6 +146,16 @@ function Addproduct({ initialRows }) {
                   label="الفئة"
                   name="Category"
                   value={newproduct.Category}
+                  onChange={handleInputChange}
+                  fullWidth
+                  required
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  label="الفئة الفرعية"
+                  name="subCategoty"
+                  value={newproduct.subCategory}
                   onChange={handleInputChange}
                   fullWidth
                   required

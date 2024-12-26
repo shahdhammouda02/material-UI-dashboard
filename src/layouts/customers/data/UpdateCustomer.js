@@ -14,7 +14,6 @@ import {
   MenuItem,
 } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 
 function UpdateCustomer({ initialRows, customerId, onUpdate, onClose }) {
   const [customer, setCustomer] = useState({
@@ -24,7 +23,6 @@ function UpdateCustomer({ initialRows, customerId, onUpdate, onClose }) {
     mobile: "",
     email: "",
     dateOfBirth: "",
-    products: [], // Assuming products are part of the customer object
   });
 
   const [error, setError] = useState("");
@@ -34,7 +32,7 @@ function UpdateCustomer({ initialRows, customerId, onUpdate, onClose }) {
   useEffect(() => {
     const existingCustomer = initialRows.find((row) => row.id === customerId);
     if (existingCustomer) {
-      setCustomer(existingCustomer); // Load the existing customer data
+      setCustomer(existingCustomer);
     } else {
       console.error(`Customer with ID ${customerId} not found`);
       setError("Customer not found.");
@@ -50,12 +48,6 @@ function UpdateCustomer({ initialRows, customerId, onUpdate, onClose }) {
     }));
   };
 
-  // Validate email format
-  const validateEmail = (email) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
-  };
-
   // Handle form submission
   const handleSubmit = () => {
     const { name, gender, mobile, email, dateOfBirth } = customer;
@@ -63,12 +55,6 @@ function UpdateCustomer({ initialRows, customerId, onUpdate, onClose }) {
     // Validate required fields
     if (!name.trim() || !gender.trim() || !mobile.trim() || !email.trim() || !dateOfBirth.trim()) {
       setError("Please fill in all fields correctly.");
-      return;
-    }
-
-    // Validate email format
-    if (!validateEmail(email)) {
-      setError("Please enter a valid email address.");
       return;
     }
 
@@ -159,27 +145,6 @@ function UpdateCustomer({ initialRows, customerId, onUpdate, onClose }) {
             />
           </Grid>
 
-          {/* Products Section */}
-          <Grid item xs={12}>
-            <Typography variant="h6">المنتجات</Typography>
-            <Box display="flex" alignItems="center" justifyContent="space-between">
-              <Typography>
-                عدد المنتجات: {customer.products ? customer.products.length : 0}
-              </Typography>
-              <IconButton
-                color="primary"
-                onClick={() => {
-                  // Handle view products action
-                  console.log("View Products:", customer.products);
-                }}
-                title="عرض المنتجات"
-                disabled={!customer.products || customer.products.length === 0}
-              >
-                <VisibilityIcon />
-              </IconButton>
-            </Box>
-          </Grid>
-
           {/* Error Message */}
           {error && (
             <Grid item xs={12}>
@@ -217,12 +182,6 @@ UpdateCustomer.propTypes = {
       mobile: PropTypes.string.isRequired,
       email: PropTypes.string.isRequired,
       dateOfBirth: PropTypes.string.isRequired,
-      products: PropTypes.arrayOf(
-        PropTypes.shape({
-          number: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-          name: PropTypes.string.isRequired,
-        })
-      ),
     })
   ).isRequired,
   customerId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,

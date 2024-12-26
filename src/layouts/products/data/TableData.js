@@ -22,7 +22,8 @@ export default function TableData(handleEdit) {
   const [columns] = useState([
     { Header: "الرقم التعريفي", accessor: "id", align: "center" },
     { Header: "اسم المنتج", accessor: "name", align: "center" },
-    { Header: "الفئة", accessor: "Category", align: "center" },
+    { Header: "الفئة الاساسية", accessor: "Category", align: "center" },
+    { Header: "الفئة الفرعية", accessor: "Category", align: "center" },
     { Header: "الصورة", accessor: "images", align: "center" },
     { Header: "السعر", accessor: "price", align: "center" },
     { Header: "الخصم", accessor: "Discount", align: "center" },
@@ -34,6 +35,7 @@ export default function TableData(handleEdit) {
     {
       name: "زيت زيتون",
       Category: "المنتجات الغذائية",
+      subCategory: "الاكل الفلسطيني",
       images: (
         <MDBox ml={-1}>
           <img
@@ -54,6 +56,7 @@ export default function TableData(handleEdit) {
     {
       name: "ثوب فلاحي",
       Category: "الملابس والاكسسوارات",
+      subCategory: "ملابس نسائية",
       images: (
         <MDBox ml={-1}>
           <img
@@ -74,6 +77,7 @@ export default function TableData(handleEdit) {
     {
       name: "فخار",
       Category: "الحرف اليدوية",
+      subCategory: "فخار",
       images: (
         <MDBox ml={-1}>
           <img
@@ -103,7 +107,7 @@ export default function TableData(handleEdit) {
             <EditIcon />
           </MDIconButton>
           <MDBox mx={1} />
-          <MDIconButton color="success" onClick={() => handleDeleteClick(index + 1)}>
+          <MDIconButton color="error" onClick={() => handleDeleteClick(index + 1)}>
             <DeleteIcon />
           </MDIconButton>
         </MDBox>

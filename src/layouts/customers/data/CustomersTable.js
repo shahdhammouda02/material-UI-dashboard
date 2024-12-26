@@ -64,6 +64,18 @@ export default function CustomerTable({ handleEdit, handleViewProductDetails }) 
       dateOfBirth: "1995-05-15",
       products: [{ id: 3, name: "فخار" }],
     },
+    {
+      name: "عميل 3",
+      gender: "انثى",
+      mobile: "3534594580",
+      email: "customer3@example.com",
+      dateOfBirth: "1990-01-01",
+      products: [
+        { id: 1, name: "زيت زيتون" },
+        { id: 2, name: "ثوب فلاحي" },
+        { id: 3, name: "فخار" },
+      ],
+    },
   ]);
 
   const rows = useMemo(() => {
@@ -88,7 +100,7 @@ export default function CustomerTable({ handleEdit, handleViewProductDetails }) 
             <EditIcon />
           </MDIconButton>
           <MDBox mx={1} />
-          <MDIconButton color="success" onClick={() => handleDeleteClick(index + 1)}>
+          <MDIconButton color="error" onClick={() => handleDeleteClick(index + 1)}>
             <DeleteIcon />
           </MDIconButton>
         </MDBox>
