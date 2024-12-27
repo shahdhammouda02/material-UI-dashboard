@@ -1,201 +1,141 @@
 import React, { useState, useEffect } from "react";
-import PropTypes from "prop-types"; // Import PropTypes
-import {
-  TextField,
-  Button,
-  Box,
-  Grid,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Select,
-  MenuItem,
-  Typography,
-} from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
+import PropTypes from "prop-types";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import MDBox from "components/MDBox";
+import MDTypography from "components/MDTypography";
+import MDButton from "components/MDButton";
+import MDInput from "components/MDInput";
 
-function AddSubCategory({ initialRows }) {
+function AddSubCategory({ initialRows, onAdd, onCancel }) {
   const [newSubcategory, setNewSubcategory] = useState({
-    id: "", // Start with null to indicate no ID is set
-    categoryName: "",
-    description: "",
-    mainCategory: "", // الفئة الأساسية
+    id: "",
+    Category: "",
+    text: "",
+    mainCategory: "",
   });
 
   const [error, setError] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
-    // Set the initial ID based on existing data
     const highestExistingId =
       initialRows.length > 0 ? Math.max(...initialRows.map((row) => row.id)) : 0;
-    setNewSubcategory((prevSubcategory) => ({
-      ...prevSubcategory,
-      id: highestExistingId + 1, // Set ID to highest existing ID + 1
+    setNewSubcategory((prevCategory) => ({
+      ...prevCategory,
+      id: highestExistingId + 1,
     }));
-  }, [initialRows]); // Update ID when initialRows changes
+  }, [initialRows]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewSubcategory((prevSubcategory) => ({
-      ...prevSubcategory,
+    setNewSubcategory((prevCategory) => ({
+      ...prevCategory,
       [name]: value,
     }));
   };
 
-  const handleSubmit = () => {
-    // Validate input fields
-    if (
-      !newSubcategory.categoryName ||
-      !newSubcategory.description ||
-      !newSubcategory.mainCategory
-    ) {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!newSubcategory.Category || !newSubcategory.text || !newSubcategory.mainCategory) {
       setError("Please fill in all fields correctly.");
       return;
     }
 
-    const newSubcategoryWithID = {
-      id: newSubcategory.id, // Use the incremented ID
-      categoryName: newSubcategory.categoryName,
-      description: newSubcategory.description,
-      mainCategory: newSubcategory.mainCategory,
-    };
-
     setError("");
-    console.log("Subcategory added successfully:", newSubcategoryWithID);
-    setIsDialogOpen(false);
-
-    // Reset the form for the next entry
-    setNewSubcategory((prevSubcategory) => ({
-      id: prevSubcategory.id + 1, // Increment ID for next entry
-      categoryName: "",
-      description: "",
+    onAdd(newSubcategory);
+    setNewSubcategory({
+      id: "",
+      Category: "",
+      text: "",
       mainCategory: "",
-    }));
+    });
   };
 
-  const handleDialogOpen = () => {
-    setIsDialogOpen(true);
-  };
-
-  const handleDialogClose = () => {
-    setIsDialogOpen(false);
-    setNewSubcategory({ id: "", categoryName: "", description: "", mainCategory: "" }); // Reset form
+  const handleCancel = () => {
+    setNewSubcategory({
+      id: "",
+      Category: "",
+      text: "",
+      mainCategory: "",
+    });
+    setError("");
+    onCancel();
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Box
-        flexDirection="column"
-        // width="100%"
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        // p={3}
-        // bgcolor="#fbfbfb"
-        // color="#000"
-      >
-        <Button
-          onClick={handleDialogOpen}
-          sx={{
-            bgcolor: "#ffffff",
-            "&:hover": {
-              bgcolor: "#000000",
-              color: "#ffffff", // لون أغمق عند التمرير
-            },
-            transition: "all 0.3s ease-in-out",
-          }}
-        >
-          اضافة صنف جديد
-          <AddIcon />
-        </Button>
+    <MDBox p={3}>
+      <MDTypography variant="h5" mb={2}>
+        إضافة فئة جديدة
+      </MDTypography>
+      <form onSubmit={handleSubmit}>
+        <MDBox mb={2}>
+          <MDInput label="الرقم التعريفي" name="id" value={newSubcategory.id} fullWidth disabled />
+        </MDBox>
+        <MDBox mb={2}>
+          <MDInput
+            label="اسم الفئة"
+            name="Category"
+            value={newSubcategory.Category}
+            onChange={handleInputChange}
+            fullWidth
+          />
+        </MDBox>
+        <MDBox mb={2}>
+          <MDInput
+            label="الوصف"
+            name="text"
+            value={newSubcategory.text}
+            onChange={handleInputChange}
+            fullWidth
+          />
+        </MDBox>
+        <MDBox mb={2}>
+          <FormControl fullWidth>
+            <InputLabel>اختر الفئة الأساسية</InputLabel>
+            <Select
+              name="mainCategory"
+              value={newSubcategory.mainCategory}
+              onChange={handleInputChange}
+              sx={{ height: "40px" }}
+            >
+              <MenuItem value="منتجات غذائية">منتجات غذائية</MenuItem>
+              <MenuItem value="ملابس وإكسسوارات">ملابس وإكسسوارات</MenuItem>
+              <MenuItem value="حرف يدوية">حرف يدوية</MenuItem>
+              <MenuItem value="كتب ومطبوعات">كتب ومطبوعات</MenuItem>
+            </Select>
+          </FormControl>
+        </MDBox>
 
-        {/* Dialog for subcategory input */}
-        <Dialog open={isDialogOpen} onClose={handleDialogClose}>
-          <DialogTitle>اضافة صنف جديد</DialogTitle>
-          <DialogContent>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  disabled
-                  label="الرقم التعريفي"
-                  value={newSubcategory.id} // Display existing or generated ID
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="اسم الصنف"
-                  name="categoryName"
-                  value={newSubcategory.categoryName}
-                  onChange={handleInputChange}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="الوصف"
-                  name="description"
-                  value={newSubcategory.description}
-                  onChange={handleInputChange}
-                  fullWidth
-                  multiline
-                  rows={4}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                {/* Dropdown to select the main category */}
-                <Select
-                  name="mainCategory"
-                  value={newSubcategory.mainCategory}
-                  onChange={handleInputChange}
-                  fullWidth
-                  displayEmpty
-                  sx={{ minWidth: 200 }}
-                >
-                  <MenuItem value="" disabled>
-                    اختر الفئة الأساسية
-                  </MenuItem>
-                  <MenuItem value="food-products">منتجات غذائية</MenuItem>
-                  <MenuItem value="men-clothes">ملابس وإكسسوارات</MenuItem>
-                  <MenuItem value="handicrafts">حرف يدوية</MenuItem>
-                  <MenuItem value="books">كتب ومطبوعات</MenuItem>
-                </Select>
-              </Grid>
-              {error && (
-                <Grid item xs={12}>
-                  <Typography color="error">{error}</Typography>
-                </Grid>
-              )}
-            </Grid>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleDialogClose}>الغاء</Button>
-            <Button variant="contained" sx={{ color: "#ffffff" }} onClick={handleSubmit}>
-              حفظ
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Box>
-    </div>
+        {error && (
+          <MDTypography color="error" mb={2}>
+            {error}
+          </MDTypography>
+        )}
+
+        <MDBox display="flex" justifyContent="space-between">
+          <MDButton variant="gradient" color="success" type="submit">
+            حفظ
+          </MDButton>
+          <MDButton variant="gradient" color="error" onClick={handleCancel}>
+            إلغاء
+          </MDButton>
+        </MDBox>
+      </form>
+    </MDBox>
   );
 }
 
-// PropTypes Validation
 AddSubCategory.propTypes = {
   initialRows: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
-      // Add other properties of your row object as needed
+      Category: PropTypes.string,
+      text: PropTypes.string,
+      mainCategory: PropTypes.string,
     })
-  ).isRequired, // Mark as required
+  ),
+  onAdd: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };
 
 export default AddSubCategory;

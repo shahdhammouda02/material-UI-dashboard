@@ -8,32 +8,49 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import Addshipping from "./data/Addshipping";
 import TableData from "./data/TableData";
-import UpdateShipping from "./data/UpdateShipping"; // Import UpdateShipping component
+import UpdateShipping from "./data/UpdateShipping";
 import DataproductBodyCell from "../../examples/products/Dataproduct/DataproductBodyCell";
 import DataproductHeadCell from "../../examples/products/Dataproduct/DataproductHeadCell";
-
+import MDButton from "components/MDButton";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 function Delivery() {
-  const [editingId, setEditingId] = useState(null); // State to track the editing ID
-  const [DeliveryRows, setDeliveryRows] = useState([]); // State to hold delivery rows
+  const [editingId, setEditingId] = useState(null); // حالة لتتبع الـ ID للتعديل
+  const [DeliveryRows, setDeliveryRows] = useState([]); // حالة لحفظ بيانات الشحنات
+  const [isAddShippingOpen, setIsAddShippingOpen] = useState(false); // حالة لفتح/إغلاق نافذة إضافة الشحنة
 
-  // Function to handle the edit action
   const handleEdit = (id) => {
-    setEditingId(id); // Set the ID to edit
+    setEditingId(id); // تعيين الـ ID للتعديل
   };
 
-  // Function to handle the update action
   const handleUpdate = (updatedShipping) => {
     setDeliveryRows((prevRows) =>
       prevRows.map((row) => (row.id === updatedShipping.id ? updatedShipping : row))
     );
-    setEditingId(null); // Close the edit dialog
+    setEditingId(null); // إغلاق نافذة التعديل
   };
 
-  const { columns, rows } = TableData(handleEdit); // Pass the handleEdit function
+  const handleDelete = (id) => {
+    setDeliveryRows((prevRows) => prevRows.filter((row) => row.id !== id));
+  };
 
-  // Update DeliveryRows with the rows from TableData
+  const handleAddShippingOpen = () => {
+    setIsAddShippingOpen(true); // فتح نافذة إضافة الشحنة
+  };
+
+  const handleAddShippingClose = () => {
+    setIsAddShippingOpen(false); // إغلاق نافذة إضافة الشحنة
+  };
+
+  const handleAddShipping = (newShipping) => {
+    setDeliveryRows((prevRows) => [...prevRows, newShipping]); // إضافة الشحنة الجديدة
+    setIsAddShippingOpen(false); // إغلاق نافذة إضافة الشحنة
+  };
+
+  const { columns, rows } = TableData(handleEdit); // تمرير دالة handleEdit
+
   useEffect(() => {
-    setDeliveryRows(rows); // ✅ Correct function name to setDeliveryRows
+    setDeliveryRows(rows); // ✅ تحديث DeliveryRows
   }, [rows]);
 
   return (
@@ -54,15 +71,23 @@ function Delivery() {
                 justifyContent="space-between"
                 alignItems="center"
               >
-                <MDTypography variant="h6" color="white">
+                <MDTypography variant="h5" color="white">
                   جدول التوصيل
                 </MDTypography>
-                <Addshipping initialRows={DeliveryRows} />
+                <MDButton variant="gradient" color="success" onClick={handleAddShippingOpen}>
+                  إضافة شحنة جديدة
+                </MDButton>
               </MDBox>
               <MDBox pt={3}>
-                {editingId ? (
+                {isAddShippingOpen ? (
+                  <Addshipping
+                    initialRows={rows}
+                    onAdd={handleAddShipping}
+                    onCancel={handleAddShippingClose}
+                  />
+                ) : editingId ? (
                   <UpdateShipping
-                    initialRows={DeliveryRows} // Pass the correct rows here
+                    initialRows={DeliveryRows}
                     ShippingId={editingId}
                     onUpdate={handleUpdate}
                   />
@@ -86,7 +111,45 @@ function Delivery() {
                           <DataproductBodyCell align="center">{row.shipping}</DataproductBodyCell>
                           <DataproductBodyCell align="center">{row.price}</DataproductBodyCell>
                           <DataproductBodyCell align="center">{row.adress}</DataproductBodyCell>
-                          <DataproductBodyCell align="center">{row.actions}</DataproductBodyCell>
+                          <DataproductBodyCell align="center">
+                            <MDBox
+                              display="flex"
+                              justifyContent="center"
+                              alignItems="center"
+                              sx={{ padding: "0 !important" }}
+                            >
+                              <MDButton
+                                variant="text"
+                                color="success"
+                                onClick={() => handleEdit(row.id)}
+                                sx={{ padding: "0 !important" }}
+                                flex-inline
+                              >
+                                <EditIcon
+                                  sx={{
+                                    height: "1.5rem !important",
+                                    width: "1.5rem !important",
+                                    padding: "0 !important",
+                                  }}
+                                />
+                              </MDButton>
+                              <MDButton
+                                mx={1}
+                                variant="text"
+                                color="success"
+                                onClick={() => handleDelete(row.id)}
+                                sx={{ padding: "0 !important" }}
+                              >
+                                <DeleteIcon
+                                  sx={{
+                                    height: "1.5rem !important",
+                                    width: "1.5rem !important",
+                                    padding: "0 !important",
+                                  }}
+                                />
+                              </MDButton>
+                            </MDBox>
+                          </DataproductBodyCell>
                         </tr>
                       ))}
                     </tbody>

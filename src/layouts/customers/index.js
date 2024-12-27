@@ -101,7 +101,7 @@ function Customers() {
                 justifyContent="space-between"
                 alignItems="center"
               >
-                <MDTypography variant="h6" color="white">
+                <MDTypography variant="h5" color="white">
                   جدول العملاء
                 </MDTypography>
                 <AddCustomer initialRows={customerRows} onAddCustomer={handleAddCustomer} />

@@ -1,37 +1,31 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import {
-  TextField,
-  Button,
-  Box,
-  Typography,
-  Grid,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
+import MDBox from "components/MDBox";
+import MDTypography from "components/MDTypography";
+import MDButton from "components/MDButton";
+import MDInput from "components/MDInput";
+import MDIconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
-function AddCategory({ initialRows }) {
+function AddCategory({ initialRows, onAdd, onCancel, onDelete }) {
   const [newCategory, setNewCategory] = useState({
-    id: "", // Start with null to indicate no ID is set
+    id: "",
     categoryName: "",
     description: "",
   });
 
   const [error, setError] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  // Automatically generate the next ID based on existing rows
   useEffect(() => {
-    // Set the initial ID based on existing data
     const highestExistingId =
       initialRows.length > 0 ? Math.max(...initialRows.map((row) => row.id)) : 0;
     setNewCategory((prevCategory) => ({
       ...prevCategory,
-      id: highestExistingId + 1, // Set ID to highest existing ID + 1
+      id: highestExistingId + 1,
     }));
-  }, [initialRows]); // Update ID when initialRows changes
+  }, [initialRows]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -41,123 +35,105 @@ function AddCategory({ initialRows }) {
     }));
   };
 
-  const handleSubmit = () => {
+  const handleEditClick = (id) => {
+    console.log(`Editing category with ID: ${id}`);
+    // Add your editing logic here
+  };
+
+  const handleDeleteClick = (id) => {
+    if (onDelete) {
+      onDelete(id);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Validate that all fields are filled
     if (!newCategory.categoryName || !newCategory.description) {
-      setError("Please fill in all fields correctly.");
+      setError("من فضلك قم بملء جميع الحقول بشكل صحيح.");
       return;
     }
 
-    const newCategoryWithID = {
-      id: newCategory.id, // Use the incremented ID
-      categoryName: newCategory.categoryName,
-      description: newCategory.description,
+    setError(""); // Clear error message if all fields are valid
+
+    const newCategoryData = {
+      ...newCategory,
+      actions: (
+        <MDBox display="flex" justifyContent="center" alignItems="center">
+          <MDIconButton color="success" onClick={() => handleEditClick(newCategory.id)}>
+            <EditIcon />
+          </MDIconButton>
+          <MDBox mx={1} />
+          <MDIconButton color="error" onClick={() => handleDeleteClick(newCategory.id)}>
+            <DeleteIcon />
+          </MDIconButton>
+        </MDBox>
+      ),
     };
 
-    setError("");
-    console.log("Category added successfully:", newCategoryWithID);
-    setIsDialogOpen(false);
-
-    // Reset the form for the next entry
-    setNewCategory((prevCategory) => ({
-      id: prevCategory.id + 1, // Increment ID for next entry
+    onAdd(newCategoryData);
+    setNewCategory({
+      id: "",
       categoryName: "",
       description: "",
-    }));
+    });
   };
 
-  const handleDialogOpen = () => {
-    setIsDialogOpen(true);
-  };
-
-  const handleDialogClose = () => {
-    setIsDialogOpen(false);
-    setNewCategory({ id: null, categoryName: "", description: "" }); // Reset ID to null
+  const handleCancel = () => {
+    setNewCategory({
+      id: "",
+      categoryName: "",
+      description: "",
+    });
+    setError("");
+    onCancel();
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        // backgroundColor: "#eaeaea",
-        // borderTop: "2px solid rgb(240 242 243)",
-      }}
-    >
-      <Box
-        flexDirection="column"
-        // width="100%"
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        // p={3}
-        // bgcolor="#fbfbfb"
-        // color="#00000"
-      >
-        <Button
-          onClick={handleDialogOpen}
-          sx={{
-            bgcolor: "#ffffff",
-            "&:hover": {
-              bgcolor: "#000000",
-              color: "#ffffff", // لون أغمق عند التمرير
-            },
-            transition: "all 0.3s ease-in-out",
-          }}
-        >
-          اضافة فئة جديدة
-          <AddIcon />
-        </Button>
+    <MDBox p={3}>
+      <MDTypography variant="h5" mb={2}>
+        اضافة فئة جديدة
+      </MDTypography>
+      <form onSubmit={handleSubmit}>
+        <MDBox mb={2}>
+          <MDInput label="الرقم التعريفي" name="id" value={newCategory.id} fullWidth disabled />
+        </MDBox>
+        <MDBox mb={2}>
+          <MDInput
+            label="اسم الصنف"
+            name="categoryName"
+            value={newCategory.categoryName}
+            onChange={handleInputChange}
+            fullWidth
+          />
+        </MDBox>
+        <MDBox mb={2}>
+          <MDInput
+            label="الوصف"
+            name="description"
+            value={newCategory.description}
+            onChange={handleInputChange}
+            fullWidth
+          />
+        </MDBox>
 
-        {/* Dialog for category input */}
-        <Dialog open={isDialogOpen} onClose={handleDialogClose}>
-          <DialogTitle>اضافة فئة جديدة</DialogTitle>
-          <DialogContent>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  disabled
-                  label="الرقم التعريفي"
-                  value={newCategory.id} // Display existing or generated ID
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="اسم الصنف"
-                  name="categoryName"
-                  value={newCategory.categoryName}
-                  onChange={handleInputChange}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="الوصف"
-                  name="description"
-                  value={newCategory.description}
-                  onChange={handleInputChange}
-                  fullWidth
-                  multiline
-                  rows={4}
-                />
-              </Grid>
-              {error && (
-                <Grid item xs={12}>
-                  <Typography color="error">{error}</Typography>
-                </Grid>
-              )}
-            </Grid>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleDialogClose}>الغاء</Button>
-            <Button variant="contained" sx={{ color: "#ffffff" }} onClick={handleSubmit}>
-              إضافة
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Box>
-    </div>
+        {error && (
+          <MDTypography color="error" mb={2}>
+            {error}
+          </MDTypography>
+        )}
+
+        <MDBox display="flex" justifyContent="space-between">
+          <MDButton variant="gradient" color="success" type="submit">
+            حفظ
+          </MDButton>
+          <MDButton variant="gradient" color="error" onClick={handleCancel}>
+            إلغاء
+          </MDButton>
+        </MDBox>
+      </form>
+    </MDBox>
   );
 }
 
@@ -165,13 +141,18 @@ AddCategory.propTypes = {
   initialRows: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
-      // ... other properties of your row object
+      categoryName: PropTypes.string,
+      description: PropTypes.string,
     })
   ),
+  onAdd: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
+  onDelete: PropTypes.func,
 };
 
 AddCategory.defaultProps = {
   initialRows: [],
+  onDelete: null,
 };
 
 export default AddCategory;

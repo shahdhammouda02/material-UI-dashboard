@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Routes, Route, useNavigate, Outlet } from "react-router-dom"; // Import Outlet
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
@@ -12,12 +11,13 @@ import TableData from "./data/TableData";
 import UpdateProduct from "./data/UpdateProduct"; // Import UpdateProduct
 import DataproductBodyCell from "../../examples/products/Dataproduct/DataproductBodyCell";
 import DataproductHeadCell from "../../examples/products/Dataproduct/DataproductHeadCell";
-
+import MDButton from "components/MDButton";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 function Products() {
   const [editingId, setEditingId] = useState(null); // State to track the editing ID
   const [productRows, setproductRows] = useState([]);
-  const navigate = useNavigate(); // For navigation
-
+  const [isAddProductOpen, setIsAddProductOpen] = useState(false);
   const handleEdit = (id) => {
     setEditingId(id); // Set the ID to edit
   };
@@ -28,7 +28,19 @@ function Products() {
     );
     setEditingId(null); // Close the edit dialog
   };
-
+  const handleDelete = (id) => {
+    setProductRows((prevRows) => prevRows.filter((row) => row.id !== id)); // Delete row by orderId
+  };
+  const handleAddProductOpen = () => {
+    setIsAddProductOpen(true); // Open Add Order modal
+  };
+  const handleAddProductClose = () => {
+    setIsAddProductOpen(false); // Close Add Order modal
+  };
+  const handleAddProduct = (newProduct) => {
+    setproductRows((prevRows) => [...prevRows, newProduct]); // Add the new Product
+    setIsAddProductOpen(false); // Close Add Product modal
+  };
   const { columns, rows } = TableData(handleEdit); // Pass the handleEdit function
 
   // Update productRows with the rows from TableData
@@ -53,14 +65,23 @@ function Products() {
                 display="flex"
                 justifyContent="space-between"
                 alignItems="center"
+                // coloredShadow="info"
               >
-                <MDTypography variant="h6" color="white">
+                <MDTypography variant="h5" color="white">
                   جدول المنتجات
                 </MDTypography>
-                <Addproduct initialRows={productRows} />
+                <MDButton variant="gradient" color="success" onClick={handleAddProductOpen}>
+                  اضافة منتج{" "}
+                </MDButton>
               </MDBox>
               <MDBox pt={3}>
-                {editingId ? (
+                {isAddProductOpen ? (
+                  <Addproduct
+                    initialRows={rows}
+                    onAdd={handleAddProduct}
+                    onCancel={handleAddProductClose}
+                  />
+                ) : editingId ? (
                   <UpdateProduct
                     initialRows={productRows}
                     productId={editingId}
@@ -81,16 +102,41 @@ function Products() {
                       {productRows.map((row, index) => (
                         <tr key={index}>
                           <DataproductBodyCell align="center">{row.id}</DataproductBodyCell>
-                          <DataproductBodyCell align="center">{row.name}</DataproductBodyCell>
+                          <DataproductBodyCell align="center">{row.author}</DataproductBodyCell>
                           <DataproductBodyCell align="center">{row.Category}</DataproductBodyCell>
-                          <DataproductBodyCell align="center">
-                            {row.subCategory}
-                          </DataproductBodyCell>
                           <DataproductBodyCell align="center">{row.images}</DataproductBodyCell>
                           <DataproductBodyCell align="center">{row.price}</DataproductBodyCell>
-                          <DataproductBodyCell align="center">{row.Discount}</DataproductBodyCell>
-                          <DataproductBodyCell align="center">{row.text}</DataproductBodyCell>
-                          <DataproductBodyCell align="center">{row.actions}</DataproductBodyCell>
+                          <DataproductBodyCell align="center">{row.discount}</DataproductBodyCell>
+                          <DataproductBodyCell align="center">
+                            {row.description}
+                          </DataproductBodyCell>
+                          <DataproductBodyCell>
+                            {" "}
+                            <MDBox
+                              display="flex"
+                              justifyContent="center"
+                              alignItems="center"
+                              sx={{ padding: "0 !important" }}
+                            >
+                              <MDButton
+                                variant="text"
+                                color="success"
+                                onClick={() => handleEdit(row.id)} // Pass orderId
+                                sx={{ padding: "0 !important" }}
+                              >
+                                <EditIcon sx={{ height: "1.5rem", width: "1.5rem" }} />
+                              </MDButton>
+                              <MDButton
+                                mx={1}
+                                variant="text"
+                                color="success"
+                                onClick={() => handleDelete(row.id)} // Pass orderId
+                                sx={{ padding: "0 !important" }}
+                              >
+                                <DeleteIcon sx={{ height: "1.5rem", width: "1.5rem" }} />
+                              </MDButton>
+                            </MDBox>
+                          </DataproductBodyCell>
                         </tr>
                       ))}
                     </tbody>
@@ -102,8 +148,6 @@ function Products() {
         </Grid>
       </MDBox>
       <Footer />
-      {/* Render nested routes */}
-      <Outlet context={productRows} />
     </DashboardLayout>
   );
 }

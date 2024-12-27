@@ -1,25 +1,17 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import {
-  TextField,
-  Button,
-  Box,
-  Typography,
-  Grid,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-} from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
+import MDBox from "components/MDBox";
+import MDTypography from "components/MDTypography";
+import MDButton from "components/MDButton";
+import MDInput from "components/MDInput";
+import MDIconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 
-function Addshipping({ initialRows }) {
-  const [shipping, setshipping] = useState({
-    id: "", // Start with an empty ID
+function AddShipping({ initialRows, onAdd, onCancel, onDelete }) {
+  const [formData, setFormData] = useState({
+    id: "",
     userid: "",
     proid: "",
     shipping: "",
@@ -27,205 +19,176 @@ function Addshipping({ initialRows }) {
     adress: "",
   });
 
-  const [error, setError] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-
+  // Automatically generate the next shipping ID
   useEffect(() => {
-    // Set the initial ID based on existing data
     const highestExistingId =
       initialRows.length > 0 ? Math.max(...initialRows.map((row) => row.id)) : 0;
-    setshipping((prevshipping) => ({
-      ...prevshipping,
-      id: highestExistingId + 1, // Set ID to highest existing ID + 1
+    setFormData((prevData) => ({
+      ...prevData,
+      id: highestExistingId + 1,
     }));
-  }, [initialRows]); // Update ID when initialRows changes
+  }, [initialRows]);
+
+  const [error, setError] = useState("");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setshipping((prevshipping) => ({
-      ...prevshipping,
+    setFormData((prevData) => ({
+      ...prevData,
       [name]: value,
     }));
   };
 
-  const handleSubmit = () => {
+  const handleEditClick = (id) => {
+    console.log(`Editing product with ID: ${id}`);
+    // Add your editing logic here
+  };
+
+  const handleDeleteClick = (id) => {
+    if (onDelete) {
+      onDelete(id); // Pass the ID to the parent for deletion
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
     if (
-      !shipping.userid ||
-      !shipping.proid ||
-      !shipping.shipping ||
-      !shipping.price ||
-      !shipping.adress
+      !formData.userid ||
+      !formData.proid ||
+      !formData.shipping ||
+      !formData.price ||
+      !formData.adress
     ) {
       setError("من فضلك قم بملء جميع الحقول بشكل صحيح.");
       return;
     }
 
-    const shippingWithID = {
-      id: shipping.id, // Use the incremented ID
-      userid: shipping.userid,
-      proid: shipping.proid,
-      shipping: shipping.shipping,
-      price: shipping.price,
-      adress: shipping.adress,
+    setError("");
+
+    const newShipping = {
+      ...formData,
+      actions: (
+        <MDBox display="flex" justifyContent="center" alignItems="center">
+          <MDIconButton color="success" onClick={() => handleEditClick(formData.id)}>
+            <EditIcon />
+          </MDIconButton>
+          <MDBox mx={1} />
+          <MDIconButton color="error" onClick={() => handleDeleteClick(formData.id)}>
+            <DeleteIcon />
+          </MDIconButton>
+        </MDBox>
+      ),
     };
 
-    setError("");
-    console.log("تم إضافة الشحنة بنجاح:", shippingWithID);
-    setIsDialogOpen(false);
-
-    // Reset the form for the next entry, keeping the id increment logic
-    setshipping({
-      id: shipping.id + 1, // Increment ID for next entry
+    onAdd(newShipping); // Add the new shipping entry
+    setFormData((prevData) => ({
+      ...prevData,
       userid: "",
       proid: "",
       shipping: "",
       price: "",
       adress: "",
-    });
-  };
-
-  const handleDialogOpen = () => {
-    setIsDialogOpen(true);
-  };
-
-  const handleDialogClose = () => {
-    setIsDialogOpen(false);
-    setshipping({
-      id: "", // Reset ID to empty on close
-      userid: "",
-      proid: "",
-      shipping: "",
-      price: "",
-      adress: "",
-    });
+    }));
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Box flexDirection="column" display="flex" justifyContent="center" alignItems="center">
-        <Button
-          onClick={handleDialogOpen}
-          sx={{
-            bgcolor: "#ffffff",
-            color: "#1e8234",
-            "&:hover": {
-              bgcolor: "#000000",
-              color: "#ffffff", // لون أغمق عند التمرير
-            },
-            transition: "all 0.3s ease-in-out",
-          }}
-        >
-          اضافة شحنة جديدة
-          <AddIcon />
-        </Button>
-
-        {/* Dialog for shipping input */}
-        <Dialog open={isDialogOpen} onClose={handleDialogClose}>
-          <DialogTitle>اضافة شحنة جديدة</DialogTitle>
-          <DialogContent>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  disabled
-                  label="رقم الشحنة"
-                  value={shipping.id} // Display existing or generated ID
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="رقم الزبون"
-                  name="userid"
-                  value={shipping.userid}
-                  onChange={handleInputChange}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="رقم المنتج"
-                  name="proid"
-                  value={shipping.proid}
-                  onChange={handleInputChange}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12}>
-                {/* قائمة منسدلة لاختيار الفئة الأساسية */}
-                <FormControl fullWidth>
-                  <InputLabel>نوع الشحن</InputLabel>
-                  <Select
-                    label="نوع الشحن"
-                    name="shipping"
-                    value={shipping.shipping}
-                    onChange={handleInputChange}
-                    fullWidth
-                    displayEmpty
-                    sx={{ minWidth: 200, height: 40 }}
-                  >
-                    <MenuItem value="fast">سريع</MenuItem>
-                    <MenuItem value="normal">عادي</MenuItem>
-                    <MenuItem value="free">مجاني</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="السعر"
-                  name="price"
-                  value={shipping.price}
-                  onChange={handleInputChange}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="العنوان"
-                  name="adress"
-                  value={shipping.adress}
-                  onChange={handleInputChange}
-                  fullWidth
-                  multiline
-                  rows={4}
-                />
-              </Grid>
-
-              {error && (
-                <Grid item xs={12}>
-                  <Typography color="error">{error}</Typography>
-                </Grid>
-              )}
-            </Grid>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleDialogClose}>الغاء</Button>
-            <Button variant="contained" sx={{ color: "#ffffff" }} onClick={handleSubmit}>
-              إضافة
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Box>
-    </div>
+    <MDBox p={3}>
+      <MDTypography variant="h5" mb={2}>
+        اضافة شحنة
+      </MDTypography>
+      <form onSubmit={handleSubmit}>
+        <MDBox mb={2}>
+          <MDInput label="رقم الشحنة" name="id" value={formData.id} fullWidth disabled />
+        </MDBox>
+        <MDBox mb={2}>
+          <MDInput
+            label="رقم المستخدم"
+            name="userid"
+            value={formData.userid}
+            onChange={handleInputChange}
+            fullWidth
+          />
+        </MDBox>
+        <MDBox mb={2}>
+          <MDInput
+            label="رقم المنتج"
+            name="proid"
+            value={formData.proid}
+            onChange={handleInputChange}
+            fullWidth
+          />
+        </MDBox>
+        <MDBox mb={2}>
+          <FormControl fullWidth>
+            <InputLabel>نوع الشحن</InputLabel>
+            <Select
+              label="نوع الشحن"
+              name="shipping"
+              value={formData.shipping}
+              onChange={handleInputChange}
+              sx={{ height: "40px" }}
+            >
+              <MenuItem value="مجاني">مجاني</MenuItem>
+              <MenuItem value="عادي">عادي</MenuItem>
+              <MenuItem value="سريع">سريع</MenuItem>
+            </Select>
+          </FormControl>
+        </MDBox>
+        <MDBox mb={2}>
+          <MDInput
+            label="السعر"
+            name="price"
+            value={formData.price}
+            onChange={handleInputChange}
+            fullWidth
+          />
+        </MDBox>
+        <MDBox mb={2}>
+          <MDInput
+            label="العنوان"
+            name="adress"
+            value={formData.adress}
+            onChange={handleInputChange}
+            fullWidth
+          />
+        </MDBox>
+        {error && (
+          <MDTypography color="error" mb={2}>
+            {error}
+          </MDTypography>
+        )}
+        <MDBox display="flex" justifyContent="space-between">
+          <MDButton variant="gradient" color="success" type="submit">
+            حفظ
+          </MDButton>
+          <MDButton variant="gradient" color="error" onClick={onCancel}>
+            إلغاء
+          </MDButton>
+        </MDBox>
+      </form>
+    </MDBox>
   );
 }
 
-Addshipping.propTypes = {
+AddShipping.propTypes = {
   initialRows: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
-      // other properties of your row object
+      userid: PropTypes.string,
+      proid: PropTypes.string,
+      shipping: PropTypes.string,
+      price: PropTypes.string,
+      adress: PropTypes.string,
     })
   ),
+  onAdd: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
+  onDelete: PropTypes.func, // Function to handle deletion
 };
 
-Addshipping.defaultProps = {
+AddShipping.defaultProps = {
   initialRows: [],
+  onDelete: null,
 };
 
-export default Addshipping;
+export default AddShipping;

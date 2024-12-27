@@ -7,31 +7,48 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import AddSubCategory from "./data/AddSubCategory"; // Import the AddCategory component
-import TablesubData from "./data/TablesubData"; // Import the TablesubData function
+import DataTable from "./data/TablesubData"; // Import the TablesubData function
 import UpdateSubCategory from "./data/UpdateSubCategory"; // Import UpdateCategory
 import CategoryBodyCell from "examples/Categories/CategoriesData/CategoryBodyCell"; // Import CategoryBodyCell
 import CategoryHeadCell from "examples/Categories/CategoriesData/CategoryHeadCell"; // Import CategoryHeadCell
+import MDButton from "components/MDButton";
+import MDInput from "components/MDInput";
+import MDIconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 function SubCategories() {
   const [editingId, setEditingId] = useState(null); // State to track the editing ID
-  const [subcategoryRows, setSubcategoryRows] = useState([]);
-
+  const [categoryRows, setCategoryRows] = useState([]);
+  const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const handleEdit = (id) => {
     setEditingId(id); // Set the ID to edit
   };
 
-  const handleUpdate = (updatedSubcategory) => {
-    setSubcategoryRows((prevRows) =>
-      prevRows.map((row) => (row.author === updatedSubcategory.author ? updatedSubcategory : row))
+  const handleUpdate = (updatedCategory) => {
+    setCategoryRows((prevRows) =>
+      prevRows.map((row) => (row.id === updatedCategory.id ? updatedCategory : row))
     );
     setEditingId(null); // Close the edit dialog
   };
+  const handleDelete = (id) => {
+    setCategoryRows((prevRows) => prevRows.filter((row) => row.id !== id)); // Delete row by orderId
+  };
+  const handleAddCategoryOpen = () => {
+    setIsAddCategoryOpen(true); // Open Add Order modal
+  };
+  const handleAddCategoryClose = () => {
+    setIsAddCategoryOpen(false); // Close Add Order modal
+  };
+  const handleAddCategory = (newCategory) => {
+    setCategoryRows((prevRows) => [...prevRows, newCategory]); // Add the new Category
+    setIsAddCategoryOpen(false); // Close Add Category modal
+  };
+  const { columns, rows } = DataTable(handleEdit); // Pass the handleEdit function
 
-  const { columns, rows } = TablesubData(handleEdit); // Pass the handleEdit function
-
-  // Update subcategoryRows with the rows from TablesubData
+  // Update categoryRows with the rows from DataTable
   useEffect(() => {
-    setSubcategoryRows(rows); // Set initial rows from TablesubData
+    setCategoryRows(rows); // Set initial rows from DataTable
   }, [rows]);
 
   return (
@@ -52,15 +69,23 @@ function SubCategories() {
                 justifyContent="space-between"
                 alignItems="center"
               >
-                <MDTypography variant="h6" color="white">
+                <MDTypography variant="h5" color="white">
                   جدول الفئات الفرعية
                 </MDTypography>
-                <AddSubCategory initialRows={subcategoryRows} />
+                <MDButton variant="gradient" color="success" onClick={handleAddCategoryOpen}>
+                  اضافة فئة
+                </MDButton>
               </MDBox>
               <MDBox pt={3}>
-                {editingId ? (
+                {isAddCategoryOpen ? (
+                  <AddSubCategory
+                    initialRows={rows}
+                    onAdd={handleAddCategory}
+                    onCancel={handleAddCategoryClose}
+                  />
+                ) : editingId ? (
                   <UpdateSubCategory
-                    initialRows={subcategoryRows}
+                    initialRows={categoryRows}
                     categoryId={editingId}
                     onUpdate={handleUpdate}
                   />
@@ -76,13 +101,38 @@ function SubCategories() {
                       </tr>
                     </thead>
                     <tbody>
-                      {subcategoryRows.map((row, index) => (
+                      {categoryRows.map((row, index) => (
                         <tr key={index}>
-                          <CategoryBodyCell align="left">{row.id}</CategoryBodyCell>
+                          <CategoryBodyCell align="center">{row.id}</CategoryBodyCell>
                           <CategoryBodyCell align="center">{row.Category}</CategoryBodyCell>
                           <CategoryBodyCell align="center">{row.text}</CategoryBodyCell>
                           <CategoryBodyCell align="center">{row.mainCategory}</CategoryBodyCell>
-                          <CategoryBodyCell align="center">{row.Actions}</CategoryBodyCell>
+                          <CategoryBodyCell align="center">
+                            <MDBox
+                              display="flex"
+                              justifyContent="center"
+                              alignItems="center"
+                              sx={{ padding: "0 !important" }}
+                            >
+                              <MDButton
+                                variant="text"
+                                color="success"
+                                onClick={() => handleEdit(row.id)}
+                                sx={{ padding: "0 !important" }}
+                              >
+                                <EditIcon sx={{ height: "1.5rem", width: "1.5rem" }} />
+                              </MDButton>
+                              <MDButton
+                                mx={1}
+                                variant="text"
+                                color="success"
+                                onClick={() => handleDelete(row.id)}
+                                sx={{ padding: "0 !important" }}
+                              >
+                                <DeleteIcon sx={{ height: "1.5rem", width: "1.5rem" }} />
+                              </MDButton>
+                            </MDBox>
+                          </CategoryBodyCell>
                         </tr>
                       ))}
                     </tbody>

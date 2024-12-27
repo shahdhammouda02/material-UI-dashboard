@@ -4,10 +4,6 @@ import MDIconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import test from "../../../assets/images/bg-profile.jpeg";
-import clothes from "assets/images/clothes.jpg";
-import handcraft from "assets/images/handcraft.jpg";
-import food from "assets/images/food.jpg";
-
 export default function TableData(handleEdit) {
   // Edit button handler
   const handleEditClick = (id) => {
@@ -21,25 +17,23 @@ export default function TableData(handleEdit) {
 
   const [columns] = useState([
     { Header: "الرقم التعريفي", accessor: "id", align: "center" },
-    { Header: "اسم المنتج", accessor: "name", align: "center" },
-    { Header: "الفئة الاساسية", accessor: "Category", align: "center" },
-    { Header: "الفئة الفرعية", accessor: "Category", align: "center" },
-    { Header: "الصورة", accessor: "images", align: "center" },
+    { Header: "الاسم", accessor: "author", align: "center" },
+    { Header: "الفئة", accessor: "category", align: "center" },
+    { Header: "الصورة", accessor: "image", align: "center" },
     { Header: "السعر", accessor: "price", align: "center" },
-    { Header: "الخصم", accessor: "Discount", align: "center" },
-    { Header: "الوصف", accessor: "text", align: "center" },
+    { Header: "الخصم", accessor: "discount", align: "center" },
+    { Header: "الوصف", accessor: "description", align: "center" },
     { Header: "الإجراءات", accessor: "actions", align: "center" },
   ]);
 
   const [initialRows, setInitialRows] = useState([
     {
-      name: "زيت زيتون",
+      author: "سارة خالد",
       Category: "المنتجات الغذائية",
-      subCategory: "الاكل الفلسطيني",
       images: (
         <MDBox ml={-1}>
           <img
-            src={food}
+            src={test}
             alt="image description"
             style={{
               width: "100px",
@@ -50,17 +44,16 @@ export default function TableData(handleEdit) {
         </MDBox>
       ),
       price: "$50",
-      Discount: "10%",
-      text: "الاكل الفلسطيني له طعم مميز",
+      discount: "10%",
+      description: "الاكل الفلسطيني له طعم مميز",
     },
     {
-      name: "ثوب فلاحي",
+      author: "مرح علي",
       Category: "الملابس والاكسسوارات",
-      subCategory: "ملابس نسائية",
       images: (
         <MDBox ml={-1}>
           <img
-            src={clothes}
+            src={test}
             alt="image description"
             style={{
               width: "100px",
@@ -71,17 +64,16 @@ export default function TableData(handleEdit) {
         </MDBox>
       ),
       price: "$50",
-      Discount: "10%",
-      text: "الملابس الفلسطينية لها طابع تراثي اصيل",
+      discount: "10%",
+      description: "الملابس الفلسطينية لها طابع تراثي اصيل",
     },
     {
-      name: "فخار",
+      author: "احمد علي",
       Category: "الحرف اليدوية",
-      subCategory: "فخار",
       images: (
         <MDBox ml={-1}>
           <img
-            src={handcraft}
+            src={test}
             alt="image description"
             style={{
               width: "100px",
@@ -92,8 +84,8 @@ export default function TableData(handleEdit) {
         </MDBox>
       ),
       price: "$50",
-      Discount: "10%",
-      text: "الحرف اليدوية تمثل التاريخ الفلسطيني القديم المميز",
+      discount: "10%",
+      description: "الحرف اليدوية تمثل التاريخ الفلسطيني القديم المميز",
     },
   ]);
 
@@ -107,7 +99,7 @@ export default function TableData(handleEdit) {
             <EditIcon />
           </MDIconButton>
           <MDBox mx={1} />
-          <MDIconButton color="error" onClick={() => handleDeleteClick(index + 1)}>
+          <MDIconButton color="success" onClick={() => handleDeleteClick(index + 1)}>
             <DeleteIcon />
           </MDIconButton>
         </MDBox>

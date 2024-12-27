@@ -1,30 +1,20 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import {
-  TextField,
-  Button,
-  Box,
-  Typography,
-  Grid,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Select,
-  MenuItem,
-} from "@mui/material";
-import SaveIcon from "@mui/icons-material/Save";
-
+import MDBox from "components/MDBox";
+import MDTypography from "components/MDTypography";
+import MDButton from "components/MDButton";
+import MDInput from "components/MDInput";
+import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 function UpdateSubCategory({ initialRows, categoryId, onUpdate }) {
   const [subcategory, setSubcategory] = useState({
-    author: categoryId,
+    id: categoryId || null,
     Category: "",
     text: "",
     mainCategory: "",
   });
 
   const [error, setError] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(true); // Open dialog by default
+  // Open dialog by default
 
   useEffect(() => {
     const existingSubcategory = initialRows.find((row) => row.id === categoryId);
@@ -51,104 +41,95 @@ function UpdateSubCategory({ initialRows, categoryId, onUpdate }) {
 
     setError("");
     onUpdate(subcategory); // Call the update function passed as a prop
-    setIsDialogOpen(false); // Close the dialog
-  };
-
-  const handleDialogClose = () => {
-    setIsDialogOpen(false);
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "#eaeaea",
-      }}
-    >
-      <Box
-        flexDirection="column"
-        width="100%"
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        p={3}
-        bgcolor="#fbfbfb"
-      >
-        <Dialog open={isDialogOpen} onClose={handleDialogClose}>
-          <DialogTitle>تحديث الفئة الفرعية</DialogTitle>
-          <DialogContent>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  disabled
-                  label="الرقم التعريفي"
-                  value={subcategory.id} // Display existing ID
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="اسم الفئة"
-                  name="Category"
-                  value={subcategory.Category} // Set existing category name
-                  onChange={handleInputChange}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="الوصف"
-                  name="text"
-                  value={subcategory.text} // Set existing description
-                  onChange={handleInputChange}
-                  fullWidth
-                  multiline
-                  rows={4}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                {/* قائمة منسدلة لاختيار الفئة الأساسية */}
-                <Select
-                  name="mainCategory"
-                  value={subcategory.mainCategory} // Set existing main category
-                  onChange={handleInputChange}
-                  fullWidth
-                  displayEmpty
-                  sx={{ minWidth: 200 }}
-                >
-                  <MenuItem value={subcategory.mainCategory}>{subcategory.mainCategory}</MenuItem>
-                  <MenuItem value="food-products">منتجات غذائية</MenuItem>
-                  <MenuItem value="men-clothes">ملابس وإكسسوارات</MenuItem>
-                  <MenuItem value="handicrafts">حرف يدوية</MenuItem>
-                  <MenuItem value="books">كتب ومطبوعات</MenuItem>
-                </Select>
-              </Grid>
-              {error && (
-                <Grid item xs={12}>
-                  <Typography color="error">{error}</Typography>
-                </Grid>
-              )}
-            </Grid>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleDialogClose}>الغاء</Button>
-            <Button variant="contained" sx={{ color: "#ffffff" }} onClick={handleSubmit}>
-              حفظ <SaveIcon />
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Box>
-    </div>
+    <MDBox p={3}>
+      {/* 🔶 عنوان النموذج */}
+      <MDTypography variant="h5" mb={2}>
+        تحديث الفئة
+      </MDTypography>
+
+      {/* 📝 نموذج التعديل */}
+      <form onSubmit={handleSubmit}>
+        {/* 🆔 حقل: رقم الفئة */}
+        <MDBox mb={2}>
+          <MDInput label="الرقم التعريفي" value={subcategory.id} disabled fullWidth />
+        </MDBox>
+
+        {/* 📝 حقل: اسم الفئة */}
+        <MDBox mb={2}>
+          <MDInput
+            label="اسم الفئة"
+            name="Category"
+            value={subcategory.Category}
+            onChange={handleInputChange}
+            fullWidth
+          />
+        </MDBox>
+
+        {/* 📋 حقل: الوصف */}
+        <MDBox mb={2}>
+          <MDInput
+            label="الوصف"
+            name="text"
+            value={subcategory.text}
+            onChange={handleInputChange}
+            fullWidth
+            multiline
+            rows={4}
+          />
+        </MDBox>
+        <MDBox mb={2}>
+          <FormControl fullWidth>
+            <InputLabel>اختر الفئة الأساسية</InputLabel>
+            <Select
+              name="mainCategory"
+              value={subcategory.mainCategory}
+              onChange={handleInputChange}
+              sx={{ height: "40px" }}
+            >
+              <MenuItem value="منتجات غذائية">منتجات غذائية</MenuItem>
+              <MenuItem value="ملابس وإكسسوارات">ملابس وإكسسوارات</MenuItem>
+              <MenuItem value="حرف يدوية">حرف يدوية</MenuItem>
+              <MenuItem value="كتب ومطبوعات">كتب ومطبوعات</MenuItem>
+            </Select>
+          </FormControl>
+        </MDBox>
+
+        {/* 🛑 عرض الخطأ */}
+        {error && (
+          <MDBox mb={2}>
+            <MDTypography color="error">{error}</MDTypography>
+          </MDBox>
+        )}
+
+        {/* 🔘 أزرار التحكم */}
+        <MDBox display="flex" justifyContent="space-between">
+          {/* ✅ زر الحفظ */}
+          <MDButton variant="gradient" color="success" type="submit">
+            حفظ التعديلات
+          </MDButton>
+
+          {/* ❌ زر الإلغاء */}
+          <MDButton
+            variant="gradient"
+            color="error"
+            onClick={() => onUpdate(categoryId ? subcategory : null)} // Ensure categoryId is valid
+          >
+            إلغاء
+          </MDButton>
+        </MDBox>
+      </form>
+    </MDBox>
   );
 }
 
 UpdateSubCategory.propTypes = {
   initialRows: PropTypes.arrayOf(
     PropTypes.shape({
-      author: PropTypes.number.isRequired,
-      Category: PropTypes.string.isRequired,
+      id: PropTypes.number.isRequired,
+      category: PropTypes.string.isRequired,
       text: PropTypes.string.isRequired,
       mainCategory: PropTypes.string.isRequired,
     })

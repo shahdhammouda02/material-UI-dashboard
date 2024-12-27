@@ -1,38 +1,32 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import {
-  TextField,
-  Button,
-  Box,
-  Typography,
-  Grid,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  MenuItem,
-} from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
+import MDBox from "components/MDBox";
+import MDTypography from "components/MDTypography";
+import MDButton from "components/MDButton";
+import MDInput from "components/MDInput";
+import MDIconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { useDropzone } from "react-dropzone";
+import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 
-function Addproduct({ initialRows }) {
-  const [newproduct, setNewproduct] = useState({
-    id: null,
-    name: "",
+function AddProduct({ initialRows, onAdd, onCancel, onDelete }) {
+  const [newProduct, setNewProduct] = useState({
+    id: "",
+    author: "",
     Category: "",
-    subCategory: "",
-    images: "",
+    image: "",
     price: "",
-    Discount: "",
-    text: "",
+    discount: "",
+    description: "",
   });
 
   const [error, setError] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
     const highestExistingId =
       initialRows.length > 0 ? Math.max(...initialRows.map((row) => row.id)) : 0;
-    setNewproduct((prev) => ({
+    setNewProduct((prev) => ({
       ...prev,
       id: highestExistingId + 1,
     }));
@@ -40,200 +34,192 @@ function Addproduct({ initialRows }) {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewproduct((prev) => ({
+    setNewProduct((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
 
-  const handleSubmit = () => {
-    const { name, Category, subCategory, images, price, Discount, text } = newproduct;
-    if (
-      !name.trim() ||
-      !Category.trim() ||
-      !subCategory.trim() ||
-      !images.trim() ||
-      !price.trim() ||
-      !Discount.trim() ||
-      !text.trim()
-    ) {
-      setError("Please fill in all fields correctly.");
+  const handleDrop = (acceptedFiles) => {
+    const file = acceptedFiles[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setNewProduct((prev) => ({ ...prev, image: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop: handleDrop,
+    accept: "image/*",
+    multiple: false,
+  });
+
+  const validateForm = () => {
+    return Object.values(newProduct).every((value) => {
+      // Ensure the value is a string before calling trim
+      return String(value).trim() !== "";
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      setError("من فضلك قم بملء جميع الحقول بشكل صحيح.");
       return;
     }
 
-    console.log("Product added successfully:", newproduct);
-
-    // Reset form
-    setNewproduct((prev) => ({
-      id: prev.id + 1,
-      name: "",
-      Category: "",
-      subCategory: "",
-      images: "",
-      price: "",
-      Discount: "",
-      text: "",
-    }));
-
     setError("");
-    setIsDialogOpen(false);
+    const newProductData = {
+      ...newProduct,
+      actions: (
+        <MDBox display="flex" justifyContent="center" alignItems="center">
+          <MDIconButton
+            color="success"
+            onClick={() => console.log(`Editing product with ID: ${newProduct.id}`)}
+          >
+            <EditIcon />
+          </MDIconButton>
+          <MDBox mx={1} />
+          <MDIconButton color="error" onClick={() => onDelete && onDelete(newProduct.id)}>
+            <DeleteIcon />
+          </MDIconButton>
+        </MDBox>
+      ),
+    };
+
+    onAdd(newProductData);
+    resetForm();
   };
 
-  const handleDialogOpen = () => {
-    setIsDialogOpen(true);
+  const resetForm = () => {
+    setNewProduct({
+      id: "",
+      author: "",
+      Category: "",
+      image: "",
+      price: "",
+      discount: "",
+      description: "",
+    });
+    setError("");
   };
 
-  const handleDialogClose = () => {
-    setIsDialogOpen(false);
-    setError("");
-    setNewproduct((prev) => ({
-      id: prev.id,
-      name: "",
-      Category: "",
-      subCategory: "",
-      images: "",
-      price: "",
-      Discount: "",
-      text: "",
-    }));
+  const handleCancel = () => {
+    resetForm();
+    onCancel();
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Box flexDirection="column" display="flex" justifyContent="center" alignItems="center">
-        <Button
-          onClick={handleDialogOpen}
-          sx={{
-            bgcolor: "#ffffff",
-            color: "#1e8234",
-            "&:hover": {
-              bgcolor: "#000000",
-              color: "#ffffff", // لون أغمق عند التمرير
-            },
-            transition: "all 0.3s ease-in-out",
-          }}
-        >
-          اضافة منتج جديد
-          <AddIcon />
-        </Button>
+    <MDBox p={3}>
+      <MDTypography variant="h5" mb={2}>
+        إضافة منتج جديد
+      </MDTypography>
+      <form onSubmit={handleSubmit}>
+        <MDBox mb={2}>
+          <MDInput label="الرقم التعريفي" name="id" value={newProduct.id} fullWidth disabled />
+        </MDBox>
+        <MDBox mb={2}>
+          <MDInput
+            label="الاسم"
+            name="author"
+            value={newProduct.author}
+            onChange={handleInputChange}
+            fullWidth
+          />
+        </MDBox>
+        <MDBox mb={2}>
+          <MDInput
+            label="الفئة"
+            name="Category"
+            value={newProduct.Category}
+            onChange={handleInputChange}
+            fullWidth
+          />
+        </MDBox>
+        <MDBox mb={2} {...getRootProps()} border="1px dashed #ccc" p={2} textAlign="center">
+          <input {...getInputProps()} />
+          {isDragActive ? (
+            <MDTypography>أسقط الصورة هنا...</MDTypography>
+          ) : (
+            <MDTypography>اسحب وأسقط الصورة هنا، أو انقر لاختيار صورة</MDTypography>
+          )}
+        </MDBox>
+        <MDBox mb={2}>
+          {newProduct.image && (
+            <img
+              src={newProduct.image}
+              alt="Preview"
+              style={{ maxWidth: "100%", height: "auto", borderRadius: "8px" }}
+            />
+          )}
+        </MDBox>
+        <MDBox mb={2}>
+          <MDInput
+            label="السعر"
+            name="price"
+            type="number"
+            value={newProduct.price}
+            onChange={handleInputChange}
+            fullWidth
+          />
+        </MDBox>
+        <MDBox mb={2}>
+          <MDInput
+            label="الخصم"
+            name="discount"
+            type="number"
+            value={newProduct.discount}
+            onChange={handleInputChange}
+            fullWidth
+          />
+        </MDBox>
+        <MDBox mb={2}>
+          <MDInput
+            label="الوصف"
+            name="description"
+            value={newProduct.description}
+            onChange={handleInputChange}
+            fullWidth
+          />
+        </MDBox>
 
-        {/* Dialog for product input */}
-        <Dialog open={isDialogOpen} onClose={handleDialogClose}>
-          <DialogTitle>اضافة فئة جديدة</DialogTitle>
-          <DialogContent>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField disabled label="الرقم التعريفي" value={newproduct.id || ""} fullWidth />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="اسم المنتج"
-                  name="name"
-                  value={newproduct.author}
-                  onChange={handleInputChange}
-                  fullWidth
-                  required
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="الفئة"
-                  name="Category"
-                  value={newproduct.Category}
-                  onChange={handleInputChange}
-                  fullWidth
-                  required
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="الفئة الفرعية"
-                  name="subCategoty"
-                  value={newproduct.subCategory}
-                  onChange={handleInputChange}
-                  fullWidth
-                  required
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="الصورة (الرابط)"
-                  name="images"
-                  value={newproduct.images}
-                  onChange={handleInputChange}
-                  fullWidth
-                  required
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  label="السعر"
-                  name="price"
-                  type="number"
-                  value={newproduct.price}
-                  onChange={handleInputChange}
-                  fullWidth
-                  required
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  label="الخصم"
-                  name="Discount"
-                  type="number"
-                  value={newproduct.Discount}
-                  onChange={handleInputChange}
-                  fullWidth
-                  required
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="الوصف"
-                  name="text"
-                  value={newproduct.text}
-                  onChange={handleInputChange}
-                  fullWidth
-                  multiline
-                  rows={4}
-                  required
-                />
-              </Grid>
-              {error && (
-                <Grid item xs={12}>
-                  <Typography color="error">{error}</Typography>
-                </Grid>
-              )}
-            </Grid>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleDialogClose}>الغاء</Button>
-            <Button variant="contained" sx={{ color: "#ffffff" }} onClick={handleSubmit}>
-              إضافة
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Box>
-    </div>
+        {error && (
+          <MDTypography color="error" mb={2}>
+            {error}
+          </MDTypography>
+        )}
+
+        <MDBox display="flex" justifyContent="space-between">
+          <MDButton variant="gradient" color="success" type="submit">
+            حفظ
+          </MDButton>
+          <MDButton variant="gradient" color="error" onClick={handleCancel}>
+            إلغاء
+          </MDButton>
+        </MDBox>
+      </form>
+    </MDBox>
   );
 }
 
-Addproduct.propTypes = {
+AddProduct.propTypes = {
   initialRows: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
     })
   ),
+  onAdd: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
+  onDelete: PropTypes.func,
 };
 
-Addproduct.defaultProps = {
+AddProduct.defaultProps = {
   initialRows: [],
+  onDelete: null,
 };
 
-export default Addproduct;
+export default AddProduct;

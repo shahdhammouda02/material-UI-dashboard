@@ -1,23 +1,15 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import {
-  TextField,
-  Button,
-  Box,
-  Typography,
-  Grid,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  MenuItem,
-  Select,
-  InputLabel,
-  FormControl,
-} from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
+import MDBox from "components/MDBox";
+import MDTypography from "components/MDTypography";
+import MDButton from "components/MDButton";
+import MDInput from "components/MDInput";
+import MDIconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 
-function AddOrder({ initialRows }) {
+function AddOrder({ initialRows, onAdd, onCancel, onDelete }) {
   const [newOrder, setNewOrder] = useState({
     orderId: "", // Start with empty to indicate no ID is set
     customerName: "",
@@ -25,227 +17,176 @@ function AddOrder({ initialRows }) {
     productNumber: "",
     quantity: "",
     totalAmount: "",
-    status: "", // Add a field for status
+    status: "", // Add status field here
   });
 
-  const [error, setError] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-
+  // Automatically generate the next order ID based on existing rows
   useEffect(() => {
-    // Set the initial orderId based on existing data
     const highestExistingId =
       initialRows.length > 0 ? Math.max(...initialRows.map((row) => row.orderId)) : 0;
-    setNewOrder((prevOrder) => ({
-      ...prevOrder,
-      orderId: highestExistingId + 1, // Set ID to highest existing ID + 1
+    setNewOrder((prevData) => ({
+      ...prevData,
+      orderId: highestExistingId + 1,
     }));
-  }, [initialRows]); // Update ID when initialRows changes
+  }, [initialRows]);
+
+  const [error, setError] = useState("");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewOrder((prevOrder) => ({
-      ...prevOrder,
+    setNewOrder((prevData) => ({
+      ...prevData,
       [name]: value,
     }));
   };
 
-  const handleStatusChange = (e) => {
-    setNewOrder((prevOrder) => ({
-      ...prevOrder,
-      status: e.target.value,
-    }));
+  const handleEditClick = (id) => {
+    console.log(`Editing product with ID: ${id}`);
+    // Add your editing logic here
   };
 
-  const handleSubmit = () => {
-    // Enhanced validation
+  const handleDeleteClick = (id) => {
+    if (onDelete) {
+      onDelete(id); // تمرير الـ ID فقط لحذف الصف المحدد
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Validate that all fields are filled
     if (
       !newOrder.customerName ||
       !newOrder.product ||
+      !newOrder.productNumber ||
       !newOrder.quantity ||
       !newOrder.totalAmount ||
-      !newOrder.status || // Ensure status is selected
-      isNaN(newOrder.quantity) ||
-      isNaN(newOrder.totalAmount) ||
-      newOrder.quantity <= 0 ||
-      newOrder.totalAmount <= 0
+      !newOrder.status // Validate the status field as well
     ) {
-      setError("Please fill in all fields correctly with positive numbers.");
+      setError("من فضلك قم بملء جميع الحقول بشكل صحيح.");
       return;
     }
 
+    setError(""); // Clear error message if all fields are valid
+
     const newOrderData = {
-      orderId: newOrder.orderId, // Use the incremented ID
-      customerName: newOrder.customerName,
-      product: newOrder.product,
-      productNumber: newOrder.productNumber,
-      quantity: parseInt(newOrder.quantity, 10),
-      totalAmount: newOrder.totalAmount,
-      status: newOrder.status, // Use the selected status
+      ...newOrder,
       actions: (
-        <Box display="flex" justifyContent="center" alignItems="center">
-          <Button color="primary">Edit</Button>
-          <Button color="error">Delete</Button>
-        </Box>
+        <MDBox display="flex" justifyContent="center" alignItems="center">
+          <MDIconButton color="success" onClick={() => handleEditClick(newOrder.orderId)}>
+            <EditIcon />
+          </MDIconButton>
+          <MDBox mx={1} />
+          <MDIconButton color="error" onClick={() => handleDeleteClick(newOrder.orderId)}>
+            <DeleteIcon />
+          </MDIconButton>
+        </MDBox>
       ),
     };
 
-    setError("");
-    console.log("Order added successfully:", newOrderData);
-    setIsDialogOpen(false);
-
-    // Reset the form for the next entry
-    setNewOrder((prevOrder) => ({
-      orderId: prevOrder.orderId + 1, // Increment ID for next entry
-      customerName: "",
-      product: "",
-      productNumber: "",
-      quantity: "",
-      totalAmount: "",
-      status: "", // Reset the status field
-    }));
-  };
-
-  const handleDialogOpen = () => {
-    setIsDialogOpen(true);
-  };
-
-  const handleDialogClose = () => {
-    setIsDialogOpen(false);
+    onAdd(newOrderData); // Add the new order entry to the parent component
     setNewOrder({
-      orderId: null,
+      orderId: "", // Reset form fields after submission
       customerName: "",
       product: "",
       productNumber: "",
       quantity: "",
       totalAmount: "",
-      status: "", // Reset the status field
-    }); // Reset form
+      status: "", // Reset status as well
+    });
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Box flexDirection="column" display="flex" justifyContent="center" alignItems="center">
-        <Button
-          onClick={handleDialogOpen}
-          sx={{
-            bgcolor: "#ffffff",
-            color: "#1e8234",
-            "&:hover": {
-              bgcolor: "#000000",
-              color: "#ffffff", // لون أغمق عند التمرير
-            },
-            transition: "all 0.3s ease-in-out",
-          }}
-        >
-          إضافة طلب جديد
-          <AddIcon />
-        </Button>
+    <MDBox p={3}>
+      <MDTypography variant="h5" mb={2}>
+        إضافة طلب جديد
+      </MDTypography>
+      <form onSubmit={handleSubmit}>
+        <MDBox mb={2}>
+          <MDInput label="رقم الطلب" name="orderId" value={newOrder.orderId} fullWidth disabled />
+        </MDBox>
+        <MDBox mb={2}>
+          <MDInput
+            label="اسم العميل"
+            name="customerName"
+            value={newOrder.customerName}
+            onChange={handleInputChange}
+            fullWidth
+          />
+        </MDBox>
+        <MDBox mb={2}>
+          <MDInput
+            label="المنتج"
+            name="product"
+            value={newOrder.product}
+            onChange={handleInputChange}
+            fullWidth
+          />
+        </MDBox>
+        <MDBox mb={2}>
+          <MDInput
+            label="رقم المنتج"
+            name="productNumber"
+            value={newOrder.productNumber}
+            onChange={handleInputChange}
+            fullWidth
+          />
+        </MDBox>
+        <MDBox mb={2}>
+          <MDInput
+            label="الكمية"
+            name="quantity"
+            type="number"
+            value={newOrder.quantity}
+            onChange={handleInputChange}
+            fullWidth
+          />
+        </MDBox>
+        <MDBox mb={2}>
+          <MDInput
+            label="المبلغ الإجمالي"
+            name="totalAmount"
+            value={newOrder.totalAmount}
+            onChange={handleInputChange}
+            fullWidth
+          />
+        </MDBox>
 
-        {/* Dialog for order input */}
-        <Dialog open={isDialogOpen} onClose={handleDialogClose}>
-          <DialogTitle>إضافة طلب جديد</DialogTitle>
-          <DialogContent dir="rtl">
-            {" "}
-            {/* Ensure correct text direction */}
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  disabled
-                  label="رقم الطلب"
-                  value={newOrder.orderId} // Display existing or generated ID
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="اسم العميل"
-                  name="customerName"
-                  value={newOrder.customerName}
-                  onChange={handleInputChange}
-                  fullWidth
-                  error={error}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="المنتج"
-                  name="product"
-                  value={newOrder.product}
-                  onChange={handleInputChange}
-                  fullWidth
-                  error={error}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="رقم المنتج"
-                  name="productNumber"
-                  value={newOrder.productNumber}
-                  onChange={handleInputChange}
-                  fullWidth
-                  error={error}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="الكمية"
-                  name="quantity"
-                  type="number"
-                  value={newOrder.quantity}
-                  onChange={handleInputChange}
-                  fullWidth
-                  inputProps={{ min: 0 }} // Ensure non-negative input
-                  error={error}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="المبلغ الإجمالي"
-                  name="totalAmount"
-                  value={newOrder.totalAmount}
-                  onChange={handleInputChange}
-                  fullWidth
-                  error={error}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <InputLabel>الحالة</InputLabel>
-                  <Select
-                    label="الحالة"
-                    value={newOrder.status}
-                    onChange={handleStatusChange}
-                    sx={{ height: 50 }}
-                  >
-                    <MenuItem value="قيد المعالجة">قيد المعالجة</MenuItem>
-                    <MenuItem value="تم التنفيذ">تم التنفيذ</MenuItem>
-                    <MenuItem value="ملغى">ملغى</MenuItem>
-                    {/* Add more statuses as required */}
-                  </Select>
-                </FormControl>
-              </Grid>
-              {error && (
-                <Grid item xs={12}>
-                  <Typography color="error">{error}</Typography>
-                </Grid>
-              )}
-            </Grid>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleDialogClose}>إلغاء</Button>
-            <Button variant="contained" sx={{ color: "#ffffff" }} onClick={handleSubmit}>
-              إضافة
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Box>
-    </div>
+        {/* حقل الحالة باستخدام القائمة المنسدلة */}
+        <MDBox mb={2}>
+          <FormControl fullWidth>
+            <InputLabel>الحالة</InputLabel>
+            <Select
+              label="الحالة"
+              name="status"
+              value={newOrder.status}
+              onChange={handleInputChange}
+              sx={{ height: "40px" }}
+            >
+              <MenuItem value="قيد التنفيذ">قيد التنفيذ</MenuItem>
+              <MenuItem value="تم الشحن">تم الشحن</MenuItem>
+              <MenuItem value="تم التسليم">تم التسليم</MenuItem>
+              <MenuItem value="ملغي">ملغي</MenuItem>
+            </Select>
+          </FormControl>
+        </MDBox>
+
+        {error && (
+          <MDTypography color="error" mb={2}>
+            {error}
+          </MDTypography>
+        )}
+
+        <MDBox display="flex" justifyContent="space-between">
+          <MDButton variant="gradient" color="success" type="submit">
+            حفظ
+          </MDButton>
+          <MDButton variant="gradient" color="error" onClick={onCancel}>
+            إلغاء
+          </MDButton>
+        </MDBox>
+      </form>
+    </MDBox>
   );
 }
 
@@ -253,13 +194,16 @@ AddOrder.propTypes = {
   initialRows: PropTypes.arrayOf(
     PropTypes.shape({
       orderId: PropTypes.number.isRequired,
-      // ... other properties of your row object
     })
   ),
+  onAdd: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
+  onDelete: PropTypes.func, // Function to handle deletion
 };
 
 AddOrder.defaultProps = {
   initialRows: [],
+  onDelete: null,
 };
 
 export default AddOrder;

@@ -1,155 +1,173 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import Grid from "@mui/material/Grid";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import SaveIcon from "@mui/icons-material/Save";
-import Typography from "@mui/material/Typography";
+import MDBox from "components/MDBox";
+import MDTypography from "components/MDTypography";
+import MDButton from "components/MDButton";
+import MDInput from "components/MDInput";
+import { Select, MenuItem, InputLabel, FormControl } from "@mui/material";
 
 function UpdateShipping({ initialRows, ShippingId, onUpdate }) {
-  const [Shipping, setShipping] = useState({
-    id: ShippingId,
+  // 🟢 الحالة (State) الخاصة ببيانات النموذج
+  const [formData, setFormData] = useState({
+    id: "",
     userid: "",
     proid: "",
     shipping: "",
     price: "",
-    adress: "",
+    address: "",
   });
 
-  const [error, setError] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(true);
-
+  // 🔄 تحميل بيانات الشحنة بناءً على ShippingId
   useEffect(() => {
-    const existingShipping = initialRows.find((row) => row.id === ShippingId);
-    if (existingShipping) {
-      setShipping(existingShipping);
+    const selectedRow = initialRows.find((row) => row.id === ShippingId);
+    if (selectedRow) {
+      setFormData(selectedRow); // نسخ البيانات إلى النموذج
     } else {
-      console.error(`Shipping with ID ${ShippingId} not found`);
+      console.warn(`No row found with ID: ${ShippingId}`);
     }
-  }, [initialRows, ShippingId]);
+  }, [ShippingId, initialRows]);
 
-  const handleInputChange = (e) => {
+  // ✍️ تابع لمعالجة المدخلات
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setShipping((prevShipping) => ({
-      ...prevShipping,
+    setFormData((prevData) => ({
+      ...prevData,
       [name]: value,
     }));
   };
 
-  const handleSubmit = () => {
-    if (
-      !Shipping.userid.trim() ||
-      !Shipping.proid.trim() ||
-      !Shipping.shipping.trim() ||
-      !Shipping.price.trim() ||
-      !Shipping.adress.trim()
-    ) {
-      setError("Please fill in all fields correctly.");
-      return;
+  // ✅ تابع لحفظ التغييرات
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (onUpdate) {
+      onUpdate(formData); // استدعاء الدالة لتحديث البيانات في المكون الرئيسي
     }
-
-    setError("");
-    onUpdate(Shipping);
-    setIsDialogOpen(false);
   };
 
-  const handleDialogClose = () => {
-    setIsDialogOpen(false);
+  // ❌ تابع لإلغاء التعديلات
+  const handleCancel = () => {
+    if (onUpdate) {
+      onUpdate(formData); // إرسال null لإغلاق النموذج
+    }
   };
 
   return (
-    <Dialog open={isDialogOpen} onClose={handleDialogClose} fullWidth maxWidth="sm">
-      <DialogTitle>تحديث الشحنة</DialogTitle>
-      <DialogContent>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField disabled label="الرقم التعريفي" value={Shipping.id} fullWidth />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              label="رقم الزبون"
-              name="userid"
-              value={Shipping.userid}
-              onChange={handleInputChange}
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              label="رقم المنتج"
-              name="proid"
-              value={Shipping.proid}
-              onChange={handleInputChange}
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              label="نوع الشحن"
+    <MDBox p={3}>
+      {/* 🔶 عنوان النموذج */}
+      <MDTypography variant="h5" mb={2}>
+        تعديل معلومات التوصيل
+      </MDTypography>
+
+      {/* 📝 نموذج التعديل */}
+      <form onSubmit={handleSubmit}>
+        {/* 🆔 حقل: رقم الشحنة (عرض فقط) */}
+        <MDBox mb={2}>
+          <MDInput
+            type="text"
+            label="رقم الشحنة"
+            name="id"
+            value={formData.id}
+            onChange={handleChange}
+            disabled
+            fullWidth
+          />
+        </MDBox>
+
+        {/* 👤 حقل: رقم المستخدم */}
+        <MDBox mb={2}>
+          <MDInput
+            type="text"
+            label="رقم المستخدم"
+            name="userid"
+            value={formData.userid}
+            onChange={handleChange}
+            fullWidth
+          />
+        </MDBox>
+
+        {/* 🛒 حقل: رقم المنتج */}
+        <MDBox mb={2}>
+          <MDInput
+            type="text"
+            label="رقم المنتج"
+            name="proid"
+            value={formData.proid}
+            onChange={handleChange}
+            fullWidth
+          />
+        </MDBox>
+
+        {/* 🚚 حقل: طريقة الشحن (قائمة منسدلة) */}
+        <MDBox mb={2}>
+          <FormControl fullWidth>
+            <InputLabel>طريقة الشحن</InputLabel>
+            <Select
+              label="طريقة الشحن"
               name="shipping"
-              value={Shipping.shipping}
-              onChange={handleInputChange}
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              label="السعر"
-              name="price"
-              value={Shipping.price}
-              onChange={handleInputChange}
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              label="العنوان"
-              name="adress"
-              value={Shipping.adress}
-              onChange={handleInputChange}
-              fullWidth
-            />
-          </Grid>
-          {error && (
-            <Grid item xs={12}>
-              <Typography color="error" variant="body2">
-                {error}
-              </Typography>
-            </Grid>
-          )}
-        </Grid>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleDialogClose}>الغاء</Button>
-        <Button
-          variant="contained"
-          sx={{ color: "#ffffff" }}
-          onClick={handleSubmit}
-          startIcon={<SaveIcon />}
-        >
-          حفظ
-        </Button>
-      </DialogActions>
-    </Dialog>
+              value={formData.shipping}
+              onChange={handleChange}
+              sx={{ height: "40px" }}
+            >
+              <MenuItem value="عادي">عادي</MenuItem>
+              <MenuItem value="سريع">سريع</MenuItem>
+              <MenuItem value="مجاني">مجاني</MenuItem>
+            </Select>
+          </FormControl>
+        </MDBox>
+
+        {/* 💰 حقل: السعر */}
+        <MDBox mb={2}>
+          <MDInput
+            label="السعر"
+            name="price"
+            value={formData.price}
+            onChange={handleChange}
+            fullWidth
+          />
+        </MDBox>
+
+        {/* 🏠 حقل: العنوان */}
+        <MDBox mb={2}>
+          <MDInput
+            type="text"
+            label="العنوان"
+            name="address"
+            value={formData.address}
+            onChange={handleChange}
+            fullWidth
+          />
+        </MDBox>
+
+        {/* 🔘 أزرار التحكم */}
+        <MDBox display="flex" justifyContent="space-between">
+          {/* ✅ زر الحفظ */}
+          <MDButton variant="gradient" color="success" type="submit">
+            حفظ التعديلات
+          </MDButton>
+
+          {/* ❌ زر الإلغاء */}
+          <MDButton variant="gradient" color="error" onClick={handleCancel}>
+            إلغاء
+          </MDButton>
+        </MDBox>
+      </form>
+    </MDBox>
   );
 }
 
+// ⚙️ إعدادات PropTypes لضمان سلامة المدخلات
 UpdateShipping.propTypes = {
   initialRows: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      id: PropTypes.number.isRequired,
       userid: PropTypes.string.isRequired,
       proid: PropTypes.string.isRequired,
       shipping: PropTypes.string.isRequired,
-      price: PropTypes.string.isRequired,
-      adress: PropTypes.string.isRequired,
+      price: PropTypes.number.isRequired,
+      address: PropTypes.string.isRequired,
     })
   ).isRequired,
-  ShippingId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  ShippingId: PropTypes.number.isRequired,
   onUpdate: PropTypes.func.isRequired,
 };
 

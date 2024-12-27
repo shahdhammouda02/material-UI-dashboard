@@ -1,37 +1,36 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import {
-  TextField,
-  Button,
-  Box,
-  Typography,
-  Grid,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from "@mui/material";
-import SaveIcon from "@mui/icons-material/Save";
+import MDBox from "components/MDBox";
+import MDTypography from "components/MDTypography";
+import MDButton from "components/MDButton";
+import MDInput from "components/MDInput";
 
 function UpdateCategory({ initialRows, categoryId, onUpdate }) {
+  // 🟢 الحالة (State) الخاصة ببيانات النموذج
   const [category, setCategory] = useState({
-    id: categoryId,
+    id: categoryId || null, // Default to -1 if categoryId is null
     categoryName: "",
     description: "",
   });
 
   const [error, setError] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(true); // Open dialog by default
 
+  // 🔄 تحميل بيانات الفئة بناءً على categoryId
   useEffect(() => {
+    if (!categoryId) {
+      console.error("Invalid categoryId");
+      return; // Avoid proceeding if categoryId is invalid
+    }
+
     const existingCategory = initialRows.find((row) => row.id === categoryId);
     if (existingCategory) {
-      setCategory(existingCategory); // Update state with existing category data
+      setCategory(existingCategory); // نسخ البيانات إلى النموذج
     } else {
       console.error(`Category with ID ${categoryId} not found`);
     }
   }, [initialRows, categoryId]);
 
+  // ✍️ تابع لمعالجة المدخلات
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setCategory((prevCategory) => ({
@@ -40,90 +39,85 @@ function UpdateCategory({ initialRows, categoryId, onUpdate }) {
     }));
   };
 
-  const handleSubmit = () => {
+  // ✅ تابع لحفظ التغييرات
+  const handleSubmit = (e) => {
+    e.preventDefault(); // Prevent the default form submission
     if (!category.categoryName || !category.description) {
       setError("Please fill in all fields correctly.");
       return;
     }
 
     setError("");
-    onUpdate(category); // Call the update function passed as a prop
-    setIsDialogOpen(false); // Close the dialog
-  };
-
-  const handleDialogClose = () => {
-    setIsDialogOpen(false);
+    onUpdate(category); // Call onUpdate with the updated category
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "#eaeaea",
-      }}
-    >
-      <Box
-        flexDirection="column"
-        width="100%"
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        p={3}
-        bgcolor="#fbfbfb"
-      >
-        <Dialog open={isDialogOpen} onClose={handleDialogClose}>
-          <DialogTitle>تحديث الفئة</DialogTitle>
-          <DialogContent>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  disabled
-                  label="الرقم التعريفي"
-                  value={category.id} // Display existing ID
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="اسم الصنف"
-                  name="categoryName"
-                  value={category.categoryName} // Set existing category name
-                  onChange={handleInputChange}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="الوصف"
-                  name="description"
-                  value={category.description} // Set existing description
-                  onChange={handleInputChange}
-                  fullWidth
-                  multiline
-                  rows={4}
-                />
-              </Grid>
-              {error && (
-                <Grid item xs={12}>
-                  <Typography color="error">{error}</Typography>
-                </Grid>
-              )}
-            </Grid>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleDialogClose}>الغاء</Button>
-            <Button variant="contained" sx={{ color: "#ffffff" }} onClick={handleSubmit}>
-              حفظ <SaveIcon />
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Box>
-    </div>
+    <MDBox p={3}>
+      {/* 🔶 عنوان النموذج */}
+      <MDTypography variant="h5" mb={2}>
+        تحديث الفئة
+      </MDTypography>
+
+      {/* 📝 نموذج التعديل */}
+      <form onSubmit={handleSubmit}>
+        {/* 🆔 حقل: رقم الفئة */}
+        <MDBox mb={2}>
+          <MDInput label="رقم الفئة" name="id" value={category.id} disabled fullWidth />
+        </MDBox>
+
+        {/* 📝 حقل: اسم الفئة */}
+        <MDBox mb={2}>
+          <MDInput
+            label="اسم الفئة"
+            name="categoryName"
+            value={category.categoryName}
+            onChange={handleInputChange}
+            fullWidth
+          />
+        </MDBox>
+
+        {/* 📋 حقل: الوصف */}
+        <MDBox mb={2}>
+          <MDInput
+            label="الوصف"
+            name="description"
+            value={category.description}
+            onChange={handleInputChange}
+            fullWidth
+            multiline
+            rows={4}
+          />
+        </MDBox>
+
+        {/* 🛑 عرض الخطأ */}
+        {error && (
+          <MDBox mb={2}>
+            <MDTypography color="error">{error}</MDTypography>
+          </MDBox>
+        )}
+
+        {/* 🔘 أزرار التحكم */}
+        <MDBox display="flex" justifyContent="space-between">
+          {/* ✅ زر الحفظ */}
+          <MDButton variant="gradient" color="success" type="submit">
+            حفظ التعديلات
+          </MDButton>
+
+          {/* ❌ زر الإلغاء */}
+          <MDButton
+            variant="gradient"
+            color="error"
+            onClick={() => onUpdate(categoryId ? category : null)} // Ensure categoryId is valid
+          >
+            إلغاء
+          </MDButton>
+        </MDBox>
+      </form>
+    </MDBox>
   );
 }
 
+// ⚙️ إعدادات PropTypes لضمان سلامة المدخلات
 UpdateCategory.propTypes = {
   initialRows: PropTypes.arrayOf(
     PropTypes.shape({

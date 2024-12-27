@@ -33,17 +33,9 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "التصنيفات",
+    name: <> التصنيفات {<ExpandMoreIcon fontSize="small" />} </>,
     key: "categories",
-    icon: (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div>
-          <CategoryIcon fontSize="small" />
-          <span>التصنيفات</span>
-        </div>
-        <ExpandMoreIcon fontSize="small" />
-      </div>
-    ),
+    icon: <CategoryIcon fontSize="small" />,
     collapse: [
       {
         type: "collapse",
