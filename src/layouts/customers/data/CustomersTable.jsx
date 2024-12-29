@@ -5,24 +5,17 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
-export default function CustomerTable({ handleEdit, handleViewProductDetails }) {
-  const [selectedProducts, setSelectedProducts] = useState([]); // State to store selected products
-  const [isProductModalOpen, setIsProductModalOpen] = useState(false); // State to control modal visibility
+const CustomerTable = ({ handleEdit }) => {
+  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
 
-  // Edit button handler
   const handleEditClick = (id) => {
     console.log(`Editing customer with ID: ${id}`);
-    handleEdit(id); // Call the passed handleEdit function
+    handleEdit(id);
   };
 
   const handleDeleteClick = (id) => {
     setInitialRows((prevRows) => prevRows.filter((_, index) => index + 1 !== id));
-  };
-
-  // View product button handler
-  const handleViewProducts = (products) => {
-    setSelectedProducts(products); // Set selected products
-    setIsProductModalOpen(true); // Open the modal
   };
 
   const [columns] = useState([
@@ -37,8 +30,8 @@ export default function CustomerTable({ handleEdit, handleViewProductDetails }) 
       accessor: "products",
       align: "center",
       subColumns: [
-        { Header: "عدد المنتجات", accessor: "productCount", align: "center" }, // Number of products
-        { Header: "عرض المنتجات", accessor: "viewProducts", align: "center" }, // View products button
+        { Header: "عدد المنتجات", accessor: "productCount", align: "center" },
+        { Header: "عرض المنتجات", accessor: "viewProducts", align: "center" },
       ],
     },
     { Header: "الإجراءات", accessor: "actions", align: "center" },
@@ -83,12 +76,15 @@ export default function CustomerTable({ handleEdit, handleViewProductDetails }) 
       id: index + 1,
       ...row,
       products: {
-        productCount: row.products.length, // Number of products
+        productCount: row.products.length,
         viewProducts: (
           <MDIconButton
             color="primary"
-            onClick={() => handleViewProducts(row.products)}
             title="عرض المنتجات"
+            onClick={() => {
+              setSelectedProducts(row.products);
+              setIsProductModalOpen(true);
+            }}
           >
             <VisibilityIcon />
           </MDIconButton>
@@ -109,4 +105,6 @@ export default function CustomerTable({ handleEdit, handleViewProductDetails }) 
   }, [initialRows]);
 
   return { columns, rows, selectedProducts, isProductModalOpen, setIsProductModalOpen };
-}
+};
+
+export default CustomerTable;

@@ -3,8 +3,11 @@ import MDBox from "components/MDBox";
 import MDIconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import test from "../../../assets/images/bg-profile.jpeg";
-export default function TableData(handleEdit) {
+import food from "assets/images/food.jpg";
+import clothes from "assets/images/clothes.jpg";
+import handcraft from "assets/images/handcraft.jpg";
+
+export default function TableData({ handleEdit, handleDelete }) {
   // Edit button handler
   const handleEditClick = (id) => {
     console.log(`Editing product with ID: ${id}`);
@@ -12,13 +15,14 @@ export default function TableData(handleEdit) {
   };
 
   const handleDeleteClick = (id) => {
-    setInitialRows((prevRows) => prevRows.filter((_, index) => index + 1 !== id));
+    handleDelete(id); // Call the passed handleDelete function
   };
 
   const [columns] = useState([
     { Header: "الرقم التعريفي", accessor: "id", align: "center" },
     { Header: "الاسم", accessor: "author", align: "center" },
     { Header: "الفئة", accessor: "category", align: "center" },
+    { Header: "الفئة الفرعية", accessor: "subcategory", align: "center" },
     { Header: "الصورة", accessor: "image", align: "center" },
     { Header: "السعر", accessor: "price", align: "center" },
     { Header: "الخصم", accessor: "discount", align: "center" },
@@ -30,10 +34,11 @@ export default function TableData(handleEdit) {
     {
       author: "سارة خالد",
       Category: "المنتجات الغذائية",
+      subcategory: "الاكل الفلسطيني",
       images: (
         <MDBox ml={-1}>
           <img
-            src={test}
+            src={food}
             alt="image description"
             style={{
               width: "100px",
@@ -50,10 +55,11 @@ export default function TableData(handleEdit) {
     {
       author: "مرح علي",
       Category: "الملابس والاكسسوارات",
+      subcategory: "الملابس",
       images: (
         <MDBox ml={-1}>
           <img
-            src={test}
+            src={clothes}
             alt="image description"
             style={{
               width: "100px",
@@ -70,10 +76,11 @@ export default function TableData(handleEdit) {
     {
       author: "احمد علي",
       Category: "الحرف اليدوية",
+      subcategory: "التراث",
       images: (
         <MDBox ml={-1}>
           <img
-            src={test}
+            src={handcraft}
             alt="image description"
             style={{
               width: "100px",
@@ -99,7 +106,7 @@ export default function TableData(handleEdit) {
             <EditIcon />
           </MDIconButton>
           <MDBox mx={1} />
-          <MDIconButton color="success" onClick={() => handleDeleteClick(index + 1)}>
+          <MDIconButton color="error" onClick={() => handleDeleteClick(index + 1)}>
             <DeleteIcon />
           </MDIconButton>
         </MDBox>
@@ -107,5 +114,5 @@ export default function TableData(handleEdit) {
     }));
   }, [initialRows]);
 
-  return { columns, rows };
+  return { columns, rows, products: initialRows };
 }

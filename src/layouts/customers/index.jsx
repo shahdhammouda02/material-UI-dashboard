@@ -11,7 +11,6 @@ import CustomerTable from "./data/CustomersTable";
 import UpdateCustomer from "./data/UpdateCustomer";
 import AddCustomer from "./data/AddCustomer";
 import DataproductBodyCell from "../../examples/products/Dataproduct/DataproductBodyCell";
-import DataproductHeadCell from "../../examples/products/Dataproduct/DataproductHeadCell";
 import {
   Dialog,
   DialogTitle,
@@ -22,65 +21,43 @@ import {
   Box,
 } from "@mui/material";
 
-function Customers() {
-  const [editingId, setEditingId] = useState(null); // State to track the editing ID
+const Customers = () => {
+  const [editingId, setEditingId] = useState(null);
   const [customerRows, setCustomerRows] = useState([]);
-  const navigate = useNavigate(); // For navigation
+  const navigate = useNavigate();
 
-  // Function to handle editing a customer
   const handleEdit = (id) => {
-    setEditingId(id); // Set the ID to edit
+    setEditingId(id);
   };
 
-  // Function to handle viewing product details
-  const handleViewProductDetails = (id) => {
-    console.log("Navigating to product with ID:", id);
-    navigate(`/products/${id}`);
-  };
-
-  // Function to highlight the clicked row
-  const handleHighlightRow = (rowIndex) => {
-    setCustomerRows((prevRows) =>
-      prevRows.map((row, index) => (index === rowIndex ? { ...row, isHighlighted: true } : row))
-    );
-  };
-
-  // Function to remove highlight from all rows
-  const removeHighlight = () => {
-    setCustomerRows((prevRows) => prevRows.map((row) => ({ ...row, isHighlighted: false })));
-  };
-
-  // Get columns, rows, and modal state from the CustomerTable component
   const { columns, rows, selectedProducts, isProductModalOpen, setIsProductModalOpen } =
     CustomerTable({
       handleEdit,
-      handleViewProductDetails,
-      handleHighlightRow,
-      removeHighlight,
     });
 
-  // Function to handle updating a customer
   const handleUpdate = (updatedCustomer) => {
     setCustomerRows((prevRows) =>
       prevRows.map((row) => (row.id === updatedCustomer.id ? updatedCustomer : row))
     );
-    setEditingId(null); // Close the edit dialog
+    setEditingId(null);
   };
 
-  // Function to handle adding a new customer
   const handleAddCustomer = (newCustomer) => {
     setCustomerRows((prevRows) => [
       ...prevRows,
       {
         ...newCustomer,
-        id: prevRows.length + 1, // Assign a new ID to the customer
+        id: prevRows.length + 1,
       },
     ]);
   };
 
-  // Update customerRows with the rows from CustomerTable
+  const handleViewProductDetails = (id) => {
+    navigate(`/products/${id}`);
+  };
+
   useEffect(() => {
-    setCustomerRows(rows); // Set initial rows from CustomerTable
+    setCustomerRows(rows);
   }, [rows]);
 
   return (
@@ -200,7 +177,6 @@ function Customers() {
         </Grid>
       </MDBox>
 
-      {/* Modal for displaying product details */}
       <Dialog open={isProductModalOpen} onClose={() => setIsProductModalOpen(false)}>
         <DialogTitle>تفاصيل المنتجات</DialogTitle>
         <DialogContent>
@@ -230,6 +206,6 @@ function Customers() {
       <Footer />
     </DashboardLayout>
   );
-}
+};
 
 export default Customers;
