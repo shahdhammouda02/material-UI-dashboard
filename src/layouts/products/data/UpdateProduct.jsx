@@ -7,11 +7,12 @@ import MDInput from "components/MDInput";
 import { useDropzone } from "react-dropzone";
 import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 
-function UpdateProduct({ initialRows, productId, onUpdate }) {
+const UpdateProduct = ({ initialRows, productId, onUpdate }) => {
   const [product, setProduct] = useState({
     id: productId,
     author: "",
     Category: "",
+    subcategory: "", // Added subcategory
     image: "",
     price: "",
     discount: "",
@@ -57,6 +58,7 @@ function UpdateProduct({ initialRows, productId, onUpdate }) {
     if (
       !product.author ||
       !product.Category ||
+      !product.subcategory || // Added subcategory validation
       !product.image ||
       !product.price ||
       !product.discount ||
@@ -68,7 +70,6 @@ function UpdateProduct({ initialRows, productId, onUpdate }) {
 
     setError("");
     onUpdate(product); // Call the update function passed as a prop
-    // Close the dialog
   };
 
   return (
@@ -83,7 +84,7 @@ function UpdateProduct({ initialRows, productId, onUpdate }) {
         <MDBox mb={2}>
           <MDInput
             label="اسم المنتج"
-            name="author" // Corrected: match the state key
+            name="author"
             value={product.author}
             onChange={handleInputChange}
             fullWidth
@@ -92,32 +93,51 @@ function UpdateProduct({ initialRows, productId, onUpdate }) {
         <MDBox mb={2}>
           <MDInput
             label="الفئة"
-            name="Category" // Corrected: match the state key
+            name="Category"
             value={product.Category}
             onChange={handleInputChange}
             fullWidth
           />
         </MDBox>
         <MDBox mb={2}>
-          <div
-            {...getRootProps()}
-            style={{ border: "2px dashed #ccc", padding: "10px", textAlign: "center" }}
-          >
-            <input {...getInputProps()} />
-            <p>اسحب وأفلت صورة هنا أو انقر لاختيار صورة</p>
-            {product.image && (
-              <img
-                src={product.image}
-                alt="Product"
-                style={{ width: "100%", maxHeight: "200px", objectFit: "contain" }}
-              />
-            )}
-          </div>
+          <MDInput
+            label="الفئة الفرعية" // Added subcategory field
+            name="subcategory"
+            value={product.subcategory}
+            onChange={handleInputChange}
+            fullWidth
+          />
+        </MDBox>
+        <MDBox
+          mb={2}
+          border="2px dashed #ccc"
+          p={2}
+          textAlign="center"
+          onClick={getRootProps().onClick}
+          onDragOver={getRootProps().onDragOver}
+          onDragEnter={getRootProps().onDragEnter}
+          onDragLeave={getRootProps().onDragLeave}
+          onDrop={getRootProps().onDrop}
+        >
+          <input
+            type="file"
+            accept="image/*"
+            onChange={getInputProps().onChange}
+            style={{ display: "none" }}
+          />
+          <p>اسحب وأفلت صورة هنا أو انقر لاختيار صورة</p>
+          {product.image && (
+            <img
+              src={product.image}
+              alt="Product"
+              style={{ width: "100%", maxHeight: "200px", objectFit: "contain" }}
+            />
+          )}
         </MDBox>
         <MDBox mb={2}>
           <MDInput
             label="السعر"
-            name="price" // Corrected: match the state key
+            name="price"
             value={product.price}
             onChange={handleInputChange}
             fullWidth
@@ -126,7 +146,7 @@ function UpdateProduct({ initialRows, productId, onUpdate }) {
         <MDBox mb={2}>
           <MDInput
             label="الخصم"
-            name="discount" // Corrected: match the state key
+            name="discount"
             value={product.discount}
             onChange={handleInputChange}
             fullWidth
@@ -135,7 +155,7 @@ function UpdateProduct({ initialRows, productId, onUpdate }) {
         <MDBox mb={2}>
           <MDInput
             label="الوصف"
-            name="description" // Corrected: match the state key
+            name="description"
             value={product.description}
             onChange={handleInputChange}
             fullWidth
@@ -147,12 +167,9 @@ function UpdateProduct({ initialRows, productId, onUpdate }) {
           </MDBox>
         )}
         <MDBox display="flex" justifyContent="space-between">
-          {/* ✅ زر الحفظ */}
           <MDButton variant="gradient" color="success" type="submit">
             حفظ التعديلات
           </MDButton>
-
-          {/* ❌ زر الإلغاء */}
           <MDButton
             variant="gradient"
             color="error"
@@ -164,7 +181,7 @@ function UpdateProduct({ initialRows, productId, onUpdate }) {
       </form>
     </MDBox>
   );
-}
+};
 
 UpdateProduct.propTypes = {
   initialRows: PropTypes.arrayOf(
@@ -172,6 +189,7 @@ UpdateProduct.propTypes = {
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
       author: PropTypes.string.isRequired,
       Category: PropTypes.string.isRequired,
+      subcategory: PropTypes.string.isRequired, // Added subcategory
       image: PropTypes.string.isRequired,
       price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
       discount: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),

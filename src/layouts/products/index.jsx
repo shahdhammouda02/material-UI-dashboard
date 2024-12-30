@@ -15,7 +15,7 @@ import MDButton from "components/MDButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-function Products() {
+const Products = () => {
   const [editingId, setEditingId] = useState(null);
   const [productRows, setProductRows] = useState([]);
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
@@ -48,7 +48,7 @@ function Products() {
     setIsAddProductOpen(false);
   };
 
-  const { columns, rows } = TableData({ handleEdit, handleDelete }); // Pass handleDelete
+  const { columns, rows } = TableData({ handleEdit, handleDelete });
 
   useEffect(() => {
     setProductRows(rows);
@@ -157,6 +157,6 @@ function Products() {
       <Footer />
     </DashboardLayout>
   );
-}
+};
 
 export default Products;

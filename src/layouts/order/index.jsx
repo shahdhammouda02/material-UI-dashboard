@@ -6,7 +6,6 @@ import MDTypography from "components/MDTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import AddOrder from "./data/AddOrder";
 import OrdersTable from "./data/orderTable";
 import UpdateOrder from "./data/UpdateOrder";
 import DataproductBodyCell from "../../examples/products/Dataproduct/DataproductBodyCell";
@@ -18,7 +17,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 function Order() {
   const [editingId, setEditingId] = useState(null); // State to track the editing order ID
   const [orderRows, setOrderRows] = useState([]); // State to hold order rows
-  const [isAddOrderOpen, setIsAddOrderOpen] = useState(false); // State for Add Order modal
 
   const handleEdit = (orderId) => {
     setEditingId(orderId); // Set the ID to edit
@@ -33,19 +31,6 @@ function Order() {
 
   const handleDelete = (orderId) => {
     setOrderRows((prevRows) => prevRows.filter((row) => row.orderId !== orderId)); // Delete row by orderId
-  };
-
-  const handleAddOrderOpen = () => {
-    setIsAddOrderOpen(true); // Open Add Order modal
-  };
-
-  const handleAddOrderClose = () => {
-    setIsAddOrderOpen(false); // Close Add Order modal
-  };
-
-  const handleAddOrder = (newOrder) => {
-    setOrderRows((prevRows) => [...prevRows, newOrder]); // Add the new order
-    setIsAddOrderOpen(false); // Close Add Order modal
   };
 
   const { columns, rows } = OrdersTable(handleEdit); // Pass handleEdit to get column and row data
@@ -76,18 +61,9 @@ function Order() {
                 <MDTypography variant="h5" color="white">
                   جدول الطلبات
                 </MDTypography>
-                <MDButton variant="gradient" color="success" onClick={handleAddOrderOpen}>
-                  إضافة طلب
-                </MDButton>
               </MDBox>
               <MDBox pt={3}>
-                {isAddOrderOpen ? (
-                  <AddOrder
-                    initialRows={rows}
-                    onAdd={handleAddOrder}
-                    onCancel={handleAddOrderClose}
-                  />
-                ) : editingId ? (
+                {editingId ? (
                   <UpdateOrder
                     initialRows={orderRows}
                     orderId={editingId}

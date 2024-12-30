@@ -22,6 +22,7 @@ import SubCategories from "layouts/categories/sub-category";
 // @mui icons
 import Icon from "@mui/material/Icon";
 import ProductDetails from "layouts/products/data/ProductDetails";
+import VendorManagement from "layouts/authentication/VendorManagement";
 
 const routes = [
   {
@@ -116,6 +117,14 @@ const routes = [
     icon: <Icon fontSize="small">assignment</Icon>,
     route: "/authentication/sign-up",
     component: <SignUp />,
+  },
+  {
+    type: "collapse",
+    name: "ادارة البائعين",
+    key: "vendor-management",
+    icon: <Icon fontSize="small">management</Icon>,
+    route: "/authentication/vendor-management",
+    component: <VendorManagement />,
   },
 ];
 

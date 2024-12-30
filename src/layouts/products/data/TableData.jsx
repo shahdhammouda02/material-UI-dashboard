@@ -7,7 +7,7 @@ import food from "assets/images/food.jpg";
 import clothes from "assets/images/clothes.jpg";
 import handcraft from "assets/images/handcraft.jpg";
 
-export default function TableData({ handleEdit, handleDelete }) {
+const TableData = ({ handleEdit, handleDelete }) => {
   // Edit button handler
   const handleEditClick = (id) => {
     console.log(`Editing product with ID: ${id}`);
@@ -115,4 +115,6 @@ export default function TableData({ handleEdit, handleDelete }) {
   }, [initialRows]);
 
   return { columns, rows, products: initialRows };
-}
+};
+
+export default TableData;

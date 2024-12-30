@@ -8,13 +8,13 @@ import MDIconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useDropzone } from "react-dropzone";
-import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 
-function AddProduct({ initialRows, onAdd, onCancel, onDelete }) {
+const AddProduct = ({ initialRows, onAdd, onCancel, onDelete }) => {
   const [newProduct, setNewProduct] = useState({
     id: "",
     author: "",
     Category: "",
+    subcategory: "", // Added subcategory
     image: "",
     price: "",
     discount: "",
@@ -59,7 +59,6 @@ function AddProduct({ initialRows, onAdd, onCancel, onDelete }) {
 
   const validateForm = () => {
     return Object.values(newProduct).every((value) => {
-      // Ensure the value is a string before calling trim
       return String(value).trim() !== "";
     });
   };
@@ -100,6 +99,7 @@ function AddProduct({ initialRows, onAdd, onCancel, onDelete }) {
       id: "",
       author: "",
       Category: "",
+      subcategory: "", // Reset subcategory
       image: "",
       price: "",
       discount: "",
@@ -140,8 +140,32 @@ function AddProduct({ initialRows, onAdd, onCancel, onDelete }) {
             fullWidth
           />
         </MDBox>
-        <MDBox mb={2} {...getRootProps()} border="1px dashed #ccc" p={2} textAlign="center">
-          <input {...getInputProps()} />
+        <MDBox mb={2}>
+          <MDInput
+            label="الفئة الفرعية" // Added subcategory field
+            name="subcategory"
+            value={newProduct.subcategory}
+            onChange={handleInputChange}
+            fullWidth
+          />
+        </MDBox>
+        <MDBox
+          mb={2}
+          border="1px dashed #ccc"
+          p={2}
+          textAlign="center"
+          onClick={getRootProps().onClick}
+          onDragOver={getRootProps().onDragOver}
+          onDragEnter={getRootProps().onDragEnter}
+          onDragLeave={getRootProps().onDragLeave}
+          onDrop={getRootProps().onDrop}
+        >
+          <input
+            type="file"
+            accept="image/*"
+            onChange={getInputProps().onChange}
+            style={{ display: "none" }}
+          />
           {isDragActive ? (
             <MDTypography>أسقط الصورة هنا...</MDTypography>
           ) : (
@@ -204,7 +228,7 @@ function AddProduct({ initialRows, onAdd, onCancel, onDelete }) {
       </form>
     </MDBox>
   );
-}
+};
 
 AddProduct.propTypes = {
   initialRows: PropTypes.arrayOf(
