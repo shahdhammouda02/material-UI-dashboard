@@ -26,7 +26,7 @@ function AddCustomer({ initialRows, onAddCustomer }) {
     mobile: "",
     email: "",
     dateOfBirth: "",
-    productCount: 0, // Number of products
+    products: [], // Initialize products as an empty array
   });
 
   const [error, setError] = useState("");
@@ -58,7 +58,7 @@ function AddCustomer({ initialRows, onAddCustomer }) {
   };
 
   const handleSubmit = () => {
-    const { name, gender, mobile, email, dateOfBirth, productCount } = newCustomer;
+    const { name, gender, mobile, email, dateOfBirth } = newCustomer;
 
     // Validate required fields
     if (!name.trim() || !gender.trim() || !mobile.trim() || !email.trim() || !dateOfBirth.trim()) {
@@ -66,17 +66,11 @@ function AddCustomer({ initialRows, onAddCustomer }) {
       return;
     }
 
-    // Validate product count
-    if (productCount <= 0) {
-      setError("Number of products must be greater than 0.");
-      return;
-    }
-
     // Add actions and viewProducts button automatically
     const customerWithActions = {
       ...newCustomer,
       products: {
-        productCount: newCustomer.productCount, // Number of products
+        productCount: newCustomer.products.length, // Number of products
         viewProducts: (
           <IconButton color="primary" title="عرض المنتجات">
             <VisibilityIcon />
@@ -89,7 +83,7 @@ function AddCustomer({ initialRows, onAddCustomer }) {
             <EditIcon />
           </IconButton>
           <Box mx={1} />
-          <IconButton color="success" title="حذف">
+          <IconButton color="error" title="حذف">
             <DeleteIcon />
           </IconButton>
         </Box>
@@ -107,7 +101,7 @@ function AddCustomer({ initialRows, onAddCustomer }) {
       mobile: "",
       email: "",
       dateOfBirth: "",
-      productCount: 0,
+      products: [],
     }));
 
     setError("");
@@ -128,7 +122,7 @@ function AddCustomer({ initialRows, onAddCustomer }) {
       mobile: "",
       email: "",
       dateOfBirth: "",
-      productCount: 0,
+      products: [],
     }));
   };
 
@@ -219,19 +213,6 @@ function AddCustomer({ initialRows, onAddCustomer }) {
                   fullWidth
                   required
                   InputLabelProps={{ shrink: true }}
-                />
-              </Grid>
-              {/* Number of Products */}
-              <Grid item xs={12}>
-                <TextField
-                  label="عدد المنتجات"
-                  name="productCount"
-                  type="number"
-                  value={newCustomer.productCount}
-                  onChange={handleInputChange}
-                  fullWidth
-                  required
-                  inputProps={{ min: 1 }} // Ensure the value is at least 1
                 />
               </Grid>
               {error && (

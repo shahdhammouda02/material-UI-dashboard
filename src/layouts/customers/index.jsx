@@ -42,17 +42,19 @@ const Customers = () => {
     setEditingId(null);
   };
 
+  // Handle adding a new customer
   const handleAddCustomer = (newCustomer) => {
     setCustomerRows((prevRows) => [
       ...prevRows,
       {
         ...newCustomer,
-        id: prevRows.length + 1,
+        id: prevRows.length + 1, // Ensure unique ID
       },
     ]);
   };
 
   const handleViewProductDetails = (id) => {
+    console.log("Navigating to product ID:", id); // Debugging
     navigate(`/products/${id}`);
   };
 
@@ -177,26 +179,50 @@ const Customers = () => {
         </Grid>
       </MDBox>
 
-      <Dialog open={isProductModalOpen} onClose={() => setIsProductModalOpen(false)}>
-        <DialogTitle>تفاصيل المنتجات</DialogTitle>
+      <Dialog
+        open={isProductModalOpen}
+        onClose={() => setIsProductModalOpen(false)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>
+          <MDTypography variant="h5" color="primary" fontWeight="bold">
+            تفاصيل المنتجات
+          </MDTypography>
+        </DialogTitle>
         <DialogContent>
-          {selectedProducts.map((product) => (
-            <Box key={product.id} mb={2}>
-              <Typography>
-                <strong>ID:</strong> {product.id}
-              </Typography>
-              <Typography>
-                <strong>اسم المنتج:</strong> {product.name}
-              </Typography>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => handleViewProductDetails(product.id)}
-              >
-                عرض التفاصيل
-              </Button>
-            </Box>
-          ))}
+          <Grid container spacing={2}>
+            {selectedProducts.map((product) => (
+              <Grid item xs={12} key={product.id}>
+                <Card sx={{ p: 1 }}>
+                  <Grid container spacing={1}>
+                    <Grid item xs={12} md={6}>
+                      <MDTypography variant="body2" fontWeight="bold" color="primary">
+                        الرقم التعريفي:
+                      </MDTypography>
+                      <MDTypography variant="body2">{product.id}</MDTypography>
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <MDTypography variant="body2" fontWeight="bold" color="primary">
+                        اسم المنتج:
+                      </MDTypography>
+                      <MDTypography variant="body2">{product.name}</MDTypography>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        size="small"
+                        onClick={() => handleViewProductDetails(product.id)}
+                      >
+                        عرض التفاصيل
+                      </Button>
+                    </Grid>
+                  </Grid>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsProductModalOpen(false)}>إغلاق</Button>

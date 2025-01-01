@@ -63,12 +63,6 @@ const routes = [
     icon: <ShoppingCartIcon fontSize="small" />,
     route: "/products",
     component: <Products />,
-    children: [
-      {
-        path: ":id",
-        element: <ProductDetails />,
-      },
-    ],
   },
   {
     type: "collapse",
@@ -117,6 +111,7 @@ const routes = [
     icon: <Icon fontSize="small">assignment</Icon>,
     route: "/authentication/sign-up",
     component: <SignUp />,
+    visibleToMainVendor: true,
   },
   {
     type: "collapse",
@@ -125,6 +120,11 @@ const routes = [
     icon: <Icon fontSize="small">management</Icon>,
     route: "/authentication/vendor-management",
     component: <VendorManagement />,
+    visibleToMainVendor: true,
+  },
+  {
+    route: "/products/:id",
+    component: <ProductDetails />,
   },
 ];
 

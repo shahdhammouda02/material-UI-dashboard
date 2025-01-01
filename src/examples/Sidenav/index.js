@@ -85,27 +85,115 @@ function Sidenav({ color, brand, routes, ...rest }) {
     setSelectedRoute(route);
   };
 
+  // Check if the logged-in vendor is the main vendor
+  const isMainVendor = localStorage.getItem("isMainVendor") === "true";
+
   // Render navigation routes
   const renderRoutes = (routes) =>
-    routes.map((route) => {
-      const isSelected = selectedRoute === route.route;
-      const routeColor = isSelected ? "green" : "transparent";
+    routes
+      .filter((route) => {
+        // Skip rendering if the route is only for the main vendor and the logged-in vendor is not the main vendor
+        if (route.visibleToMainVendor && !isMainVendor) {
+          return false;
+        }
+        return true;
+      })
+      .map((route) => {
+        const isSelected = selectedRoute === route.route;
+        const routeColor = isSelected ? "green" : "transparent";
 
-      if (route.collapse) {
+        if (route.collapse) {
+          return (
+            <div key={route.key}>
+              <MDBox
+                display="flex"
+                alignItems="center"
+                onClick={() => handleCollapseToggle(route.key)}
+                sx={{
+                  cursor: "pointer",
+                  padding: "8px 16px",
+                  backgroundColor: routeColor,
+                  borderRadius: "4px",
+                }}
+                aria-expanded={openCollapse[route.key]}
+                aria-controls={`collapse-${route.key}`}
+              >
+                {route.icon && (
+                  <Icon
+                    sx={{
+                      color: isSelected ? "white !important" : textColor,
+                      marginRight: "8px",
+                      color: "white !important",
+                    }}
+                  >
+                    {route.icon}
+                  </Icon>
+                )}
+                <MDTypography variant="body1" color={isSelected ? "white" : textColor} ml={2}>
+                  {route.name}
+                </MDTypography>
+              </MDBox>
+              <Collapse in={openCollapse[route.key]} timeout="auto" unmountOnExit>
+                {route.collapse.map((subRoute) => (
+                  <NavLink
+                    to={subRoute.route}
+                    key={subRoute.key}
+                    style={{ textDecoration: "none" }}
+                    onClick={() => handleRouteSelect(subRoute.route)}
+                  >
+                    <MDBox
+                      display="flex"
+                      alignItems="center"
+                      pl={4}
+                      py={1}
+                      sx={{
+                        backgroundColor: selectedRoute === subRoute.route ? "green" : "transparent",
+                        borderRadius: "4px",
+                      }}
+                    >
+                      {subRoute.icon && (
+                        <Icon
+                          sx={{
+                            color:
+                              selectedRoute === subRoute.route ? "white !important" : textColor,
+                            marginRight: "8px",
+                            color: "white !important",
+                          }}
+                        >
+                          {subRoute.icon}
+                        </Icon>
+                      )}
+                      <MDTypography
+                        variant="body2"
+                        color={selectedRoute === subRoute.route ? "white" : textColor}
+                        ml={2}
+                      >
+                        {subRoute.name}
+                      </MDTypography>
+                    </MDBox>
+                  </NavLink>
+                ))}
+              </Collapse>
+            </div>
+          );
+        }
+
         return (
-          <div key={route.key}>
+          <NavLink
+            to={route.route}
+            key={route.key}
+            style={{ textDecoration: "none" }}
+            onClick={() => handleRouteSelect(route.route)}
+          >
             <MDBox
               display="flex"
               alignItems="center"
-              onClick={() => handleCollapseToggle(route.key)}
+              px={2}
+              py={1}
               sx={{
-                cursor: "pointer",
-                padding: "8px 16px",
-                backgroundColor: routeColor,
+                backgroundColor: isSelected ? "green" : "transparent",
                 borderRadius: "4px",
               }}
-              aria-expanded={openCollapse[route.key]}
-              aria-controls={`collapse-${route.key}`}
             >
               {route.icon && (
                 <Icon
@@ -122,85 +210,9 @@ function Sidenav({ color, brand, routes, ...rest }) {
                 {route.name}
               </MDTypography>
             </MDBox>
-            <Collapse in={openCollapse[route.key]} timeout="auto" unmountOnExit>
-              {route.collapse.map((subRoute) => (
-                <NavLink
-                  to={subRoute.route}
-                  key={subRoute.key}
-                  style={{ textDecoration: "none" }}
-                  onClick={() => handleRouteSelect(subRoute.route)}
-                >
-                  <MDBox
-                    display="flex"
-                    alignItems="center"
-                    pl={4}
-                    py={1}
-                    sx={{
-                      backgroundColor: selectedRoute === subRoute.route ? "green" : "transparent",
-                      borderRadius: "4px",
-                    }}
-                  >
-                    {subRoute.icon && (
-                      <Icon
-                        sx={{
-                          color: selectedRoute === subRoute.route ? "white !important" : textColor,
-                          marginRight: "8px",
-                          color: "white !important",
-                        }}
-                      >
-                        {subRoute.icon}
-                      </Icon>
-                    )}
-                    <MDTypography
-                      variant="body2"
-                      color={selectedRoute === subRoute.route ? "white" : textColor}
-                      ml={2}
-                    >
-                      {subRoute.name}
-                    </MDTypography>
-                  </MDBox>
-                </NavLink>
-              ))}
-            </Collapse>
-          </div>
+          </NavLink>
         );
-      }
-
-      return (
-        <NavLink
-          to={route.route}
-          key={route.key}
-          style={{ textDecoration: "none" }}
-          onClick={() => handleRouteSelect(route.route)}
-        >
-          <MDBox
-            display="flex"
-            alignItems="center"
-            px={2}
-            py={1}
-            sx={{
-              backgroundColor: isSelected ? "green" : "transparent",
-              borderRadius: "4px",
-            }}
-          >
-            {route.icon && (
-              <Icon
-                sx={{
-                  color: isSelected ? "white !important" : textColor,
-                  marginRight: "8px",
-                  color: "white !important",
-                }}
-              >
-                {route.icon}
-              </Icon>
-            )}
-            <MDTypography variant="body1" color={isSelected ? "white" : textColor} ml={2}>
-              {route.name}
-            </MDTypography>
-          </MDBox>
-        </NavLink>
-      );
-    });
+      });
 
   return (
     <>

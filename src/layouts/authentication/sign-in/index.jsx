@@ -94,6 +94,13 @@ const SignIn = () => {
         localStorage.setItem("vendors", JSON.stringify(vendors));
       }
 
+      // Set a flag in localStorage to indicate if the logged-in vendor is the main vendor
+      if (email === "shahd2@gmail.com") {
+        localStorage.setItem("isMainVendor", "true");
+      } else {
+        localStorage.setItem("isMainVendor", "false");
+      }
+
       // Show a success message
       alert("تم تسجيل الدخول بنجاح!");
 

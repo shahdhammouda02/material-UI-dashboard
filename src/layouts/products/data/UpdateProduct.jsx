@@ -5,7 +5,6 @@ import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 import MDInput from "components/MDInput";
 import { useDropzone } from "react-dropzone";
-import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 
 const UpdateProduct = ({ initialRows, productId, onUpdate }) => {
   const [product, setProduct] = useState({

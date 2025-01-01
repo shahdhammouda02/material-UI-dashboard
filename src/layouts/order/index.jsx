@@ -11,8 +11,10 @@ import UpdateOrder from "./data/UpdateOrder";
 import DataproductBodyCell from "../../examples/products/Dataproduct/DataproductBodyCell";
 import DataproductHeadCell from "../../examples/products/Dataproduct/DataproductHeadCell";
 import MDButton from "components/MDButton";
+import MDIconButton from "@mui/material/IconButton"; // Import MDIconButton
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { Dialog, DialogTitle, DialogContent, Divider } from "@mui/material"; // Import Dialog components
 
 function Order() {
   const [editingId, setEditingId] = useState(null); // State to track the editing order ID
@@ -33,7 +35,8 @@ function Order() {
     setOrderRows((prevRows) => prevRows.filter((row) => row.orderId !== orderId)); // Delete row by orderId
   };
 
-  const { columns, rows } = OrdersTable(handleEdit); // Pass handleEdit to get column and row data
+  const { columns, rows, openDialog, selectedRowDetails, handleCloseDialog } =
+    OrdersTable(handleEdit); // Pass handleEdit to get column and row data
 
   // Update orderRows with the rows from OrdersTable
   useEffect(() => {
@@ -89,11 +92,10 @@ function Order() {
                           </DataproductBodyCell>
                           <DataproductBodyCell align="center">{row.product}</DataproductBodyCell>
                           <DataproductBodyCell align="center">
-                            {row.productNumber}
-                          </DataproductBodyCell>
-                          <DataproductBodyCell align="center">{row.quantity}</DataproductBodyCell>
-                          <DataproductBodyCell align="center">
                             {row.totalAmount}
+                          </DataproductBodyCell>
+                          <DataproductBodyCell align="center">
+                            {row.detailsButton}
                           </DataproductBodyCell>
                           <DataproductBodyCell align="center">{row.status}</DataproductBodyCell>
                           <DataproductBodyCell align="center">
@@ -114,7 +116,7 @@ function Order() {
                               <MDButton
                                 mx={1}
                                 variant="text"
-                                color="success"
+                                color="error"
                                 onClick={() => handleDelete(row.orderId)} // Pass orderId
                                 sx={{ padding: "0 !important" }}
                               >
@@ -133,6 +135,44 @@ function Order() {
         </Grid>
       </MDBox>
       <Footer />
+
+      {/* Dialog for displaying details */}
+      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          <MDTypography variant="h5" color="primary">
+            تفاصيل المنتجات
+          </MDTypography>
+        </DialogTitle>
+        <DialogContent>
+          {selectedRowDetails.map((detail, idx) => {
+            // Calculate total amount for each product
+            const totalAmount = detail.price * detail.quantity;
+
+            return (
+              <Card key={idx} sx={{ mb: 2 }}>
+                <MDBox p={2}>
+                  <MDTypography variant="h6" color="info">
+                    المنتج: {detail.product}
+                  </MDTypography>
+                  <Divider sx={{ my: 1 }} />
+                  <MDTypography variant="body1">
+                    <strong>رقم المنتج:</strong> {detail.productId}
+                  </MDTypography>
+                  <MDTypography variant="body1">
+                    <strong>السعر:</strong> ${detail.price}
+                  </MDTypography>
+                  <MDTypography variant="body1">
+                    <strong>الكمية:</strong> {detail.quantity}
+                  </MDTypography>
+                  <MDTypography variant="body1">
+                    <strong>السعر الاجمالي:</strong> ${totalAmount}
+                  </MDTypography>
+                </MDBox>
+              </Card>
+            );
+          })}
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }

@@ -32,7 +32,7 @@ const TableData = ({ handleEdit, handleDelete }) => {
 
   const [initialRows, setInitialRows] = useState([
     {
-      author: "سارة خالد",
+      author: "زيت زيتون",
       Category: "المنتجات الغذائية",
       subcategory: "الاكل الفلسطيني",
       images: (
@@ -53,7 +53,7 @@ const TableData = ({ handleEdit, handleDelete }) => {
       description: "الاكل الفلسطيني له طعم مميز",
     },
     {
-      author: "مرح علي",
+      author: "ثوب فلاحي",
       Category: "الملابس والاكسسوارات",
       subcategory: "الملابس",
       images: (
@@ -74,7 +74,7 @@ const TableData = ({ handleEdit, handleDelete }) => {
       description: "الملابس الفلسطينية لها طابع تراثي اصيل",
     },
     {
-      author: "احمد علي",
+      author: "فخار",
       Category: "الحرف اليدوية",
       subcategory: "التراث",
       images: (
@@ -96,6 +96,11 @@ const TableData = ({ handleEdit, handleDelete }) => {
     },
   ]);
 
+  const products = initialRows.map((row, index) => ({
+    id: index + 1,
+    ...row,
+  }));
+
   const rows = useMemo(() => {
     return initialRows.map((row, index) => ({
       id: index + 1,
@@ -114,7 +119,7 @@ const TableData = ({ handleEdit, handleDelete }) => {
     }));
   }, [initialRows]);
 
-  return { columns, rows, products: initialRows };
+  return { columns, rows, products };
 };
 
 export default TableData;
