@@ -98,14 +98,6 @@ const routes = [
   // },
   {
     type: "collapse",
-    name: "تسجيل خروج",
-    key: "log-out",
-    icon: <ExitToAppIcon fontSize="small">Logout</ExitToAppIcon>,
-    route: "/",
-    component: <SignIn />,
-  },
-  {
-    type: "collapse",
     name: "إنشاء حساب جديد",
     key: "sign-up",
     icon: <Icon fontSize="small">assignment</Icon>,
@@ -121,6 +113,14 @@ const routes = [
     route: "/authentication/vendor-management",
     component: <VendorManagement />,
     visibleToMainVendor: true,
+  },
+  {
+    type: "collapse",
+    name: "تسجيل خروج",
+    key: "log-out",
+    icon: <ExitToAppIcon fontSize="small">Logout</ExitToAppIcon>,
+    route: "/",
+    component: <SignIn />,
   },
   {
     route: "/products/:id",

@@ -7,6 +7,8 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgLogin from "assets/images/bg-sign-in-basic.jpeg";
+import GoogleIcon from "@mui/icons-material/Google";
+import FacebookIcon from "@mui/icons-material/Facebook";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -17,21 +19,17 @@ const SignIn = () => {
 
   const navigate = useNavigate();
 
-  // Add the main vendor to localStorage if it doesn't exist
   useEffect(() => {
     const mainVendor = {
       name: "البائع الرئيسي",
       email: "shahd2@gmail.com",
-      password: "123456", // Store the password as plain text
+      password: "123456",
     };
 
     const registeredVendors = JSON.parse(localStorage.getItem("registeredVendors")) || [];
-
-    // Check if the main vendor already exists
     const isMainVendorExists = registeredVendors.some((v) => v.email === mainVendor.email);
 
     if (!isMainVendorExists) {
-      // Add the main vendor to the list
       registeredVendors.push(mainVendor);
       localStorage.setItem("registeredVendors", JSON.stringify(registeredVendors));
     }
@@ -43,50 +41,30 @@ const SignIn = () => {
     setError("");
 
     try {
-      // Validate inputs
       if (!email || !password) {
         setError("يرجى ملء جميع الحقول.");
         return;
       }
 
-      // Retrieve registered vendors from localStorage
       const registeredVendors = JSON.parse(localStorage.getItem("registeredVendors")) || [];
-
-      // Debugging: Log registered vendors
-      console.log("Registered Vendors:", registeredVendors);
-
-      // Find the vendor by email (case-insensitive)
       const vendor = registeredVendors.find((v) => v.email.toLowerCase() === email.toLowerCase());
 
-      // Debugging: Log the found vendor
-      console.log("Found Vendor:", vendor);
-
-      if (!vendor) {
+      if (!vendor || password !== vendor.password) {
         setError("البريد الإلكتروني أو كلمة المرور غير صحيحة.");
         return;
       }
 
-      // Compare the entered password with the stored plain text password
-      if (password !== vendor.password) {
-        setError("البريد الإلكتروني أو كلمة المرور غير صحيحة.");
-        return;
-      }
-
-      // Save token to localStorage (simulate authentication)
       const token = "your_generated_token";
       localStorage.setItem("token", token);
 
-      // Save email to localStorage if "Remember Me" is checked
       if (rememberMe) {
         localStorage.setItem("userEmail", email);
       } else {
         localStorage.removeItem("userEmail");
       }
 
-      // Set isLoggedIn to true
       localStorage.setItem("isLoggedIn", "true");
 
-      // Save the logged-in vendor to the vendors list in localStorage
       const vendors = JSON.parse(localStorage.getItem("vendors")) || [];
       const isVendorExists = vendors.some((v) => v.email === vendor.email);
       if (!isVendorExists) {
@@ -94,17 +72,13 @@ const SignIn = () => {
         localStorage.setItem("vendors", JSON.stringify(vendors));
       }
 
-      // Set a flag in localStorage to indicate if the logged-in vendor is the main vendor
       if (email === "shahd2@gmail.com") {
         localStorage.setItem("isMainVendor", "true");
       } else {
         localStorage.setItem("isMainVendor", "false");
       }
 
-      // Show a success message
       alert("تم تسجيل الدخول بنجاح!");
-
-      // Navigate to the dashboard
       navigate("/dashboard");
     } catch (err) {
       setError("حدث خطأ. يرجى المحاولة مرة أخرى.");
@@ -115,9 +89,17 @@ const SignIn = () => {
 
   return (
     <BasicLayout image={bgLogin}>
-      <Card sx={{ width: "300px", bgcolor: "#333338" }}>
-        <MDBox p={3}>
-          <MDTypography variant="h4" color="white" textAlign="center">
+      <Card
+        sx={{
+          width: "90%",
+          maxWidth: "450px",
+          bgcolor: "white",
+          borderRadius: "20px",
+          boxShadow: 3,
+        }}
+      >
+        <MDBox p={3} sx={{ maxWidth: "400px", margin: "0 auto" }}>
+          <MDTypography variant="h4" color="green" textAlign="center" fontWeight="bold" mb={3}>
             تسجيل الدخول
           </MDTypography>
 
@@ -133,7 +115,7 @@ const SignIn = () => {
             fullWidth
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            sx={{ mb: 2, color: "white" }}
+            sx={{ mb: 2 }}
           />
 
           <MDInput
@@ -142,34 +124,49 @@ const SignIn = () => {
             fullWidth
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            sx={{ mb: 2, color: "white" }}
+            sx={{ mb: 2 }}
           />
 
-          <MDBox display="flex" alignItems="center">
+          <MDBox display="flex" alignItems="center" mb={3}>
             <Switch checked={rememberMe} onChange={() => setRememberMe(!rememberMe)} />
-            <MDTypography variant="button" color="white">
+            <MDTypography variant="button" color="green">
               تذكرني
             </MDTypography>
           </MDBox>
 
-          <MDButton fullWidth color="info" onClick={handleSignIn} disabled={loading}>
+          <MDButton fullWidth color="success" onClick={handleSignIn} disabled={loading}>
             {loading ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
           </MDButton>
 
-          <MDBox mt={3} mb={1} textAlign="center">
-            <MDTypography variant="button" color="white">
-              ليس لديك حساب؟{" "}
-              <MDTypography
-                component={Link}
-                to="/authentication/sign-up"
-                variant="button"
-                color="info"
-                fontWeight="medium"
-              >
-                إنشاء حساب
-              </MDTypography>
-            </MDTypography>
+          <MDTypography variant="body2" color="textSecondary" textAlign="center" my={2}>
+            أو
+          </MDTypography>
+
+          <MDBox display="flex" justifyContent="center" gap={2} mb={3}>
+            <MDButton
+              variant="outlined"
+              color="success"
+              startIcon={<GoogleIcon />}
+              onClick={() => alert("Sign in with Google")}
+            >
+              Google
+            </MDButton>
+            <MDButton
+              variant="outlined"
+              color="success"
+              startIcon={<FacebookIcon />}
+              onClick={() => alert("Sign in with Facebook")}
+            >
+              Facebook
+            </MDButton>
           </MDBox>
+
+          <MDTypography variant="body2" color="textSecondary" textAlign="center">
+            ليس لديك حساب؟{" "}
+            <Link to="/authentication/sign-up" style={{ color: "green", textDecoration: "none" }}>
+              إنشاء حساب
+            </Link>
+          </MDTypography>
         </MDBox>
       </Card>
     </BasicLayout>

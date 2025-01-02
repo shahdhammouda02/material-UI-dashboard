@@ -6,7 +6,7 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import CoverLayout from "layouts/authentication/components/CoverLayout";
-import bgSignUp from "assets/images/bg-sign-up-cover.jpeg"; // Replace with your image path
+import bgSignUp from "assets/images/bg-sign-in-basic.jpeg"; // Replace with your image path
 
 const SignUp = () => {
   const [name, setName] = useState("");
@@ -38,12 +38,58 @@ const SignUp = () => {
   };
 
   return (
-    <CoverLayout image={bgSignUp}>
-      <Card sx={{ width: "300px", bgcolor: "#333338" }}>
-        <MDBox p={3}>
-          <MDTypography variant="h4" color="white" textAlign="center">
-            إنشاء حساب
-          </MDTypography>
+    <CoverLayout
+      image={bgSignUp}
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      <Card
+        sx={{
+          width: "90%", // Match the width of the Sign In form
+          maxWidth: "450px", // Match the maxWidth of the Sign In form
+          bgcolor: "white",
+          borderRadius: "20px", // Match the borderRadius of the Sign In form
+          boxShadow: 3,
+          padding: "20px", // Add padding to the card
+        }}
+      >
+        <MDBox sx={{ maxWidth: "400px", margin: "0 auto" }}>
+          <MDBox
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center", // Center the text and line horizontally
+              mb: 3,
+            }}
+          >
+            <MDTypography
+              variant="h4"
+              color="green"
+              textAlign="center"
+              fontWeight="bold"
+              sx={{
+                position: "relative", // Required for the pseudo-element
+                paddingBottom: "8px", // Add spacing between text and line
+                "&::after": {
+                  content: '""', // Required for the pseudo-element
+                  position: "absolute",
+                  left: "0", // Start the line from the left
+                  bottom: "0", // Position the line at the bottom of the text
+                  width: "100%", // Make the line span the full width of the text
+                  height: "2px", // Set the thickness of the line
+                  backgroundColor: "green", // Set the color of the line
+                },
+              }}
+            >
+              إنشاء حساب
+            </MDTypography>
+          </MDBox>
 
           {error && (
             <MDTypography variant="body2" color="error" textAlign="center" sx={{ mb: 2 }}>
@@ -57,7 +103,7 @@ const SignUp = () => {
             fullWidth
             value={name}
             onChange={(e) => setName(e.target.value)}
-            sx={{ mb: 2, color: "white" }}
+            sx={{ mb: 2 }}
           />
 
           <MDInput
@@ -66,7 +112,7 @@ const SignUp = () => {
             fullWidth
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            sx={{ mb: 2, color: "white" }}
+            sx={{ mb: 2 }}
           />
 
           <MDInput
@@ -75,34 +121,26 @@ const SignUp = () => {
             fullWidth
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            sx={{ mb: 2, color: "white" }}
+            sx={{ mb: 2 }}
           />
 
-          <MDBox display="flex" alignItems="center">
+          <MDBox display="flex" alignItems="center" mb={3}>
             <Checkbox checked={agree} onChange={() => setAgree(!agree)} />
-            <MDTypography variant="button" color="white">
+            <MDTypography variant="button" color="green">
               أوافق على الشروط والأحكام
             </MDTypography>
           </MDBox>
 
-          <MDButton fullWidth color="info" onClick={handleSignUp} disabled={loading}>
+          <MDButton fullWidth color="success" onClick={handleSignUp} disabled={loading}>
             {loading ? "جاري التسجيل..." : "إنشاء حساب"}
           </MDButton>
 
-          <MDBox mt={3} mb={1} textAlign="center">
-            <MDTypography variant="button" color="white">
-              لديك حساب بالفعل؟{" "}
-              <MDTypography
-                component={Link}
-                to="/authentication/sign-in"
-                variant="button"
-                color="info"
-                fontWeight="medium"
-              >
-                تسجيل الدخول
-              </MDTypography>
-            </MDTypography>
-          </MDBox>
+          <MDTypography variant="body2" color="textSecondary" textAlign="center" mt={3}>
+            لديك حساب بالفعل؟{" "}
+            <Link to="/authentication/sign-in" style={{ color: "green", textDecoration: "none" }}>
+              تسجيل الدخول
+            </Link>
+          </MDTypography>
         </MDBox>
       </Card>
     </CoverLayout>

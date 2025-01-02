@@ -6,9 +6,12 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import TableData from "./TableData"; // Import the TableData function
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import Grid from "@mui/material/Grid";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import { TableRow } from "@mui/material";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import Paper from "@mui/material/Paper";
 
 const ProductDetails = () => {
   const { id } = useParams(); // Get the `id` parameter from the URL
@@ -43,73 +46,117 @@ const ProductDetails = () => {
     <DashboardLayout>
       {/* <DashboardNavbar /> */}
       <MDBox p={3}>
-        <MDTypography variant="h3" gutterBottom textAlign="center">
+        <MDTypography
+          variant="h3"
+          gutterBottom
+          textAlign="center"
+          fontWeight="bold"
+          color="primary"
+        >
           تفاصيل المنتج
         </MDTypography>
-        <Grid container justifyContent="center">
-          <Grid item xs={12} md={8} lg={6}>
-            <Card
-              sx={{
-                borderRadius: "16px",
-                boxShadow: 3,
-                overflow: "hidden",
-              }}
-            >
-              <CardContent>
-                <MDBox p={3}>
-                  <MDBox mb={3}>
-                    <MDTypography variant="h6" fontWeight="bold" color="primary">
-                      الرقم التعريفي:
-                    </MDTypography>
-                    <MDTypography variant="body1">{product.id}</MDTypography>
-                  </MDBox>
-                  <MDBox mb={3}>
-                    <MDTypography variant="h6" fontWeight="bold" color="primary">
-                      الاسم:
-                    </MDTypography>
-                    <MDTypography variant="body1">{product.author}</MDTypography>
-                  </MDBox>
-                  <MDBox mb={3}>
-                    <MDTypography variant="h6" fontWeight="bold" color="primary">
-                      الفئة:
-                    </MDTypography>
-                    <MDTypography variant="body1">{product.Category}</MDTypography>
-                  </MDBox>
-                  <MDBox mb={3}>
-                    <MDTypography variant="h6" fontWeight="bold" color="primary">
-                      الفئة الفرعية:
-                    </MDTypography>
-                    <MDTypography variant="body1">{product.subcategory}</MDTypography>
-                  </MDBox>
-                  <MDBox mb={3}>
-                    <MDTypography variant="h6" fontWeight="bold" color="primary">
-                      الصورة:
-                    </MDTypography>
-                    <MDBox mt={1}>{product.images}</MDBox>
-                  </MDBox>
-                  <MDBox mb={3}>
-                    <MDTypography variant="h6" fontWeight="bold" color="primary">
-                      السعر:
-                    </MDTypography>
-                    <MDTypography variant="body1">{product.price}</MDTypography>
-                  </MDBox>
-                  <MDBox mb={3}>
-                    <MDTypography variant="h6" fontWeight="bold" color="primary">
-                      الخصم:
-                    </MDTypography>
-                    <MDTypography variant="body1">{product.discount}</MDTypography>
-                  </MDBox>
-                  <MDBox mb={3}>
-                    <MDTypography variant="h6" fontWeight="bold" color="primary">
-                      الوصف:
-                    </MDTypography>
-                    <MDTypography variant="body1">{product.description}</MDTypography>
-                  </MDBox>
-                </MDBox>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
+
+        {/* Simple Table */}
+        <TableContainer
+          component={Paper}
+          sx={{
+            width: "100%", // Make the table span the entire page width
+            margin: "0 auto",
+            boxShadow: 3,
+          }}
+        >
+          <Table>
+            <TableBody>
+              <TableRow>
+                <TableCell>
+                  <MDTypography variant="h6" fontWeight="bold" color="primary">
+                    الرقم التعريفي:
+                  </MDTypography>
+                </TableCell>
+                <TableCell>
+                  <MDTypography variant="body1">{product.id}</MDTypography>
+                </TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>
+                  <MDTypography variant="h6" fontWeight="bold" color="primary">
+                    الاسم:
+                  </MDTypography>
+                </TableCell>
+                <TableCell>
+                  <MDTypography variant="body1">{product.author}</MDTypography>
+                </TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>
+                  <MDTypography variant="h6" fontWeight="bold" color="primary">
+                    الفئة:
+                  </MDTypography>
+                </TableCell>
+                <TableCell>
+                  <MDTypography variant="body1">{product.Category}</MDTypography>
+                </TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>
+                  <MDTypography variant="h6" fontWeight="bold" color="primary">
+                    الفئة الفرعية:
+                  </MDTypography>
+                </TableCell>
+                <TableCell>
+                  <MDTypography variant="body1">{product.subcategory}</MDTypography>
+                </TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>
+                  <MDTypography variant="h6" fontWeight="bold" color="primary">
+                    الصورة:
+                  </MDTypography>
+                </TableCell>
+                <TableCell>
+                  <MDBox mt={1}>{product.images}</MDBox>
+                </TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>
+                  <MDTypography variant="h6" fontWeight="bold" color="primary">
+                    السعر:
+                  </MDTypography>
+                </TableCell>
+                <TableCell>
+                  <MDTypography variant="body1">{product.price}</MDTypography>
+                </TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>
+                  <MDTypography variant="h6" fontWeight="bold" color="primary">
+                    الخصم:
+                  </MDTypography>
+                </TableCell>
+                <TableCell>
+                  <MDTypography variant="body1">{product.discount}</MDTypography>
+                </TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>
+                  <MDTypography variant="h6" fontWeight="bold" color="primary">
+                    الوصف:
+                  </MDTypography>
+                </TableCell>
+                <TableCell>
+                  <MDTypography variant="body1">{product.description}</MDTypography>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
       </MDBox>
       {/* <Footer /> */}
     </DashboardLayout>
