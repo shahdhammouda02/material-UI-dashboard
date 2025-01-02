@@ -30,11 +30,7 @@ function CoverLayout({ image, children }) {
       </Box>
       <Box
         sx={{ textAlign: "center", padding: "20px", backgroundColor: "#f1f1f1", marginTop: "auto" }}
-      >
-        <Typography variant="body2" color="text.secondary">
-          Footer Content
-        </Typography>
-      </Box>
+      ></Box>
     </Box>
   );
 }

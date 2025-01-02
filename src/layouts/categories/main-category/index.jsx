@@ -123,7 +123,7 @@ function MainCategories() {
                               <MDButton
                                 mx={1}
                                 variant="text"
-                                color="success"
+                                color="error"
                                 onClick={() => handleDelete(row.id)} // Pass orderId
                                 sx={{ padding: "0 !important" }}
                               >

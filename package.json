@@ -30,6 +30,7 @@
     "chroma-js": "2.4.2",
     "crypto-js": "^4.2.0",
     "dropzone": "^6.0.0-beta.2",
+    "firebase": "^11.1.0",
     "i18next": "^24.0.5",
     "i18next-browser-languagedetector": "^8.0.0",
     "i18next-http-backend": "^3.0.1",
