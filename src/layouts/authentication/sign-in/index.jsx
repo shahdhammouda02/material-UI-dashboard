@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Card, Switch } from "@mui/material";
 import MDBox from "components/MDBox";
@@ -6,16 +6,17 @@ import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
-import bgLogin from "assets/images/000743.jpg";
-import { auth, googleProvider, facebookProvider } from "./firebaseConfig";
-import { signInWithPopup } from "firebase/auth";
-import { FaFacebook } from "react-icons";
+import bgLogin from "assets/images/bg-sign-in-basic.jpeg";
+import GoogleIcon from "@mui/icons-material/Google";
+import FacebookIcon from "@mui/icons-material/Facebook";
+
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,69 +25,63 @@ const SignIn = () => {
       email: "shahd2@gmail.com",
       password: "123456",
     };
+
     const registeredVendors = JSON.parse(localStorage.getItem("registeredVendors")) || [];
-    if (!registeredVendors.some((v) => v.email === mainVendor.email)) {
+    const isMainVendorExists = registeredVendors.some((v) => v.email === mainVendor.email);
+
+    if (!isMainVendorExists) {
       registeredVendors.push(mainVendor);
       localStorage.setItem("registeredVendors", JSON.stringify(registeredVendors));
     }
   }, []);
 
-  const handleSignIn = useCallback(
-    async (e) => {
-      e.preventDefault();
-      setLoading(true);
-      setError("");
+  const handleSignIn = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
+    try {
       if (!email || !password) {
         setError("يرجى ملء جميع الحقول.");
-        setLoading(false);
         return;
       }
 
       const registeredVendors = JSON.parse(localStorage.getItem("registeredVendors")) || [];
       const vendor = registeredVendors.find((v) => v.email.toLowerCase() === email.toLowerCase());
 
-      if (!vendor || vendor.password !== password) {
+      if (!vendor || password !== vendor.password) {
         setError("البريد الإلكتروني أو كلمة المرور غير صحيحة.");
-        setLoading(false);
         return;
       }
 
-      localStorage.setItem("token", "your_generated_token");
-      if (rememberMe) localStorage.setItem("userEmail", email);
-      else localStorage.removeItem("userEmail");
+      const token = "your_generated_token";
+      localStorage.setItem("token", token);
+
+      if (rememberMe) {
+        localStorage.setItem("userEmail", email);
+      } else {
+        localStorage.removeItem("userEmail");
+      }
 
       localStorage.setItem("isLoggedIn", "true");
-      navigate("/dashboard");
-    },
-    [email, password, rememberMe, navigate]
-  );
 
-  const handleGoogleSignIn = async () => {
-    try {
-      setLoading(true);
-      const result = await signInWithPopup(auth, googleProvider);
-      const user = result.user;
-      localStorage.setItem("token", user.accessToken);
-      localStorage.setItem("userEmail", user.email);
-      navigate("/dashboard");
-    } catch (error) {
-      setError("فشل تسجيل الدخول باستخدام Gmail: " + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+      const vendors = JSON.parse(localStorage.getItem("vendors")) || [];
+      const isVendorExists = vendors.some((v) => v.email === vendor.email);
+      if (!isVendorExists) {
+        vendors.push(vendor);
+        localStorage.setItem("vendors", JSON.stringify(vendors));
+      }
 
-  const handleFacebookSignIn = async () => {
-    try {
-      setLoading(true);
-      const result = await signInWithPopup(auth, facebookProvider);
-      const user = result.user;
-      localStorage.setItem("token", user.accessToken);
-      localStorage.setItem("userEmail", user.email);
+      if (email === "shahd2@gmail.com") {
+        localStorage.setItem("isMainVendor", "true");
+      } else {
+        localStorage.setItem("isMainVendor", "false");
+      }
+
+      alert("تم تسجيل الدخول بنجاح!");
       navigate("/dashboard");
-    } catch (error) {
-      setError("فشل تسجيل الدخول باستخدام Facebook: " + error.message);
+    } catch (err) {
+      setError("حدث خطأ. يرجى المحاولة مرة أخرى.");
     } finally {
       setLoading(false);
     }
@@ -94,67 +89,76 @@ const SignIn = () => {
 
   return (
     <BasicLayout image={bgLogin}>
-      <Card sx={{ width: "300px", bgcolor: "#333338", height: "450px" }}>
+      <Card sx={{ width: "350px", bgcolor: "white", borderRadius: "12px", boxShadow: 3 }}>
         <MDBox p={3}>
-          <MDTypography variant="h4" color="white" textAlign="center" sx={{ mb: 2 }}>
+          <MDTypography variant="h4" color="green" textAlign="center" fontWeight="bold" mb={3}>
             تسجيل الدخول
           </MDTypography>
+
           {error && (
             <MDTypography variant="body2" color="error" textAlign="center" sx={{ mb: 2 }}>
               {error}
             </MDTypography>
           )}
+
           <MDInput
             type="email"
             label="البريد الإلكتروني"
             fullWidth
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            sx={{ mb: 2, "& input": { color: "white !important" } }}
+            sx={{ mb: 2 }}
           />
+
           <MDInput
             type="password"
             label="كلمة المرور"
             fullWidth
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            sx={{ mb: 2, "& input": { color: "white !important" } }}
-          />
-          <MDButton fullWidth color="info" onClick={handleSignIn} disabled={loading} sx={{ mb: 2 }}>
-            {loading ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
-          </MDButton>
-          <MDButton
-            fullWidth
-            color="info"
-            onClick={handleGoogleSignIn}
-            disabled={loading}
             sx={{ mb: 2 }}
-          >
-            تسجيل الدخول عن طريق Gmail
-          </MDButton>
-          <MDButton
-            fullWidth
-            color="info"
-            onClick={handleFacebookSignIn}
-            disabled={loading}
-            startIcon={<FaFacebook />} // إضافة الأيقونة قبل النص
-          >
-            تسجيل الدخول عن طريق Facebook
-          </MDButton>
-          <MDBox mt={3} mb={1} textAlign="center">
-            <MDTypography variant="button" color="white">
-              ليس لديك حساب؟{" "}
-              <MDTypography
-                component={Link}
-                to="/authentication/sign-up"
-                variant="button"
-                color="info"
-                fontWeight="medium"
-              >
-                إنشاء حساب
-              </MDTypography>
+          />
+
+          <MDBox display="flex" alignItems="center" mb={3}>
+            <Switch checked={rememberMe} onChange={() => setRememberMe(!rememberMe)} />
+            <MDTypography variant="button" color="green">
+              تذكرني
             </MDTypography>
           </MDBox>
+
+          <MDButton fullWidth color="success" onClick={handleSignIn} disabled={loading}>
+            {loading ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
+          </MDButton>
+
+          <MDTypography variant="body2" color="textSecondary" textAlign="center" my={2}>
+            أو
+          </MDTypography>
+
+          <MDBox display="flex" justifyContent="center" gap={2} mb={3}>
+            <MDButton
+              variant="outlined"
+              color="success"
+              startIcon={<GoogleIcon />}
+              onClick={() => alert("Sign in with Google")}
+            >
+              Google
+            </MDButton>
+            <MDButton
+              variant="outlined"
+              color="success"
+              startIcon={<FacebookIcon />}
+              onClick={() => alert("Sign in with Facebook")}
+            >
+              Facebook
+            </MDButton>
+          </MDBox>
+
+          {/* <MDTypography variant="body2" color="textSecondary" textAlign="center">
+            ليس لديك حساب؟{" "}
+            <Link to="/authentication/sign-up" style={{ color: "green", textDecoration: "none" }}>
+              إنشاء حساب
+            </Link>
+          </MDTypography> */}
         </MDBox>
       </Card>
     </BasicLayout>
