@@ -5,6 +5,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import TableData from "../../products/data/TableData";
+import Chip from "@mui/material/Chip"; // Import Chip for badge-like appearance
 
 export default function OrdersTable(handleEdit) {
   const [columns] = useState([
@@ -13,7 +14,7 @@ export default function OrdersTable(handleEdit) {
     { Header: "المنتجات", accessor: "product", align: "center" },
     { Header: "المبلغ الإجمالي", accessor: "totalAmount", align: "center" },
     { Header: "عرض التفاصيل", accessor: "detailsButton", align: "center" },
-    { Header: "الحالة", accessor: "status", align: "center" },
+    { Header: "حالة الطلب", accessor: "status", align: "center" },
     { Header: "الإجراءات", accessor: "actions", align: "center" },
   ]);
 
@@ -69,6 +70,14 @@ export default function OrdersTable(handleEdit) {
         0
       );
 
+      // Define badge color based on status
+      const statusColor =
+        row.status === "قيد المعالجة"
+          ? "warning" // Yellow for "قيد المعالجة"
+          : row.status === "تم التسليم"
+          ? "success" // Green for "تم التسليم"
+          : "error"; // Red for other statuses
+
       return {
         orderId: index + 1, // Assign sequential order ID
         ...row,
@@ -79,15 +88,24 @@ export default function OrdersTable(handleEdit) {
             <VisibilityIcon /> {/* Replaced with VisibilityIcon */}
           </MDIconButton>
         ),
+        status: (
+          <Chip
+            label={row.status}
+            color={statusColor}
+            variant="filled"
+            size="small"
+            sx={{ fontWeight: "bold" }}
+          />
+        ),
         actions: (
           <MDBox display="flex" justifyContent="center" alignItems="center">
             <MDIconButton color="success" onClick={() => handleEditClick(index + 1)}>
               <EditIcon />
             </MDIconButton>
             <MDBox mx={1} />
-            <MDIconButton color="error" onClick={() => handleDeleteClick(index + 1)}>
+            {/* <MDIconButton color="error" onClick={() => handleDeleteClick(index + 1)}>
               <DeleteIcon />
-            </MDIconButton>
+            </MDIconButton> */}
           </MDBox>
         ),
       };
@@ -98,10 +116,10 @@ export default function OrdersTable(handleEdit) {
     handleEdit(id);
   };
 
-  const handleDeleteClick = (id) => {
-    setInitialRows((prevRows) => prevRows.filter((_, index) => index + 1 !== id));
-    console.log(`Deleted order with ID: ${id}`);
-  };
+  // const handleDeleteClick = (id) => {
+  //   setInitialRows((prevRows) => prevRows.filter((_, index) => index + 1 !== id));
+  //   console.log(`Deleted order with ID: ${id}`);
+  // };
 
   return {
     columns,

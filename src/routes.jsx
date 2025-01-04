@@ -48,7 +48,7 @@ const routes = [
       },
       {
         type: "collapse",
-        name: "التصنيفات الثانوية",
+        name: "التصنيفات الفرعية",
         key: "subcategories",
         route: "/categories/sub-category",
         icon: <SubdirectoryArrowRightIcon fontSize="small" />,
@@ -88,14 +88,6 @@ const routes = [
     route: "/delivery",
     component: <Delivery />,
   },
-  // {
-  //   type: "collapse",
-  //   name: "تسجيل دخول",
-  //   key: "sign-in",
-  //   icon: <Icon fontSize="small">login</Icon>,
-  //   route: "/authentication/sign-in",
-  //   component: <SignIn />,
-  // },
   {
     type: "collapse",
     name: "إنشاء حساب جديد",
@@ -109,7 +101,7 @@ const routes = [
     type: "collapse",
     name: "ادارة البائعين",
     key: "vendor-management",
-    icon: <Icon fontSize="small">management</Icon>,
+    icon: <Icon fontSize="small">groups</Icon>, // Updated icon
     route: "/authentication/vendor-management",
     component: <VendorManagement />,
     visibleToMainVendor: true,

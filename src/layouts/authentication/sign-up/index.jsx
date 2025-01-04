@@ -59,7 +59,7 @@ const SignUp = () => {
           padding: "20px", // Add padding to the card
         }}
       >
-        <MDBox sx={{ maxWidth: "400px", margin: "0 auto" }}>
+        <MDBox sx={{ maxWidth: "300px", margin: "0 auto" }}>
           <MDBox
             sx={{
               display: "flex",
@@ -90,51 +90,44 @@ const SignUp = () => {
               إنشاء حساب
             </MDTypography>
           </MDBox>
-
           {error && (
             <MDTypography variant="body2" color="error" textAlign="center" sx={{ mb: 2 }}>
               {error}
             </MDTypography>
           )}
-
           <MDInput
             type="text"
             label="الاسم"
             fullWidth
             value={name}
             onChange={(e) => setName(e.target.value)}
-            sx={{ mb: 2 }}
+            sx={{ mb: 2, width: "100%" }} // Set width to 100% of the container
           />
-
           <MDInput
             type="email"
             label="البريد الإلكتروني"
             fullWidth
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            sx={{ mb: 2 }}
+            sx={{ mb: 2, width: "100%" }} // Set width to 100% of the container
           />
-
           <MDInput
             type="password"
             label="كلمة المرور"
             fullWidth
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            sx={{ mb: 2 }}
+            sx={{ mb: 2, width: "100%" }} // Set width to 100% of the container
           />
-
           <MDBox display="flex" alignItems="center" mb={3}>
             <Checkbox checked={agree} onChange={() => setAgree(!agree)} />
             <MDTypography variant="button" color="green">
               أوافق على الشروط والأحكام
             </MDTypography>
           </MDBox>
-
           <MDButton fullWidth color="success" onClick={handleSignUp} disabled={loading}>
             {loading ? "جاري التسجيل..." : "إنشاء حساب"}
           </MDButton>
-
           <MDTypography variant="body2" color="textSecondary" textAlign="center" mt={3}>
             لديك حساب بالفعل؟{" "}
             <Link to="/authentication/sign-in" style={{ color: "green", textDecoration: "none" }}>

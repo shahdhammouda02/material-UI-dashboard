@@ -5,6 +5,7 @@ import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 import MDInput from "components/MDInput";
 import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import Chip from "@mui/material/Chip"; // Import Chip for badge-like appearance
 
 function UpdateOrder({ initialRows, orderId, onUpdate }) {
   // 🟢 الحالة (State) الخاصة ببيانات النموذج
@@ -142,10 +143,49 @@ function UpdateOrder({ initialRows, orderId, onUpdate }) {
               value={order.status}
               onChange={handleInputChange}
               sx={{ height: "40px" }}
+              renderValue={(selected) => (
+                <Chip
+                  label={selected}
+                  color={
+                    selected === "قيد المعالجة"
+                      ? "warning"
+                      : selected === "تم التنفيذ"
+                      ? "success"
+                      : "error"
+                  }
+                  variant="filled"
+                  size="small"
+                  sx={{ fontWeight: "bold" }}
+                />
+              )}
             >
-              <MenuItem value="قيد المعالجة">قيد المعالجة</MenuItem>
-              <MenuItem value="تم التنفيذ">تم التنفيذ</MenuItem>
-              <MenuItem value="ملغى">ملغى</MenuItem>
+              <MenuItem value="قيد المعالجة">
+                <Chip
+                  label="قيد المعالجة"
+                  color="warning"
+                  variant="filled"
+                  size="small"
+                  sx={{ fontWeight: "bold" }}
+                />
+              </MenuItem>
+              <MenuItem value="تم التنفيذ">
+                <Chip
+                  label="تم التنفيذ"
+                  color="success"
+                  variant="filled"
+                  size="small"
+                  sx={{ fontWeight: "bold" }}
+                />
+              </MenuItem>
+              <MenuItem value="ملغى">
+                <Chip
+                  label="ملغى"
+                  color="error"
+                  variant="filled"
+                  size="small"
+                  sx={{ fontWeight: "bold" }}
+                />
+              </MenuItem>
             </Select>
           </FormControl>
         </MDBox>

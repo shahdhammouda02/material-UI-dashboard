@@ -12,8 +12,6 @@ import UpdateSubCategory from "./data/UpdateSubCategory"; // Import UpdateCatego
 import CategoryBodyCell from "examples/Categories/CategoriesData/CategoryBodyCell"; // Import CategoryBodyCell
 import CategoryHeadCell from "examples/Categories/CategoriesData/CategoryHeadCell"; // Import CategoryHeadCell
 import MDButton from "components/MDButton";
-import MDInput from "components/MDInput";
-import MDIconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
@@ -73,7 +71,7 @@ function SubCategories() {
                   جدول الفئات الفرعية
                 </MDTypography>
                 <MDButton variant="gradient" color="success" onClick={handleAddCategoryOpen}>
-                  اضافة فئة
+                  اضافة فئة فرعية
                 </MDButton>
               </MDBox>
               <MDBox pt={3}>

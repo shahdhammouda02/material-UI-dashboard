@@ -43,6 +43,11 @@ function Order() {
     setOrderRows(rows); // Set initial rows from OrdersTable
   }, [rows]);
 
+  // Calculate the total amount for all products in the dialog
+  const totalAmount = selectedRowDetails.reduce((sum, detail) => {
+    return sum + detail.price * detail.quantity;
+  }, 0);
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -113,7 +118,7 @@ function Order() {
                               >
                                 <EditIcon sx={{ height: "1.5rem", width: "1.5rem" }} />
                               </MDButton>
-                              <MDButton
+                              {/* <MDButton
                                 mx={1}
                                 variant="text"
                                 color="error"
@@ -121,7 +126,7 @@ function Order() {
                                 sx={{ padding: "0 !important" }}
                               >
                                 <DeleteIcon sx={{ height: "1.5rem", width: "1.5rem" }} />
-                              </MDButton>
+                              </MDButton> */}
                             </MDBox>
                           </DataproductBodyCell>
                         </tr>
@@ -171,6 +176,15 @@ function Order() {
               </Card>
             );
           })}
+
+          {/* Display the total amount for all products */}
+          <Card sx={{ mt: 2 }}>
+            <MDBox p={2}>
+              <MDTypography variant="h6" color="success">
+                <strong>المبلغ الاجمالي:</strong> ${totalAmount}
+              </MDTypography>
+            </MDBox>
+          </Card>
         </DialogContent>
       </Dialog>
     </DashboardLayout>

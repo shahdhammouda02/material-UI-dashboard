@@ -31,9 +31,9 @@ export default function DataTable(handleEdit) {
       mainCategory: "ملابس واكسسوارات",
     },
     {
-      Category: "أحذية",
-      text: "أحذية رياضية وكلاسيكية",
-      mainCategory: "ملابس واكسسوارات",
+      Category: "مأكولات",
+      text: "أكل فلسطيني مفيد واصيل",
+      mainCategory: "المنتجات الغذائية",
     },
     {
       Category: "فخار",

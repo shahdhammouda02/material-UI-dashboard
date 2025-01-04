@@ -16,11 +16,10 @@ import themeDarkRTL from "assets/theme-dark/theme-rtl";
 
 import routes from "routes";
 import ProtectedRoute from "./ProtectedRoute";
-import SignIn from "./layouts/authentication/sign-in";
 import Dashboard from "layouts/dashboard";
 import ZaytonaLogo from "assets/images/Artboard 1 copy.png";
 
-export default function App() {
+const App = () => {
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, layout, openConfigurator, sidenavColor, darkMode } = controller;
   const [onMouseEnter, setOnMouseEnter] = useState(false);
@@ -137,4 +136,6 @@ export default function App() {
       </ThemeProvider>
     </CacheProvider>
   );
-}
+};
+
+export default App;
