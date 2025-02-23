@@ -1,20 +1,21 @@
 import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { logoutVendor } from "../../Store/Slices/logoutSlice/logoutAction";
 
 const Logout = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Clear all authentication-related data
-    localStorage.removeItem("token");
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("isLoggedIn");
+    // استدعاء action الخاص بتسجيل الخروج
+    dispatch(logoutVendor()).then(() => {
+      // بعد نجاح تسجيل الخروج، يتم التوجيه إلى صفحة تسجيل الدخول
+      navigate("/authentication/sign-in");
+    });
+  }, [dispatch, navigate]);
 
-    // Redirect to the login page
-    navigate("/authentication/sign-in");
-  }, [navigate]);
-
-  return <div>Logging out...</div>;
+  return <div>جاري تسجيل الخروج...</div>;
 };
 
 export default Logout;

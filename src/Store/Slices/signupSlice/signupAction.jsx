@@ -1,0 +1,47 @@
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import axiosFetching from "../../../API/axiosFetching";
+import Cookies from "js-cookie";
+
+export const signupVendor = createAsyncThunk(
+  "signup/signupVendor",
+  async ({ name, email, phone, password }, { rejectWithValue }) => {
+    try {
+      const response = await axiosFetching.post("/vendors", {
+        name,
+        email,
+        phone,
+        password,
+      });
+
+      console.log("🔹 API Full Response:", response);
+      console.log("🔹 Response Data:", response.data);
+
+      // ✅ التحقق من نجاح الاستجابة حتى لو لم يكن هناك Token
+      if ((response.status === 201 || response.status === 200) && response.data) {
+        if (response.data.token) {
+          Cookies.set("token", response.data.token, { expires: 7 });
+
+          return {
+            success: true,
+            token: response.data.token,
+            user: response.data.user || response.data.vendor,
+          };
+        } else {
+          console.warn("⚠️ No token returned. Redirecting user to login.");
+          return {
+            success: true,
+            message: "تم إنشاء الحساب بنجاح! يرجى تسجيل الدخول يدويًا.",
+          };
+        }
+      } else {
+        console.error("❌ Unexpected API Response:", response.data);
+        return rejectWithValue("استجابة غير متوقعة من الخادم.");
+      }
+    } catch (error) {
+      console.error("❌ Signup Error:", error.response?.data || error.message);
+      return rejectWithValue(
+        error.response?.data?.message || "فشل التسجيل. يرجى المحاولة مرة أخرى."
+      );
+    }
+  }
+);

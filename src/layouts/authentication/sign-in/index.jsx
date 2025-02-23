@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Card, Switch } from "@mui/material";
 import MDBox from "components/MDBox";
@@ -9,82 +9,45 @@ import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgLogin from "assets/images/bg-sign-in-basic.jpeg";
 import GoogleIcon from "@mui/icons-material/Google";
 import FacebookIcon from "@mui/icons-material/Facebook";
+import { useSelector, useDispatch } from "react-redux";
+import { loginVendor } from "../../../Store/Slices/loginSlice/LoginAction";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
 
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const mainVendor = {
-      name: "البائع الرئيسي",
-      email: "shahd2@gmail.com",
-      password: "123456",
-    };
-
-    const registeredVendors = JSON.parse(localStorage.getItem("registeredVendors")) || [];
-    const isMainVendorExists = registeredVendors.some((v) => v.email === mainVendor.email);
-
-    if (!isMainVendorExists) {
-      registeredVendors.push(mainVendor);
-      localStorage.setItem("registeredVendors", JSON.stringify(registeredVendors));
-    }
-  }, []);
-
+  const error = useSelector((state) => state.login.error);
+  const loading = useSelector((state) => state.login.loading);
   const handleSignIn = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError("");
+    console.log("🔹 Submitting login request");
 
-    try {
-      if (!email || !password) {
-        setError("يرجى ملء جميع الحقول.");
-        return;
-      }
-
-      const registeredVendors = JSON.parse(localStorage.getItem("registeredVendors")) || [];
-      const vendor = registeredVendors.find((v) => v.email.toLowerCase() === email.toLowerCase());
-
-      if (!vendor || password !== vendor.password) {
-        setError("البريد الإلكتروني أو كلمة المرور غير صحيحة.");
-        return;
-      }
-
-      const token = "your_generated_token";
-      localStorage.setItem("token", token);
-
-      if (rememberMe) {
-        localStorage.setItem("userEmail", email);
-      } else {
-        localStorage.removeItem("userEmail");
-      }
-
-      localStorage.setItem("isLoggedIn", "true");
-
-      const vendors = JSON.parse(localStorage.getItem("vendors")) || [];
-      const isVendorExists = vendors.some((v) => v.email === vendor.email);
-      if (!isVendorExists) {
-        vendors.push(vendor);
-        localStorage.setItem("vendors", JSON.stringify(vendors));
-      }
-
-      if (email === "shahd2@gmail.com") {
-        localStorage.setItem("isMainVendor", "true");
-      } else {
-        localStorage.setItem("isMainVendor", "false");
-      }
-
-      alert("تم تسجيل الدخول بنجاح!");
-      navigate("/dashboard");
-    } catch (err) {
-      setError("حدث خطأ. يرجى المحاولة مرة أخرى.");
-    } finally {
-      setLoading(false);
+    if (!email || !password) {
+      alert("يرجى ملء جميع الحقول.");
+      return;
     }
+
+    dispatch(loginVendor({ email, password }))
+      .then((res) => {
+        console.log("🔹 API Response:", res);
+        console.log("🔹 Payload:", res.payload);
+
+        // ✅ تحقق من وجود التوكن بدلاً من `success`
+        if (res.payload && res.payload.token) {
+          console.log("✅ Token Received:", res.payload.token);
+          navigate("/dashboard");
+        } else {
+          alert("تسجيل الدخول غير ناجح. حاول مرة أخرى.");
+        }
+      })
+      .catch((error) => {
+        console.error("❌ Login error:", error);
+        alert("حدث خطأ أثناء محاولة تسجيل الدخول.");
+      });
   };
 
   return (
