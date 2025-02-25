@@ -39,6 +39,7 @@ const SignIn = () => {
         // ✅ تحقق من وجود التوكن بدلاً من `success`
         if (res.payload && res.payload.token) {
           console.log("✅ Token Received:", res.payload.token);
+          localStorage.setItem("email", email);
           navigate("/dashboard");
         } else {
           alert("تسجيل الدخول غير ناجح. حاول مرة أخرى.");

@@ -86,7 +86,7 @@ function Sidenav({ color, brand, routes, ...rest }) {
   };
 
   // Check if the logged-in vendor is the main vendor
-  const isMainVendor = localStorage.getItem("isMainVendor") === "true";
+  const isMainVendor = localStorage.getItem("email") === "admin@vendor.com";
 
   // Render navigation routes
   const renderRoutes = (routes) =>

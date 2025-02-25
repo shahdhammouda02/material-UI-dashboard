@@ -16,10 +16,11 @@ export const signupVendor = createAsyncThunk(
       console.log("🔹 API Full Response:", response);
       console.log("🔹 Response Data:", response.data);
 
-      // ✅ التحقق من نجاح الاستجابة حتى لو لم يكن هناك Token
+      // ✅ Check for a successful response even if no token is returned
       if ((response.status === 201 || response.status === 200) && response.data) {
         if (response.data.token) {
-          Cookies.set("token", response.data.token, { expires: 7 });
+          Cookies.set("token", response.data.token, { expires: 7 }); // Save in cookies
+          localStorage.setItem("token", response.data.token); // Save in localStorage
 
           return {
             success: true,

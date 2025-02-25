@@ -11,12 +11,16 @@ export const loginVendor = createAsyncThunk(
       console.log("🔹 API Response:", response);
       console.log("🔹 Response Data:", response.data);
 
-      // ✅ تحقق من وجود التوكن في الاستجابة بدلاً من `user`
+      // ✅ Check for token in response
       if (response.status === 200 && response.data.token) {
-        Cookies.set("token", response.data.token, { expires: 7 });
-        return { success: true, token: response.data.token }; // ✅ تأكد من إرجاع كائن يتضمن success
+        Cookies.set("token", response.data.token, { expires: 7 }); // Save token in cookies
+        localStorage.setItem("token", response.data.token); // Save token in localStorage as well
+        localStorage.setItem("token", response.data.token); // Save token in localStorage as well
+        localStorage.setItem("email", email); // ✅ حفظ البريد الإلكتروني
+
+        return { success: true, token: response.data.token }; // Return token
       } else {
-        return rejectWithValue("Invalid login response"); // 🚨 رسالة واضحة للخطأ
+        return rejectWithValue("Invalid login response"); // Invalid response message
       }
     } catch (error) {
       console.error("❌ Login Error:", error.response?.data || error.message);

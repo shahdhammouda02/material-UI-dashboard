@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
@@ -12,115 +12,82 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
 import TextField from "@mui/material/TextField";
-import DataproductHeadCell from "examples/products/Dataproduct/DataproductHeadCell";
-import DataproductBodyCell from "examples/products/Dataproduct/DataproductBodyCell";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchVendors,
+  updateVendor,
+  deleteVendor,
+} from "../../../Store/Slices/vendorsSlice/vendorsAction"; // Import actions
 
 const VendorManagement = () => {
-  const [vendors, setVendors] = useState([]); // State to store vendors
+  const dispatch = useDispatch();
+  const { vendors, loading, error } = useSelector((state) => state.vendor);
+
   const [editingId, setEditingId] = useState(null); // State to track the vendor being edited
-  const [tempData, setTempData] = useState({ name: "", email: "", password: "" }); // Temporary storage for edited data
+  const [tempData, setTempData] = useState({ name: "", email: "", password: "", phone: "" }); // Temporary storage for edited data
 
-  // Load vendors from localStorage on component mount
+  // Fetch vendors from the store on mount
   useEffect(() => {
-    const storedVendors = JSON.parse(localStorage.getItem("vendors")) || [];
-    setVendors(storedVendors);
-  }, []);
+    dispatch(fetchVendors());
+  }, [dispatch]);
 
-  // Function to handle editing a vendor
+  // Log vendors, loading, and error to help debug
+  useEffect(() => {
+    console.log("Vendors:", vendors);
+    console.log("Loading:", loading);
+    console.log("Error:", error);
+  }, [vendors, loading, error]);
+
   const handleEdit = (vendor) => {
-    setEditingId(vendor.email);
-    setTempData({ name: vendor.name, email: vendor.email, password: vendor.password });
+    setEditingId(vendor.id);
+    setTempData({
+      name: vendor.name,
+      email: vendor.email,
+      password: vendor.password,
+      phone: vendor.phone,
+    });
   };
 
-  // Function to save edited vendor data
   const handleSave = () => {
-    const updatedVendors = vendors.map((v) => (v.email === editingId ? { ...v, ...tempData } : v));
-    setVendors(updatedVendors);
-    localStorage.setItem("vendors", JSON.stringify(updatedVendors));
+    dispatch(updateVendor({ id: editingId, updatedData: tempData }));
     setEditingId(null);
     alert("تم تحديث البائع بنجاح!");
   };
 
-  // Function to cancel editing
   const handleCancel = () => {
     setEditingId(null);
   };
 
-  // Function to delete a vendor
-  const handleDelete = (email) => {
-    const updatedVendors = vendors.filter((v) => v.email !== email);
-    setVendors(updatedVendors);
-    localStorage.setItem("vendors", JSON.stringify(updatedVendors));
+  const handleDelete = (id) => {
+    dispatch(deleteVendor(id));
     alert("تم حذف البائع بنجاح!");
   };
 
-  // Table columns
-  const columns = [
-    { Header: "الاسم", accessor: "name", align: "center" },
-    { Header: "البريد الإلكتروني", accessor: "email", align: "center" },
-    { Header: "كلمة المرور", accessor: "password", align: "center" },
-    { Header: "الإجراءات", accessor: "actions", align: "center" },
-  ];
+  const renderTextField = (value, onChange) => (
+    <TextField value={value} onChange={onChange} fullWidth size="small" />
+  );
 
-  // Table rows
-  const rows = vendors.map((vendor) => ({
-    name:
-      editingId === vendor.email ? (
-        <TextField
-          value={tempData.name}
-          onChange={(e) => setTempData({ ...tempData, name: e.target.value })}
-          fullWidth
-          size="small"
-        />
-      ) : (
-        vendor.name
-      ),
-    email:
-      editingId === vendor.email ? (
-        <TextField
-          value={tempData.email}
-          onChange={(e) => setTempData({ ...tempData, email: e.target.value })}
-          fullWidth
-          size="small"
-        />
-      ) : (
-        vendor.email
-      ),
-    password:
-      editingId === vendor.email ? (
-        <TextField
-          value={tempData.password}
-          onChange={(e) => setTempData({ ...tempData, password: e.target.value })}
-          fullWidth
-          size="small"
-        />
-      ) : (
-        "••••••"
-      ),
-    actions: (
-      <MDBox display="flex" justifyContent="center" alignItems="center">
-        {editingId === vendor.email ? (
-          <>
-            <MDButton variant="text" color="success" onClick={handleSave}>
-              <SaveIcon sx={{ height: "1.5rem", width: "1.5rem" }} />
-            </MDButton>
-            <MDButton variant="text" color="error" onClick={handleCancel}>
-              <CancelIcon sx={{ height: "1.5rem", width: "1.5rem" }} />
-            </MDButton>
-          </>
-        ) : (
-          <>
-            <MDButton variant="text" color="info" onClick={() => handleEdit(vendor)}>
-              <EditIcon sx={{ height: "1.5rem", width: "1.5rem" }} />
-            </MDButton>
-            <MDButton variant="text" color="error" onClick={() => handleDelete(vendor.email)}>
-              <DeleteIcon sx={{ height: "1.5rem", width: "1.5rem" }} />
-            </MDButton>
-          </>
-        )}
-      </MDBox>
-    ),
-  }));
+  const renderActionButtons = (vendor) => {
+    return editingId === vendor.id ? (
+      <>
+        <MDButton variant="text" color="success" onClick={handleSave}>
+          <SaveIcon sx={{ height: "1.5rem", width: "1.5rem" }} />
+        </MDButton>
+        <MDButton variant="text" color="error" onClick={handleCancel}>
+          <CancelIcon sx={{ height: "1.5rem", width: "1.5rem" }} />
+        </MDButton>
+      </>
+    ) : (
+      <>
+        <MDButton variant="text" color="info" onClick={() => handleEdit(vendor)}>
+          <EditIcon sx={{ height: "1.5rem", width: "1.5rem" }} />
+        </MDButton>
+        <MDButton variant="text" color="error" onClick={() => handleDelete(vendor.id)}>
+          <DeleteIcon sx={{ height: "1.5rem", width: "1.5rem" }} />
+        </MDButton>
+      </>
+    );
+  };
 
   return (
     <DashboardLayout>
@@ -145,31 +112,85 @@ const VendorManagement = () => {
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
-                {vendors.length === 0 ? (
+                {loading ? (
+                  <MDTypography variant="body1" textAlign="center" p={3}>
+                    جاري التحميل...
+                  </MDTypography>
+                ) : error ? (
+                  <MDTypography variant="body1" textAlign="center" p={3}>
+                    {error}
+                  </MDTypography>
+                ) : vendors.length === 0 ? (
                   <MDTypography variant="body1" textAlign="center" p={3}>
                     لا يوجد بائعين متاحين.
                   </MDTypography>
                 ) : (
-                  <table style={{ width: "100%" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
                     <thead>
                       <tr>
-                        {columns.map((column, index) => (
-                          <DataproductHeadCell key={index} align={column.align}>
-                            {column.Header}
-                          </DataproductHeadCell>
+                        {[
+                          "الاسم",
+                          "البريد الإلكتروني",
+                          "كلمة المرور",
+                          "رقم الهاتف",
+                          "الإجراءات",
+                        ].map((header, index) => (
+                          <th
+                            key={index}
+                            style={{
+                              textAlign: "center",
+                              padding: "10px",
+                              backgroundColor: "#f4f4f4",
+                            }}
+                          >
+                            {header}
+                          </th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
-                      {rows.map((row, index) => (
-                        <tr key={index}>
-                          {columns.map((column, colIndex) => (
-                            <DataproductBodyCell key={colIndex} align={column.align}>
-                              {row[column.accessor]}
-                            </DataproductBodyCell>
-                          ))}
+                      {Array.isArray(vendors) && vendors.length > 0 ? (
+                        vendors.map((vendor) => {
+                          console.log("Vendor Data:", vendor); // Check each vendor data
+                          return (
+                            <tr key={vendor.id}>
+                              {["name", "email", "password", "phone"].map((key, idx) => (
+                                <td
+                                  key={idx}
+                                  style={{
+                                    textAlign: "center",
+                                    padding: "8px",
+                                    borderBottom: "1px solid #ddd",
+                                  }}
+                                >
+                                  {editingId === vendor.id
+                                    ? renderTextField(tempData[key], (e) =>
+                                        setTempData({ ...tempData, [key]: e.target.value })
+                                      )
+                                    : key === "password" || key === "phone"
+                                    ? "••••••"
+                                    : vendor[key] || "-"}
+                                </td>
+                              ))}
+                              <td
+                                style={{
+                                  textAlign: "center",
+                                  padding: "8px",
+                                  borderBottom: "1px solid #ddd",
+                                }}
+                              >
+                                {renderActionButtons(vendor)}
+                              </td>
+                            </tr>
+                          );
+                        })
+                      ) : (
+                        <tr>
+                          <td colSpan={5} style={{ textAlign: "center", padding: "10px" }}>
+                            لا يوجد بائعين
+                          </td>
                         </tr>
-                      ))}
+                      )}
                     </tbody>
                   </table>
                 )}
