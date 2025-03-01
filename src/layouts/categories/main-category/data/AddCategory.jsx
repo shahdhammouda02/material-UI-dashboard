@@ -1,93 +1,53 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 import MDInput from "components/MDInput";
-import MDIconButton from "@mui/material/IconButton";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { addCategory } from "../../../../Store/Slices/mainCategory/mainCategoryAction";
 
-function AddCategory({ initialRows, onAdd, onCancel, onDelete }) {
-  const [newCategory, setNewCategory] = useState({
-    id: "",
-    categoryName: "",
-    description: "",
-  });
+const AddCategory = ({ initialRows, onAdd, onCancel }) => {
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const [error, setError] = useState("");
+  // الحصول على الخطأ من الـ Redux Store
+  const { error } = useSelector((state) => state.categories || {});
 
-  // Automatically generate the next ID based on existing rows
-  useEffect(() => {
-    const highestExistingId =
-      initialRows.length > 0 ? Math.max(...initialRows.map((row) => row.id)) : 0;
-    setNewCategory((prevCategory) => ({
-      ...prevCategory,
-      id: highestExistingId + 1,
-    }));
-  }, [initialRows]);
+  const handleAddCategory = async (e) => {
+    e.preventDefault(); // لمنع إعادة تحميل الصفحة عند تقديم النموذج
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewCategory((prevCategory) => ({
-      ...prevCategory,
-      [name]: value,
-    }));
-  };
-
-  const handleEditClick = (id) => {
-    console.log(`Editing category with ID: ${id}`);
-    // Add your editing logic here
-  };
-
-  const handleDeleteClick = (id) => {
-    if (onDelete) {
-      onDelete(id);
-    }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    // Validate that all fields are filled
-    if (!newCategory.categoryName || !newCategory.description) {
-      setError("من فضلك قم بملء جميع الحقول بشكل صحيح.");
+    if (!name || !description) {
+      alert("جميع الحقول مطلوبة.");
       return;
     }
 
-    setError(""); // Clear error message if all fields are valid
+    try {
+      const res = await dispatch(addCategory({ name, description })).unwrap(); // تفكيك الـ Promise
 
-    const newCategoryData = {
-      ...newCategory,
-      actions: (
-        <MDBox display="flex" justifyContent="center" alignItems="center">
-          <MDIconButton color="success" onClick={() => handleEditClick(newCategory.id)}>
-            <EditIcon />
-          </MDIconButton>
-          <MDBox mx={1} />
-          <MDIconButton color="error" onClick={() => handleDeleteClick(newCategory.id)}>
-            <DeleteIcon />
-          </MDIconButton>
-        </MDBox>
-      ),
-    };
+      console.log("🔹 API Response:", res);
 
-    onAdd(newCategoryData);
-    setNewCategory({
-      id: "",
-      categoryName: "",
-      description: "",
-    });
+      if (res?.success) {
+        alert(res?.message || "تم إضافة الفئة بنجاح!");
+        setTimeout(() => {
+          window.location.reload(); // إعادة تحميل الصفحة بعد نجاح الإضافة
+        }, 500); // تأخير نصف ثانية لضمان اكتمال العملية
+      } else {
+        alert("حدث خطأ أثناء إضافة الفئة.");
+      }
+    } catch (error) {
+      console.error("❌ Error:", error);
+      alert("حدث خطأ غير متوقع.");
+    }
   };
 
   const handleCancel = () => {
-    setNewCategory({
-      id: "",
-      categoryName: "",
-      description: "",
-    });
-    setError("");
-    onCancel();
+    setName("");
+    setDescription("");
+    if (onCancel) onCancel();
   };
 
   return (
@@ -95,16 +55,13 @@ function AddCategory({ initialRows, onAdd, onCancel, onDelete }) {
       <MDTypography variant="h5" mb={2}>
         اضافة فئة جديدة
       </MDTypography>
-      <form onSubmit={handleSubmit}>
-        <MDBox mb={2}>
-          <MDInput label="الرقم التعريفي" name="id" value={newCategory.id} fullWidth disabled />
-        </MDBox>
+      <form onSubmit={handleAddCategory}>
         <MDBox mb={2}>
           <MDInput
             label="اسم الصنف"
             name="categoryName"
-            value={newCategory.categoryName}
-            onChange={handleInputChange}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             fullWidth
           />
         </MDBox>
@@ -112,8 +69,8 @@ function AddCategory({ initialRows, onAdd, onCancel, onDelete }) {
           <MDInput
             label="الوصف"
             name="description"
-            value={newCategory.description}
-            onChange={handleInputChange}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             fullWidth
           />
         </MDBox>
@@ -135,7 +92,7 @@ function AddCategory({ initialRows, onAdd, onCancel, onDelete }) {
       </form>
     </MDBox>
   );
-}
+};
 
 AddCategory.propTypes = {
   initialRows: PropTypes.arrayOf(
@@ -147,12 +104,10 @@ AddCategory.propTypes = {
   ),
   onAdd: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
-  onDelete: PropTypes.func,
 };
 
 AddCategory.defaultProps = {
   initialRows: [],
-  onDelete: null,
 };
 
 export default AddCategory;

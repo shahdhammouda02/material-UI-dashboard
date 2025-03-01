@@ -5,75 +5,111 @@ import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 import MDInput from "components/MDInput";
 import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
-function UpdateSubCategory({ initialRows, categoryId, onUpdate }) {
-  const [subcategory, setSubcategory] = useState({
+import { useDispatch, useSelector } from "react-redux";
+import { updateSubCategory } from "../../../../Store/Slices/subCategory/subCategoryAction";
+
+function UpdateSubCategory({ initialRows, categoryId, onUpdate, categories }) {
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.categories);
+  const [category, setCategory] = useState({
     id: categoryId || null,
-    Category: "",
-    text: "",
-    mainCategory: "",
+    name: "",
+    description: "",
+    category_id: "", // ✅ تأكد من أن category_id يكون فارغًا أو رقمًا
   });
 
-  const [error, setError] = useState("");
-  // Open dialog by default
-
   useEffect(() => {
-    const existingSubcategory = initialRows.find((row) => row.id === categoryId);
-    if (existingSubcategory) {
-      setSubcategory(existingSubcategory); // Update state with existing subcategory data
+    if (!categoryId) {
+      console.error("Invalid categoryId");
+      return;
+    }
+
+    const existingCategory = initialRows.find((row) => row.id === categoryId);
+    console.log("Existing category:", existingCategory);
+
+    if (existingCategory) {
+      setCategory({
+        id: existingCategory.id,
+        name: existingCategory.name || "",
+        description: existingCategory.description || "",
+        category_id: existingCategory.category_id || "", // لا تحويل إلى نص هنا، يجب أن يبقى العدد كما هو
+      });
     } else {
-      console.error(`Subcategory with ID ${categoryId} not found`);
+      console.error(`Category with ID ${categoryId} not found`);
     }
   }, [initialRows, categoryId]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setSubcategory((prevSubcategory) => ({
-      ...prevSubcategory,
+    setCategory((prevCategory) => ({
+      ...prevCategory,
       [name]: value,
     }));
   };
 
-  const handleSubmit = () => {
-    if (!subcategory.Category || !subcategory.text || !subcategory.mainCategory) {
-      setError("Please fill in all fields correctly.");
+  const handleCategoryChange = (e) => {
+    const selectedValue = e.target.value;
+    console.log("✅ Selected category_id:", selectedValue); // تسجيل القيمة
+    setCategory((prevCategory) => ({
+      ...prevCategory,
+      category_id: selectedValue, // تحديث category_id
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!category.name || !category.description || !category.category_id) {
+      console.error("Please fill all required fields.");
+      alert("يرجى ملء جميع الحقول المطلوبة.");
       return;
     }
 
-    setError("");
-    onUpdate(subcategory); // Call the update function passed as a prop
+    // تأكد من أن category_id يتم إرساله كعدد
+    console.log("Submitting category with category_id:", category.category_id);
+
+    const updatedCategory = {
+      ...category,
+      category_id: Number(category.category_id), // تأكد من تحويلها إلى رقم هنا عند الإرسال
+    };
+
+    console.log("Submitting category data:", updatedCategory);
+
+    dispatch(updateSubCategory({ id: category.id, updatedData: updatedCategory })).then(
+      (result) => {
+        console.log("🔍 API Response:", result);
+        if (result.meta.requestStatus === "fulfilled") {
+          onUpdate(updatedCategory);
+        } else {
+          console.error("❌ تحديث الفئة الفرعية فشل:", result);
+        }
+      }
+    );
   };
 
   return (
     <MDBox p={3}>
-      {/* 🔶 عنوان النموذج */}
       <MDTypography variant="h5" mb={2}>
-        تحديث الفئة
+        تحديث الفئة الفرعية
       </MDTypography>
-
-      {/* 📝 نموذج التعديل */}
       <form onSubmit={handleSubmit}>
-        {/* 🆔 حقل: رقم الفئة */}
         <MDBox mb={2}>
-          <MDInput label="الرقم التعريفي" value={subcategory.id} disabled fullWidth />
+          <MDInput label="رقم الفئة" name="id" value={category.id} disabled fullWidth />
         </MDBox>
-
-        {/* 📝 حقل: اسم الفئة */}
         <MDBox mb={2}>
           <MDInput
             label="اسم الفئة"
-            name="Category"
-            value={subcategory.Category}
+            name="name"
+            value={category.name}
             onChange={handleInputChange}
             fullWidth
           />
         </MDBox>
-
-        {/* 📋 حقل: الوصف */}
         <MDBox mb={2}>
           <MDInput
             label="الوصف"
-            name="text"
-            value={subcategory.text}
+            name="description"
+            value={category.description}
             onChange={handleInputChange}
             fullWidth
             multiline
@@ -82,41 +118,35 @@ function UpdateSubCategory({ initialRows, categoryId, onUpdate }) {
         </MDBox>
         <MDBox mb={2}>
           <FormControl fullWidth>
-            <InputLabel>اختر الفئة الأساسية</InputLabel>
+            <InputLabel>اختر الفئة الرئيسية</InputLabel>
             <Select
-              name="mainCategory"
-              value={subcategory.mainCategory}
-              onChange={handleInputChange}
+              name="category_id"
+              value={category.category_id || ""}
+              onChange={handleCategoryChange}
               sx={{ height: "40px" }}
             >
-              <MenuItem value="منتجات غذائية">منتجات غذائية</MenuItem>
-              <MenuItem value="ملابس وإكسسوارات">ملابس وإكسسوارات</MenuItem>
-              <MenuItem value="حرف يدوية">حرف يدوية</MenuItem>
-              <MenuItem value="كتب ومطبوعات">كتب ومطبوعات</MenuItem>
+              {Array.isArray(categories?.data) && categories.data.length > 0 ? (
+                categories.data.map((mainCat) => (
+                  <MenuItem key={mainCat.id} value={String(mainCat.id)}>
+                    {mainCat.name}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>لا توجد فئات متاحة</MenuItem>
+              )}
             </Select>
           </FormControl>
         </MDBox>
-
-        {/* 🛑 عرض الخطأ */}
         {error && (
           <MDBox mb={2}>
             <MDTypography color="error">{error}</MDTypography>
           </MDBox>
         )}
-
-        {/* 🔘 أزرار التحكم */}
         <MDBox display="flex" justifyContent="space-between">
-          {/* ✅ زر الحفظ */}
-          <MDButton variant="gradient" color="success" type="submit">
-            حفظ التعديلات
+          <MDButton variant="gradient" color="success" type="submit" disabled={loading}>
+            {loading ? "جاري الحفظ..." : "حفظ التعديلات"}
           </MDButton>
-
-          {/* ❌ زر الإلغاء */}
-          <MDButton
-            variant="gradient"
-            color="error"
-            onClick={() => onUpdate(categoryId ? subcategory : null)} // Ensure categoryId is valid
-          >
+          <MDButton variant="gradient" color="error" onClick={() => onUpdate(null)}>
             إلغاء
           </MDButton>
         </MDBox>
@@ -129,13 +159,14 @@ UpdateSubCategory.propTypes = {
   initialRows: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
-      category: PropTypes.string.isRequired,
-      text: PropTypes.string.isRequired,
-      mainCategory: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      description: PropTypes.string.isRequired,
+      category_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), // ✅ تعديل هنا
     })
   ).isRequired,
   categoryId: PropTypes.number.isRequired,
-  onUpdate: PropTypes.func.isRequired, // Function to call when updating
+  onUpdate: PropTypes.func.isRequired,
+  categories: PropTypes.object.isRequired,
 };
 
 export default UpdateSubCategory;

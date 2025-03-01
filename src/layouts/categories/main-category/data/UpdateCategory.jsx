@@ -4,33 +4,39 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 import MDInput from "components/MDInput";
+import { useDispatch, useSelector } from "react-redux";
+import { updateCategory } from "../../../../Store/Slices/mainCategory/mainCategoryAction";
 
 function UpdateCategory({ initialRows, categoryId, onUpdate }) {
-  // 🟢 الحالة (State) الخاصة ببيانات النموذج
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.categories);
   const [category, setCategory] = useState({
-    id: categoryId || null, // Default to -1 if categoryId is null
-    categoryName: "",
+    id: categoryId || null,
+    name: "",
     description: "",
   });
 
-  const [error, setError] = useState("");
-
-  // 🔄 تحميل بيانات الفئة بناءً على categoryId
   useEffect(() => {
     if (!categoryId) {
       console.error("Invalid categoryId");
-      return; // Avoid proceeding if categoryId is invalid
+      return;
     }
 
+    // البحث عن الفئة المطلوبة
     const existingCategory = initialRows.find((row) => row.id === categoryId);
+    console.log("Existing category:", existingCategory);
+
     if (existingCategory) {
-      setCategory(existingCategory); // نسخ البيانات إلى النموذج
+      setCategory({
+        id: existingCategory.id,
+        name: existingCategory.name || "", // تغيير من categoryName إلى name
+        description: existingCategory.description || "",
+      });
     } else {
       console.error(`Category with ID ${categoryId} not found`);
     }
   }, [initialRows, categoryId]);
 
-  // ✍️ تابع لمعالجة المدخلات
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setCategory((prevCategory) => ({
@@ -39,44 +45,39 @@ function UpdateCategory({ initialRows, categoryId, onUpdate }) {
     }));
   };
 
-  // ✅ تابع لحفظ التغييرات
   const handleSubmit = (e) => {
-    e.preventDefault(); // Prevent the default form submission
-    if (!category.categoryName || !category.description) {
-      setError("Please fill in all fields correctly.");
+    e.preventDefault();
+    if (!category.name || !category.description) {
       return;
     }
 
-    setError("");
-    onUpdate(category); // Call onUpdate with the updated category
+    console.log("Submitting category data:", category);
+
+    dispatch(updateCategory({ id: category.id, updatedData: category })).then((result) => {
+      if (result.meta.requestStatus === "fulfilled") {
+        onUpdate(category);
+      }
+    });
   };
 
   return (
     <MDBox p={3}>
-      {/* 🔶 عنوان النموذج */}
       <MDTypography variant="h5" mb={2}>
         تحديث الفئة
       </MDTypography>
-
-      {/* 📝 نموذج التعديل */}
       <form onSubmit={handleSubmit}>
-        {/* 🆔 حقل: رقم الفئة */}
         <MDBox mb={2}>
           <MDInput label="رقم الفئة" name="id" value={category.id} disabled fullWidth />
         </MDBox>
-
-        {/* 📝 حقل: اسم الفئة */}
         <MDBox mb={2}>
           <MDInput
             label="اسم الفئة"
-            name="categoryName"
-            value={category.categoryName}
+            name="name"
+            value={category.name} // تأكد من استخدام name بدلاً من categoryName
             onChange={handleInputChange}
             fullWidth
           />
         </MDBox>
-
-        {/* 📋 حقل: الوصف */}
         <MDBox mb={2}>
           <MDInput
             label="الوصف"
@@ -88,27 +89,16 @@ function UpdateCategory({ initialRows, categoryId, onUpdate }) {
             rows={4}
           />
         </MDBox>
-
-        {/* 🛑 عرض الخطأ */}
         {error && (
           <MDBox mb={2}>
             <MDTypography color="error">{error}</MDTypography>
           </MDBox>
         )}
-
-        {/* 🔘 أزرار التحكم */}
         <MDBox display="flex" justifyContent="space-between">
-          {/* ✅ زر الحفظ */}
-          <MDButton variant="gradient" color="success" type="submit">
-            حفظ التعديلات
+          <MDButton variant="gradient" color="success" type="submit" disabled={loading}>
+            {loading ? "جاري الحفظ..." : "حفظ التعديلات"}
           </MDButton>
-
-          {/* ❌ زر الإلغاء */}
-          <MDButton
-            variant="gradient"
-            color="error"
-            onClick={() => onUpdate(categoryId ? category : null)} // Ensure categoryId is valid
-          >
+          <MDButton variant="gradient" color="error" onClick={() => onUpdate(null)}>
             إلغاء
           </MDButton>
         </MDBox>
@@ -117,17 +107,16 @@ function UpdateCategory({ initialRows, categoryId, onUpdate }) {
   );
 }
 
-// ⚙️ إعدادات PropTypes لضمان سلامة المدخلات
 UpdateCategory.propTypes = {
   initialRows: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
-      categoryName: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired, // تغيير من categoryName إلى name
       description: PropTypes.string.isRequired,
     })
   ).isRequired,
   categoryId: PropTypes.number.isRequired,
-  onUpdate: PropTypes.func.isRequired, // Function to call when updating
+  onUpdate: PropTypes.func.isRequired,
 };
 
 export default UpdateCategory;

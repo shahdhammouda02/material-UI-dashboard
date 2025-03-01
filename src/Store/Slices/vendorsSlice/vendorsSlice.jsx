@@ -34,10 +34,15 @@ const vendorSlice = createSlice({
     builder.addCase(updateVendor.fulfilled, (state, action) => {
       state.loading = false;
       const updatedVendor = action.payload;
-      state.vendors = state.vendors.map((vendor) =>
-        vendor.id === updatedVendor.id ? updatedVendor : vendor
-      );
+      // إضافة سجل للتحقق من أن البيانات محدثة
+      console.log("البائع المحدث:", updatedVendor);
+
+      state.vendors = Array.isArray(state.vendors)
+        ? state.vendors.map((vendor) => (vendor.id === updatedVendor.id ? updatedVendor : vendor))
+        : [];
+      console.log("البيانات المحدثة للبائعين:", state.vendors); // تحقق من تحديث المصفوفة
     });
+
     builder.addCase(updateVendor.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;

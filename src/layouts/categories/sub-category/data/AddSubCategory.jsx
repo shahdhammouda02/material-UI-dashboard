@@ -1,110 +1,126 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 import MDInput from "components/MDInput";
+import { useDispatch, useSelector } from "react-redux";
+import axiosFetching from "../../../../API/axiosFetching"; // تأكد من استيراد axiosFetching بشكل صحيح
+import { useNavigate } from "react-router-dom";
 
-function AddSubCategory({ initialRows, onAdd, onCancel }) {
-  const [newSubcategory, setNewSubcategory] = useState({
-    id: "",
-    Category: "",
-    text: "",
-    mainCategory: "",
-  });
+const AddSubCategory = ({ onCancel }) => {
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [localError, setLocalError] = useState(""); // تخزين الأخطاء المحلية
 
-  const [error, setError] = useState("");
+  const { categories } = useSelector((state) => state.categories);
+  const dispatch = useDispatch();
+  const { error } = useSelector((state) => state.subCategories || {});
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const highestExistingId =
-      initialRows.length > 0 ? Math.max(...initialRows.map((row) => row.id)) : 0;
-    setNewSubcategory((prevCategory) => ({
-      ...prevCategory,
-      id: highestExistingId + 1,
-    }));
-  }, [initialRows]);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewSubcategory((prevCategory) => ({
-      ...prevCategory,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = (e) => {
+  const handleAddSubCategory = async (e) => {
     e.preventDefault();
+    setLocalError(null);
 
-    if (!newSubcategory.Category || !newSubcategory.text || !newSubcategory.mainCategory) {
-      setError("Please fill in all fields correctly.");
+    // التحقق من البيانات المدخلة
+    if (!name.trim()) {
+      setLocalError("الرجاء إدخال اسم التصنيف الفرعي.");
+      return;
+    }
+    if (!categoryId || isNaN(categoryId) || Number(categoryId) <= 0) {
+      setLocalError("يرجى اختيار فئة رئيسية صالحة.");
       return;
     }
 
-    setError("");
-    onAdd(newSubcategory);
-    setNewSubcategory({
-      id: "",
-      Category: "",
-      text: "",
-      mainCategory: "",
-    });
+    const data = {
+      name,
+      description,
+      category_id: Number(categoryId), // التأكد من أن القيمة رقمية
+    };
+
+    try {
+      console.log("📌 إرسال البيانات:", data);
+      await axiosFetching.post("/subcategories", data);
+      // إعادة تعيين الحقول بعد الإضافة الناجحة
+      setName("");
+      setDescription("");
+      setCategoryId("");
+      navigate("/categories/sub-category"); // التوجيه إلى صفحة التصنيفات الفرعية بعد الإضافة الناجحة
+    } catch (error) {
+      console.error("خطأ في إضافة التصنيف الفرعي:", error);
+      if (error.response) {
+        setLocalError(error.response.data.message || "حدث خطأ أثناء الإضافة. حاول مرة أخرى.");
+      } else {
+        setLocalError("حدث خطأ أثناء الإضافة. حاول مرة أخرى.");
+      }
+    }
   };
 
   const handleCancel = () => {
-    setNewSubcategory({
-      id: "",
-      Category: "",
-      text: "",
-      mainCategory: "",
-    });
-    setError("");
-    onCancel();
+    setName("");
+    setDescription("");
+    setCategoryId("");
+    setLocalError(""); // إعادة تعيين الخطأ
+    if (onCancel) onCancel();
   };
 
   return (
     <MDBox p={3}>
       <MDTypography variant="h5" mb={2}>
-        إضافة فئة جديدة
+        إضافة فئة فرعية جديدة
       </MDTypography>
-      <form onSubmit={handleSubmit}>
-        <MDBox mb={2}>
-          <MDInput label="الرقم التعريفي" name="id" value={newSubcategory.id} fullWidth disabled />
-        </MDBox>
+      <form onSubmit={handleAddSubCategory}>
         <MDBox mb={2}>
           <MDInput
-            label="اسم الفئة"
-            name="Category"
-            value={newSubcategory.Category}
-            onChange={handleInputChange}
+            label="اسم الفئة الفرعية"
+            name="subcategoryName"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             fullWidth
           />
         </MDBox>
         <MDBox mb={2}>
           <MDInput
             label="الوصف"
-            name="text"
-            value={newSubcategory.text}
-            onChange={handleInputChange}
+            name="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             fullWidth
           />
         </MDBox>
         <MDBox mb={2}>
           <FormControl fullWidth>
-            <InputLabel>اختر الفئة الأساسية</InputLabel>
+            <InputLabel>اختر الفئة الرئيسية</InputLabel>
             <Select
               name="mainCategory"
-              value={newSubcategory.mainCategory}
-              onChange={handleInputChange}
+              value={categoryId}
+              onChange={(e) => {
+                const selectedValue = e.target.value;
+                console.log("✅ Selected category_id:", selectedValue);
+                setCategoryId(selectedValue);
+              }}
               sx={{ height: "40px" }}
             >
-              <MenuItem value="منتجات غذائية">منتجات غذائية</MenuItem>
-              <MenuItem value="ملابس وإكسسوارات">ملابس وإكسسوارات</MenuItem>
-              <MenuItem value="حرف يدوية">حرف يدوية</MenuItem>
-              <MenuItem value="كتب ومطبوعات">كتب ومطبوعات</MenuItem>
+              {Array.isArray(categories?.data) && categories.data.length > 0 ? (
+                categories.data.map((category) => (
+                  <MenuItem key={category.id} value={category.id}>
+                    {category.name}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>لا توجد فئات متاحة</MenuItem>
+              )}
             </Select>
           </FormControl>
         </MDBox>
+
+        {localError && (
+          <MDTypography color="error" mb={2}>
+            {localError}
+          </MDTypography>
+        )}
 
         {error && (
           <MDTypography color="error" mb={2}>
@@ -123,18 +139,9 @@ function AddSubCategory({ initialRows, onAdd, onCancel }) {
       </form>
     </MDBox>
   );
-}
+};
 
 AddSubCategory.propTypes = {
-  initialRows: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      Category: PropTypes.string,
-      text: PropTypes.string,
-      mainCategory: PropTypes.string,
-    })
-  ),
-  onAdd: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
 };
 

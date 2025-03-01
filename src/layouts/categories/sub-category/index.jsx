@@ -6,48 +6,78 @@ import MDTypography from "components/MDTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import AddSubCategory from "./data/AddSubCategory"; // Import the AddCategory component
-import DataTable from "./data/TablesubData"; // Import the TablesubData function
-import UpdateSubCategory from "./data/UpdateSubCategory"; // Import UpdateCategory
-import CategoryBodyCell from "examples/Categories/CategoriesData/CategoryBodyCell"; // Import CategoryBodyCell
-import CategoryHeadCell from "examples/Categories/CategoriesData/CategoryHeadCell"; // Import CategoryHeadCell
+import AddSubCategory from "./data/AddSubCategory";
+import UpdateSubCategory from "./data/UpdateSubCategory";
+import CategoryBodyCell from "examples/Categories/CategoriesData/CategoryBodyCell";
+import CategoryHeadCell from "examples/Categories/CategoriesData/CategoryHeadCell";
 import MDButton from "components/MDButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchSubCategories,
+  updateSubCategory,
+  deleteSubCategory,
+} from "../../../Store/Slices/subCategory/subCategoryAction";
+import { fetchCategories } from "../../../Store/Slices/mainCategory/mainCategoryAction";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
 
-function SubCategories() {
-  const [editingId, setEditingId] = useState(null); // State to track the editing ID
-  const [categoryRows, setCategoryRows] = useState([]);
+const SubCategories = () => {
+  const dispatch = useDispatch();
+  const { subCategories } = useSelector((state) => state.subCategories);
+  const { categories } = useSelector((state) => state.categories);
+
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
-  const handleEdit = (id) => {
-    setEditingId(id); // Set the ID to edit
+  const [editingCategory, setEditingCategory] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+
+  useEffect(() => {
+    dispatch(fetchSubCategories());
+    dispatch(fetchCategories());
+  }, [dispatch]);
+
+  const handleAddCategoryOpen = () => setIsAddCategoryOpen(true);
+  const handleAddCategoryClose = () => setIsAddCategoryOpen(false);
+
+  const handleEdit = (category) => {
+    setEditingCategory({
+      id: category.id,
+      name: category.name,
+      description: category.description,
+      mainCategory: category.category_id,
+    });
+  };
+
+  const handleDeleteDialogOpen = (id) => {
+    setSelectedCategoryId(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    dispatch(deleteSubCategory(selectedCategoryId));
+    setDeleteDialogOpen(false);
   };
 
   const handleUpdate = (updatedCategory) => {
-    setCategoryRows((prevRows) =>
-      prevRows.map((row) => (row.id === updatedCategory.id ? updatedCategory : row))
+    dispatch(
+      updateSubCategory({
+        id: updatedCategory.id,
+        updatedData: {
+          name: updatedCategory.name,
+          description: updatedCategory.description,
+          category_id: updatedCategory.mainCategory,
+        },
+      })
     );
-    setEditingId(null); // Close the edit dialog
+    setEditingCategory(null);
   };
-  const handleDelete = (id) => {
-    setCategoryRows((prevRows) => prevRows.filter((row) => row.id !== id)); // Delete row by orderId
-  };
-  const handleAddCategoryOpen = () => {
-    setIsAddCategoryOpen(true); // Open Add Order modal
-  };
-  const handleAddCategoryClose = () => {
-    setIsAddCategoryOpen(false); // Close Add Order modal
-  };
-  const handleAddCategory = (newCategory) => {
-    setCategoryRows((prevRows) => [...prevRows, newCategory]); // Add the new Category
-    setIsAddCategoryOpen(false); // Close Add Category modal
-  };
-  const { columns, rows } = DataTable(handleEdit); // Pass the handleEdit function
-
-  // Update categoryRows with the rows from DataTable
-  useEffect(() => {
-    setCategoryRows(rows); // Set initial rows from DataTable
-  }, [rows]);
 
   return (
     <DashboardLayout>
@@ -71,61 +101,60 @@ function SubCategories() {
                   جدول الفئات الفرعية
                 </MDTypography>
                 <MDButton variant="gradient" color="success" onClick={handleAddCategoryOpen}>
-                  اضافة فئة فرعية
+                  إضافة فئة فرعية
                 </MDButton>
               </MDBox>
+
               <MDBox pt={3}>
                 {isAddCategoryOpen ? (
                   <AddSubCategory
-                    initialRows={rows}
-                    onAdd={handleAddCategory}
                     onCancel={handleAddCategoryClose}
+                    categories={categories?.data || []}
                   />
-                ) : editingId ? (
+                ) : editingCategory ? (
                   <UpdateSubCategory
-                    initialRows={categoryRows}
-                    categoryId={editingId}
-                    onUpdate={handleUpdate}
+                    initialRows={subCategories.data} // تأكد من أن هذه البيانات موجودة بشكل صحيح
+                    categoryId={editingCategory.id} // تأكد من أن editingCategory.id يحتوي على قيمة صالحة
+                    onUpdate={handleUpdate} // تأكد من أن هذه الدالة موجودة وتعمل بشكل صحيح
+                    categories={categories} // تأكد من أن categories تحتوي على البيانات الصحيحة
                   />
-                ) : (
+                ) : Array.isArray(subCategories?.data) && subCategories.data.length > 0 ? (
                   <table style={{ width: "100%" }}>
                     <thead>
                       <tr>
-                        {columns.map((column, index) => (
-                          <CategoryHeadCell key={index} align={column.align}>
-                            {column.Header}
-                          </CategoryHeadCell>
-                        ))}
+                        <CategoryHeadCell align="center">ID</CategoryHeadCell>
+                        <CategoryHeadCell align="center">اسم الفئة الفرعية</CategoryHeadCell>
+                        <CategoryHeadCell align="center">الوصف</CategoryHeadCell>
+                        <CategoryHeadCell align="center">الفئة الرئيسية</CategoryHeadCell>
+                        <CategoryHeadCell align="center">الإجراءات</CategoryHeadCell>
                       </tr>
                     </thead>
                     <tbody>
-                      {categoryRows.map((row, index) => (
-                        <tr key={index}>
-                          <CategoryBodyCell align="center">{row.id}</CategoryBodyCell>
-                          <CategoryBodyCell align="center">{row.Category}</CategoryBodyCell>
-                          <CategoryBodyCell align="center">{row.text}</CategoryBodyCell>
-                          <CategoryBodyCell align="center">{row.mainCategory}</CategoryBodyCell>
+                      {subCategories.data.map((subCategory) => (
+                        <tr key={subCategory.id}>
+                          <CategoryBodyCell align="center">{subCategory.id}</CategoryBodyCell>
+                          <CategoryBodyCell align="center">{subCategory.name}</CategoryBodyCell>
                           <CategoryBodyCell align="center">
-                            <MDBox
-                              display="flex"
-                              justifyContent="center"
-                              alignItems="center"
-                              sx={{ padding: "0 !important" }}
-                            >
+                            {subCategory.description}
+                          </CategoryBodyCell>
+                          <CategoryBodyCell align="center">
+                            {categories?.data?.find(
+                              (cat) => Number(cat.id) === Number(subCategory.category_id)
+                            )?.name || "غير معروف"}
+                          </CategoryBodyCell>
+                          <CategoryBodyCell align="center">
+                            <MDBox display="flex" justifyContent="center" alignItems="center">
                               <MDButton
                                 variant="text"
                                 color="success"
-                                onClick={() => handleEdit(row.id)}
-                                sx={{ padding: "0 !important" }}
+                                onClick={() => handleEdit(subCategory)}
                               >
                                 <EditIcon sx={{ height: "1.5rem", width: "1.5rem" }} />
                               </MDButton>
                               <MDButton
-                                mx={1}
                                 variant="text"
                                 color="error"
-                                onClick={() => handleDelete(row.id)}
-                                sx={{ padding: "0 !important" }}
+                                onClick={() => handleDeleteDialogOpen(subCategory.id)}
                               >
                                 <DeleteIcon sx={{ height: "1.5rem", width: "1.5rem" }} />
                               </MDButton>
@@ -135,6 +164,10 @@ function SubCategories() {
                       ))}
                     </tbody>
                   </table>
+                ) : (
+                  <MDTypography variant="body1" color="textSecondary">
+                    لا توجد فئات فرعية حالياً.
+                  </MDTypography>
                 )}
               </MDBox>
             </Card>
@@ -142,8 +175,24 @@ function SubCategories() {
         </Grid>
       </MDBox>
       <Footer />
+
+      {/* حوار التأكيد للحذف */}
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <DialogTitle>تأكيد الحذف</DialogTitle>
+        <DialogContent>
+          <DialogContentText>هل أنت متأكد من حذف هذه الفئة الفرعية؟</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <MDButton onClick={() => setDeleteDialogOpen(false)} color="primary">
+            إلغاء
+          </MDButton>
+          <MDButton onClick={handleDeleteConfirm} color="error">
+            حذف
+          </MDButton>
+        </DialogActions>
+      </Dialog>
     </DashboardLayout>
   );
-}
+};
 
 export default SubCategories;
