@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
@@ -7,51 +8,54 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import Addshipping from "./data/Addshipping";
-import TableData from "./data/TableData";
 import UpdateShipping from "./data/UpdateShipping";
+import {
+  fetchDeliveries,
+  addDelivery,
+  updateDelivery,
+  deleteDelivery,
+} from "../../Store/Slices/deliverySlice/deliveryAction";
 import DataproductBodyCell from "../../examples/products/Dataproduct/DataproductBodyCell";
 import DataproductHeadCell from "../../examples/products/Dataproduct/DataproductHeadCell";
 import MDButton from "components/MDButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+
 function Delivery() {
-  const [editingId, setEditingId] = useState(null); // حالة لتتبع الـ ID للتعديل
-  const [DeliveryRows, setDeliveryRows] = useState([]); // حالة لحفظ بيانات الشحنات
-  const [isAddShippingOpen, setIsAddShippingOpen] = useState(false); // حالة لفتح/إغلاق نافذة إضافة الشحنة
+  const dispatch = useDispatch();
+  const { deliveries, loading } = useSelector((state) => state.deliveries);
+  const [editingId, setEditingId] = useState(null);
+  const [isAddShippingOpen, setIsAddShippingOpen] = useState(false);
+
+  useEffect(() => {
+    dispatch(fetchDeliveries());
+  }, [dispatch]);
 
   const handleEdit = (id) => {
-    setEditingId(id); // تعيين الـ ID للتعديل
+    setEditingId(id);
   };
 
   const handleUpdate = (updatedShipping) => {
-    setDeliveryRows((prevRows) =>
-      prevRows.map((row) => (row.id === updatedShipping.id ? updatedShipping : row))
-    );
-    setEditingId(null); // إغلاق نافذة التعديل
+    dispatch(updateDelivery(updatedShipping));
+    setEditingId(null);
   };
 
   const handleDelete = (id) => {
-    setDeliveryRows((prevRows) => prevRows.filter((row) => row.id !== id));
+    dispatch(deleteDelivery(id));
   };
 
   const handleAddShippingOpen = () => {
-    setIsAddShippingOpen(true); // فتح نافذة إضافة الشحنة
+    setIsAddShippingOpen(true);
   };
 
   const handleAddShippingClose = () => {
-    setIsAddShippingOpen(false); // إغلاق نافذة إضافة الشحنة
+    setIsAddShippingOpen(false);
   };
 
   const handleAddShipping = (newShipping) => {
-    setDeliveryRows((prevRows) => [...prevRows, newShipping]); // إضافة الشحنة الجديدة
-    setIsAddShippingOpen(false); // إغلاق نافذة إضافة الشحنة
+    dispatch(addDelivery(newShipping));
+    setIsAddShippingOpen(false);
   };
-
-  const { columns, rows } = TableData(handleEdit); // تمرير دالة handleEdit
-
-  useEffect(() => {
-    setDeliveryRows(rows); // ✅ تحديث DeliveryRows
-  }, [rows]);
 
   return (
     <DashboardLayout>
@@ -80,14 +84,10 @@ function Delivery() {
               </MDBox>
               <MDBox pt={3}>
                 {isAddShippingOpen ? (
-                  <Addshipping
-                    initialRows={rows}
-                    onAdd={handleAddShipping}
-                    onCancel={handleAddShippingClose}
-                  />
+                  <Addshipping onAdd={handleAddShipping} onCancel={handleAddShippingClose} />
                 ) : editingId ? (
                   <UpdateShipping
-                    initialRows={DeliveryRows}
+                    initialRows={deliveries} // تم استبدال DeliveryRows بـ deliveries
                     ShippingId={editingId}
                     onUpdate={handleUpdate}
                   />
@@ -95,37 +95,43 @@ function Delivery() {
                   <table style={{ width: "100%" }}>
                     <thead>
                       <tr>
-                        {columns.map((column, index) => (
-                          <DataproductHeadCell key={index} align={column.align}>
-                            {column.Header}
-                          </DataproductHeadCell>
-                        ))}
+                        <DataproductHeadCell>كود الشحنة</DataproductHeadCell>
+                        <DataproductHeadCell>رقم الزبون</DataproductHeadCell>
+                        <DataproductHeadCell>رقم المنتج</DataproductHeadCell>
+                        <DataproductHeadCell>نوع الشحن</DataproductHeadCell>
+                        <DataproductHeadCell>التكلفة</DataproductHeadCell>
+                        <DataproductHeadCell>العنوان</DataproductHeadCell>
+                        <DataproductHeadCell>الإجراءات</DataproductHeadCell>
                       </tr>
                     </thead>
                     <tbody>
-                      {DeliveryRows.map((row, index) => (
-                        <tr key={index}>
-                          <DataproductBodyCell align="center">{row.id}</DataproductBodyCell>
-                          <DataproductBodyCell align="center">{row.userid}</DataproductBodyCell>
-                          <DataproductBodyCell align="center">{row.proid}</DataproductBodyCell>
-                          <DataproductBodyCell align="center">{row.shipping}</DataproductBodyCell>
-                          <DataproductBodyCell align="center">{row.price}</DataproductBodyCell>
-                          <DataproductBodyCell align="center">{row.adress}</DataproductBodyCell>
-                          <DataproductBodyCell align="center">
-                            <MDBox
-                              display="flex"
-                              justifyContent="center"
-                              alignItems="center"
-                              sx={{ padding: "0 !important" }}
-                            >
+                      {loading ? (
+                        <tr>
+                          <td colSpan="7">جار التحميل...</td>
+                        </tr>
+                      ) : (
+                        deliveries.map((row) => (
+                          <tr key={row.id}>
+                            <DataproductBodyCell align="center">{row.id}</DataproductBodyCell>
+                            <DataproductBodyCell align="center">{row.user_id}</DataproductBodyCell>
+                            <DataproductBodyCell align="center">
+                              {row.product_id}
+                            </DataproductBodyCell>
+                            <DataproductBodyCell align="center">
+                              {row.shipping_type}
+                            </DataproductBodyCell>
+                            <DataproductBodyCell align="center">{row.cost}</DataproductBodyCell>
+                            <DataproductBodyCell align="center">{row.address}</DataproductBodyCell>
+                            <DataproductBodyCell align="center">
                               <MDButton
-                                variant="text"
-                                color="success"
-                                onClick={() => handleEdit(row.id)}
+                                display="flex"
+                                justifyContent="center"
+                                alignItems="center"
                                 sx={{ padding: "0 !important" }}
-                                flex-inline
+                                onClick={() => handleEdit(row.id)}
                               >
                                 <EditIcon
+                                  color="success"
                                   sx={{
                                     height: "1.5rem !important",
                                     width: "1.5rem !important",
@@ -133,14 +139,9 @@ function Delivery() {
                                   }}
                                 />
                               </MDButton>
-                              <MDButton
-                                mx={1}
-                                variant="text"
-                                color="error"
-                                onClick={() => handleDelete(row.id)}
-                                sx={{ padding: "0 !important" }}
-                              >
+                              <MDButton onClick={() => handleDelete(row.id)}>
                                 <DeleteIcon
+                                  color="error"
                                   sx={{
                                     height: "1.5rem !important",
                                     width: "1.5rem !important",
@@ -148,10 +149,10 @@ function Delivery() {
                                   }}
                                 />
                               </MDButton>
-                            </MDBox>
-                          </DataproductBodyCell>
-                        </tr>
-                      ))}
+                            </DataproductBodyCell>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 )}

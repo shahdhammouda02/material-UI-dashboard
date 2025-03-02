@@ -6,7 +6,7 @@ function DataproductHeadCell({ width, children, align }) {
   return (
     <th
       style={{
-        textAlign: align,
+        textAlign: "center !important",
         padding: "12px 16px",
         width: width || "auto",
       }}

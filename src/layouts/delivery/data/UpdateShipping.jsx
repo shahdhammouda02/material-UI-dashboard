@@ -4,149 +4,142 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 import MDInput from "components/MDInput";
-import { Select, MenuItem, InputLabel, FormControl } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  updateDelivery,
+  fetchDeliveries,
+} from "../../../Store/Slices/deliverySlice/deliveryAction";
 
 function UpdateShipping({ initialRows, ShippingId, onUpdate }) {
-  // 🟢 الحالة (State) الخاصة ببيانات النموذج
-  const [formData, setFormData] = useState({
-    id: "",
-    userid: "",
-    proid: "",
-    shipping: "",
-    price: "",
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.deliveries);
+  const [shipping, setShipping] = useState({
+    id: ShippingId || null,
+    user_id: "",
+    product_id: "",
+    shipping_type: "",
+    cost: "",
     address: "",
   });
 
-  // 🔄 تحميل بيانات الشحنة بناءً على ShippingId
   useEffect(() => {
-    const selectedRow = initialRows.find((row) => row.id === ShippingId);
-    if (selectedRow) {
-      setFormData(selectedRow); // نسخ البيانات إلى النموذج
-    } else {
-      console.warn(`No row found with ID: ${ShippingId}`);
+    if (!ShippingId) {
+      console.error("Invalid ShippingId");
+      return;
     }
-  }, [ShippingId, initialRows]);
 
-  // ✍️ تابع لمعالجة المدخلات
-  const handleChange = (e) => {
+    // Search for the selected shipping
+    const existingShipping = initialRows.find((row) => row.id === ShippingId);
+    console.log("Existing Shipping:", existingShipping);
+
+    if (existingShipping) {
+      setShipping({
+        id: existingShipping.id,
+        user_id: existingShipping.user_id || "",
+        product_id: existingShipping.product_id || "",
+        shipping_type: existingShipping.shipping_type || "",
+        cost: existingShipping.cost || "",
+        address: existingShipping.address || "",
+      });
+    } else {
+      console.error(`Shipping with ID ${ShippingId} not found`);
+    }
+  }, [initialRows, ShippingId]);
+
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
+    setShipping((prevShipping) => ({
+      ...prevShipping,
       [name]: value,
     }));
   };
 
-  // ✅ تابع لحفظ التغييرات
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (onUpdate) {
-      onUpdate(formData); // استدعاء الدالة لتحديث البيانات في المكون الرئيسي
+    if (
+      !shipping.user_id ||
+      !shipping.product_id ||
+      !shipping.shipping_type ||
+      !shipping.cost ||
+      !shipping.address
+    ) {
+      return;
     }
-  };
 
-  // ❌ تابع لإلغاء التعديلات
-  const handleCancel = () => {
-    if (onUpdate) {
-      onUpdate(formData); // إرسال null لإغلاق النموذج
-    }
+    console.log("Submitting shipping data:", shipping);
+
+    dispatch(updateDelivery({ id: shipping.id, updatedData: shipping })).then((result) => {
+      if (result.meta.requestStatus === "fulfilled") {
+        onUpdate(shipping); // Update data in UI
+        dispatch(fetchDeliveries()); // Reload data after update
+      }
+    });
   };
 
   return (
     <MDBox p={3}>
-      {/* 🔶 عنوان النموذج */}
       <MDTypography variant="h5" mb={2}>
         تعديل معلومات التوصيل
       </MDTypography>
-
-      {/* 📝 نموذج التعديل */}
       <form onSubmit={handleSubmit}>
-        {/* 🆔 حقل: رقم الشحنة (عرض فقط) */}
         <MDBox mb={2}>
-          <MDInput
-            type="text"
-            label="رقم الشحنة"
-            name="id"
-            value={formData.id}
-            onChange={handleChange}
-            disabled
-            fullWidth
-          />
+          <MDInput label="رقم الشحنة" name="id" value={shipping.id} disabled fullWidth />
         </MDBox>
-
-        {/* 👤 حقل: رقم المستخدم */}
         <MDBox mb={2}>
           <MDInput
-            type="text"
             label="رقم المستخدم"
-            name="userid"
-            value={formData.userid}
-            onChange={handleChange}
+            name="user_id"
+            value={shipping.user_id}
+            onChange={handleInputChange}
             fullWidth
           />
         </MDBox>
-
-        {/* 🛒 حقل: رقم المنتج */}
         <MDBox mb={2}>
           <MDInput
-            type="text"
             label="رقم المنتج"
-            name="proid"
-            value={formData.proid}
-            onChange={handleChange}
+            name="product_id"
+            value={shipping.product_id}
+            onChange={handleInputChange}
             fullWidth
           />
         </MDBox>
-
-        {/* 🚚 حقل: طريقة الشحن (قائمة منسدلة) */}
         <MDBox mb={2}>
-          <FormControl fullWidth>
-            <InputLabel>طريقة الشحن</InputLabel>
-            <Select
-              label="طريقة الشحن"
-              name="shipping"
-              value={formData.shipping}
-              onChange={handleChange}
-              sx={{ height: "40px" }}
-            >
-              <MenuItem value="عادي">عادي</MenuItem>
-              <MenuItem value="سريع">سريع</MenuItem>
-              <MenuItem value="مجاني">مجاني</MenuItem>
-            </Select>
-          </FormControl>
+          <MDInput
+            label="طريقة الشحن"
+            name="shipping_type"
+            value={shipping.shipping_type}
+            onChange={handleInputChange}
+            fullWidth
+          />
         </MDBox>
-
-        {/* 💰 حقل: السعر */}
         <MDBox mb={2}>
           <MDInput
             label="السعر"
-            name="price"
-            value={formData.price}
-            onChange={handleChange}
+            name="cost"
+            value={shipping.cost}
+            onChange={handleInputChange}
             fullWidth
           />
         </MDBox>
-
-        {/* 🏠 حقل: العنوان */}
         <MDBox mb={2}>
           <MDInput
-            type="text"
             label="العنوان"
             name="address"
-            value={formData.address}
-            onChange={handleChange}
+            value={shipping.address}
+            onChange={handleInputChange}
             fullWidth
           />
         </MDBox>
-
-        {/* 🔘 أزرار التحكم */}
+        {error && (
+          <MDBox mb={2}>
+            <MDTypography color="error">{error}</MDTypography>
+          </MDBox>
+        )}
         <MDBox display="flex" justifyContent="space-between">
-          {/* ✅ زر الحفظ */}
-          <MDButton variant="gradient" color="success" type="submit">
-            حفظ التعديلات
+          <MDButton variant="gradient" color="success" type="submit" disabled={loading}>
+            {loading ? "جاري الحفظ..." : "حفظ التعديلات"}
           </MDButton>
-
-          {/* ❌ زر الإلغاء */}
-          <MDButton variant="gradient" color="error" onClick={handleCancel}>
+          <MDButton variant="gradient" color="error" onClick={() => onUpdate(null)}>
             إلغاء
           </MDButton>
         </MDBox>
@@ -155,15 +148,14 @@ function UpdateShipping({ initialRows, ShippingId, onUpdate }) {
   );
 }
 
-// ⚙️ إعدادات PropTypes لضمان سلامة المدخلات
 UpdateShipping.propTypes = {
   initialRows: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
-      userid: PropTypes.string.isRequired,
-      proid: PropTypes.string.isRequired,
-      shipping: PropTypes.string.isRequired,
-      price: PropTypes.number.isRequired,
+      user_id: PropTypes.string.isRequired,
+      product_id: PropTypes.string.isRequired,
+      shipping_type: PropTypes.string.isRequired,
+      cost: PropTypes.string.isRequired,
       address: PropTypes.string.isRequired,
     })
   ).isRequired,

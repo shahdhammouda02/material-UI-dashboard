@@ -1,36 +1,74 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 import MDInput from "components/MDInput";
-import MDIconButton from "@mui/material/IconButton";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import { Select, MenuItem, FormControl, InputLabel } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { addDelivery } from "../../../Store/Slices/deliverySlice/deliveryAction";
 
-function AddShipping({ initialRows, onAdd, onCancel, onDelete }) {
+const AddShipping = ({ onCancel }) => {
+  const dispatch = useDispatch();
+  const { deliveries } = useSelector((state) => state.deliveries);
+
+  // الحالة الأولية مع الأسماء الصحيحة للحقول
   const [formData, setFormData] = useState({
-    id: "",
-    userid: "",
-    proid: "",
-    shipping: "",
-    price: "",
-    adress: "",
+    user_id: "",
+    product_id: "",
+    shipping_type: "",
+    cost: "",
+    address: "",
   });
-
-  // Automatically generate the next shipping ID
-  useEffect(() => {
-    const highestExistingId =
-      initialRows.length > 0 ? Math.max(...initialRows.map((row) => row.id)) : 0;
-    setFormData((prevData) => ({
-      ...prevData,
-      id: highestExistingId + 1,
-    }));
-  }, [initialRows]);
 
   const [error, setError] = useState("");
 
+  // التحقق من الحقول المطلوبة واستدعاء الـ API
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // التحقق من أن جميع الحقول ليست فارغة
+    if (
+      !formData.user_id ||
+      !formData.product_id ||
+      !formData.shipping_type ||
+      !formData.cost ||
+      !formData.address
+    ) {
+      setError("من فضلك قم بملء جميع الحقول بشكل صحيح.");
+      return;
+    }
+
+    setError("");
+
+    try {
+      const highestExistingId =
+        deliveries.length > 0 ? Math.max(...deliveries.map((row) => row.id)) : 0;
+
+      const newShipping = {
+        ...formData,
+        id: highestExistingId + 1,
+      };
+
+      const res = await dispatch(addDelivery(newShipping)).unwrap();
+
+      console.log("🔹 API Response:", res);
+
+      if (res?.message === "Delivery created successfully") {
+        alert(res?.message || "تم إضافة الشحنة بنجاح!");
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+      } else {
+        alert("حدث خطأ أثناء إضافة الشحنة.");
+      }
+    } catch (error) {
+      console.error("❌ Error:", error);
+      alert("حدث خطأ غير متوقع.");
+    }
+  };
+
+  // تحديث بيانات النموذج عند تغيير المدخلات
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -39,72 +77,17 @@ function AddShipping({ initialRows, onAdd, onCancel, onDelete }) {
     }));
   };
 
-  const handleEditClick = (id) => {
-    console.log(`Editing product with ID: ${id}`);
-    // Add your editing logic here
-  };
-
-  const handleDeleteClick = (id) => {
-    if (onDelete) {
-      onDelete(id); // Pass the ID to the parent for deletion
-    }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (
-      !formData.userid ||
-      !formData.proid ||
-      !formData.shipping ||
-      !formData.price ||
-      !formData.adress
-    ) {
-      setError("من فضلك قم بملء جميع الحقول بشكل صحيح.");
-      return;
-    }
-
-    setError("");
-
-    const newShipping = {
-      ...formData,
-      actions: (
-        <MDBox display="flex" justifyContent="center" alignItems="center">
-          <MDIconButton color="success" onClick={() => handleEditClick(formData.id)}>
-            <EditIcon />
-          </MDIconButton>
-          <MDBox mx={1} />
-          <MDIconButton color="error" onClick={() => handleDeleteClick(formData.id)}>
-            <DeleteIcon />
-          </MDIconButton>
-        </MDBox>
-      ),
-    };
-
-    onAdd(newShipping); // Add the new shipping entry
-    setFormData((prevData) => ({
-      ...prevData,
-      userid: "",
-      proid: "",
-      shipping: "",
-      price: "",
-      adress: "",
-    }));
-  };
-
   return (
     <MDBox p={3}>
       <MDTypography variant="h5" mb={2}>
-        اضافة شحنة
+        إضافة شحنة جديدة
       </MDTypography>
       <form onSubmit={handleSubmit}>
         <MDBox mb={2}>
-          <MDInput label="رقم الشحنة" name="id" value={formData.id} fullWidth disabled />
-        </MDBox>
-        <MDBox mb={2}>
           <MDInput
             label="رقم المستخدم"
-            name="userid"
-            value={formData.userid}
+            name="user_id"
+            value={formData.user_id}
             onChange={handleInputChange}
             fullWidth
           />
@@ -112,8 +95,8 @@ function AddShipping({ initialRows, onAdd, onCancel, onDelete }) {
         <MDBox mb={2}>
           <MDInput
             label="رقم المنتج"
-            name="proid"
-            value={formData.proid}
+            name="product_id"
+            value={formData.product_id}
             onChange={handleInputChange}
             fullWidth
           />
@@ -123,22 +106,22 @@ function AddShipping({ initialRows, onAdd, onCancel, onDelete }) {
             <InputLabel>نوع الشحن</InputLabel>
             <Select
               label="نوع الشحن"
-              name="shipping"
-              value={formData.shipping}
+              name="shipping_type"
+              value={formData.shipping_type}
               onChange={handleInputChange}
               sx={{ height: "40px" }}
             >
-              <MenuItem value="مجاني">مجاني</MenuItem>
-              <MenuItem value="عادي">عادي</MenuItem>
-              <MenuItem value="سريع">سريع</MenuItem>
+              <MenuItem value="Free">مجاني</MenuItem>
+              <MenuItem value="Standard">عادي</MenuItem>
+              <MenuItem value="Express">سريع</MenuItem>
             </Select>
           </FormControl>
         </MDBox>
         <MDBox mb={2}>
           <MDInput
             label="السعر"
-            name="price"
-            value={formData.price}
+            name="cost"
+            value={formData.cost}
             onChange={handleInputChange}
             fullWidth
           />
@@ -146,17 +129,19 @@ function AddShipping({ initialRows, onAdd, onCancel, onDelete }) {
         <MDBox mb={2}>
           <MDInput
             label="العنوان"
-            name="adress"
-            value={formData.adress}
+            name="address"
+            value={formData.address}
             onChange={handleInputChange}
             fullWidth
           />
         </MDBox>
+
         {error && (
           <MDTypography color="error" mb={2}>
             {error}
           </MDTypography>
         )}
+
         <MDBox display="flex" justifyContent="space-between">
           <MDButton variant="gradient" color="success" type="submit">
             حفظ
@@ -168,27 +153,10 @@ function AddShipping({ initialRows, onAdd, onCancel, onDelete }) {
       </form>
     </MDBox>
   );
-}
-
-AddShipping.propTypes = {
-  initialRows: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      userid: PropTypes.string,
-      proid: PropTypes.string,
-      shipping: PropTypes.string,
-      price: PropTypes.string,
-      adress: PropTypes.string,
-    })
-  ),
-  onAdd: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired,
-  onDelete: PropTypes.func, // Function to handle deletion
 };
 
-AddShipping.defaultProps = {
-  initialRows: [],
-  onDelete: null,
+AddShipping.propTypes = {
+  onCancel: PropTypes.func.isRequired,
 };
 
 export default AddShipping;

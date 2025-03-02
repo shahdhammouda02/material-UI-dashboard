@@ -1,31 +1,57 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 import MDInput from "components/MDInput";
-import { useDropzone } from "react-dropzone";
+import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { updateProduct } from "../../../Store/Slices/productsSlice/productsAction";
+import { fetchCategories } from "../../../Store/Slices/mainCategory/mainCategoryAction";
+import { fetchSubCategories } from "../../../Store/Slices/subCategory/subCategoryAction";
 
-const UpdateProduct = ({ initialRows, productId, onUpdate }) => {
+function UpdateProduct({ initialRows, productId, onUpdate }) {
+  const dispatch = useDispatch();
+  const { categories = { data: [] } } = useSelector((state) => state.categories);
+  const { subCategories = { data: [] } } = useSelector((state) => state.subCategories);
+  const { loading, error } = useSelector((state) => state.products);
+
   const [product, setProduct] = useState({
-    id: productId,
-    author: "",
-    Category: "",
-    subcategory: "", // Added subcategory
-    image: "",
+    id: productId || null,
+    name: "",
+    description: "",
     price: "",
     discount: "",
-    description: "",
+    image: "",
+    category_id: "",
+    subcategory_id: "",
   });
 
-  const [error, setError] = useState("");
+  useEffect(() => {
+    dispatch(fetchCategories());
+    dispatch(fetchSubCategories());
+  }, [dispatch]);
 
   useEffect(() => {
+    if (!productId) {
+      console.error("❌ خطأ: رقم المنتج غير صالح.");
+      return;
+    }
+
     const existingProduct = initialRows.find((row) => row.id === productId);
     if (existingProduct) {
-      setProduct(existingProduct); // Corrected: Update product state
+      setProduct({
+        id: existingProduct.id,
+        name: existingProduct.name || "",
+        description: existingProduct.description || "",
+        price: existingProduct.price || "",
+        discount: existingProduct.discount || "",
+        image: existingProduct.image || "",
+        category_id: existingProduct.category_id || "",
+        subcategory_id: existingProduct.subcategory_id || "",
+      });
     } else {
-      console.error(`Product with ID ${productId} not found`);
+      console.error(`❌ المنتج برقم ${productId} غير موجود.`);
     }
   }, [initialRows, productId]);
 
@@ -37,39 +63,71 @@ const UpdateProduct = ({ initialRows, productId, onUpdate }) => {
     }));
   };
 
-  const handleDrop = (acceptedFiles) => {
-    const file = acceptedFiles[0];
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
     if (file) {
-      setProduct((prevProduct) => ({
-        ...prevProduct,
-        image: URL.createObjectURL(file), // Update with the file URL
-      }));
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProduct((prevProduct) => ({
+          ...prevProduct,
+          image: reader.result,
+        }));
+      };
+      reader.readAsDataURL(file);
     }
   };
 
-  const { getRootProps, getInputProps } = useDropzone({
-    onDrop: handleDrop,
-    accept: "image/*", // Allow only image files
-  });
+  const handleCategoryChange = (e) => {
+    const selectedCategoryId = e.target.value;
+    setProduct((prevProduct) => ({
+      ...prevProduct,
+      category_id: selectedCategoryId,
+      subcategory_id: "",
+    }));
+  };
+
+  const handleSubCategoryChange = (e) => {
+    setProduct((prevProduct) => ({
+      ...prevProduct,
+      subcategory_id: e.target.value,
+    }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (
-      !product.author ||
-      !product.Category ||
-      !product.subcategory || // Added subcategory validation
-      !product.image ||
-      !product.price ||
-      !product.discount ||
-      !product.description
-    ) {
-      setError("Please fill in all fields correctly.");
+    if (!product.name || !product.description || !product.price || !product.category_id) {
+      alert("❌ يرجى ملء جميع الحقول المطلوبة.");
       return;
     }
 
-    setError("");
-    onUpdate(product); // Call the update function passed as a prop
+    const updatedProduct = {
+      ...product,
+      price: Number(product.price),
+      discount: Number(product.discount) || 0,
+      category_id: Number(product.category_id),
+      subcategory_id: product.subcategory_id ? Number(product.subcategory_id) : null,
+    };
+
+    dispatch(updateProduct({ id: product.id, updatedData: updatedProduct })).then((result) => {
+      if (result.meta.requestStatus === "fulfilled") {
+        onUpdate(updatedProduct);
+      } else {
+        console.error("❌ تحديث المنتج فشل:", result.error?.message || result);
+      }
+    });
   };
+
+  const filteredSubcategories = useMemo(() => {
+    return product.category_id
+      ? subCategories?.data?.filter(
+          (sub) => String(sub.category_id) === String(product.category_id)
+        ) || []
+      : [];
+  }, [product.category_id, subCategories]);
+
+  if (!categories?.data || !subCategories?.data) {
+    return <MDTypography color="textSecondary">تحميل البيانات...</MDTypography>;
+  }
 
   return (
     <MDBox p={3}>
@@ -78,60 +136,27 @@ const UpdateProduct = ({ initialRows, productId, onUpdate }) => {
       </MDTypography>
       <form onSubmit={handleSubmit}>
         <MDBox mb={2}>
-          <MDInput disabled label="الرقم التعريفي" value={product.id} fullWidth />
+          <MDInput label="رقم المنتج" name="id" value={product.id} disabled fullWidth />
         </MDBox>
         <MDBox mb={2}>
           <MDInput
             label="اسم المنتج"
-            name="author"
-            value={product.author}
+            name="name"
+            value={product.name}
             onChange={handleInputChange}
             fullWidth
           />
         </MDBox>
         <MDBox mb={2}>
           <MDInput
-            label="الفئة"
-            name="Category"
-            value={product.Category}
+            label="الوصف"
+            name="description"
+            value={product.description}
             onChange={handleInputChange}
             fullWidth
+            multiline
+            rows={4}
           />
-        </MDBox>
-        <MDBox mb={2}>
-          <MDInput
-            label="الفئة الفرعية" // Added subcategory field
-            name="subcategory"
-            value={product.subcategory}
-            onChange={handleInputChange}
-            fullWidth
-          />
-        </MDBox>
-        <MDBox
-          mb={2}
-          border="2px dashed #ccc"
-          p={2}
-          textAlign="center"
-          onClick={getRootProps().onClick}
-          onDragOver={getRootProps().onDragOver}
-          onDragEnter={getRootProps().onDragEnter}
-          onDragLeave={getRootProps().onDragLeave}
-          onDrop={getRootProps().onDrop}
-        >
-          <input
-            type="file"
-            accept="image/*"
-            onChange={getInputProps().onChange}
-            style={{ display: "none" }}
-          />
-          <p>اسحب وأفلت صورة هنا أو انقر لاختيار صورة</p>
-          {product.image && (
-            <img
-              src={product.image}
-              alt="Product"
-              style={{ width: "100%", maxHeight: "200px", objectFit: "contain" }}
-            />
-          )}
         </MDBox>
         <MDBox mb={2}>
           <MDInput
@@ -151,51 +176,77 @@ const UpdateProduct = ({ initialRows, productId, onUpdate }) => {
             fullWidth
           />
         </MDBox>
+
         <MDBox mb={2}>
-          <MDInput
-            label="الوصف"
-            name="description"
-            value={product.description}
-            onChange={handleInputChange}
-            fullWidth
-          />
+          <FormControl fullWidth>
+            <InputLabel>اختر الفئة</InputLabel>
+            <Select
+              name="category_id"
+              value={product.category_id || ""}
+              onChange={handleCategoryChange}
+            >
+              {categories?.data?.length > 0 ? (
+                categories.data.map((category) => (
+                  <MenuItem key={category.id} value={String(category.id)}>
+                    {category.name}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>لا توجد فئات متاحة</MenuItem>
+              )}
+            </Select>
+          </FormControl>
         </MDBox>
-        {error && (
-          <MDBox mb={2}>
-            <MDTypography color="error">{error}</MDTypography>
-          </MDBox>
-        )}
+
+        <MDBox mb={2}>
+          <FormControl fullWidth>
+            <InputLabel>اختر الفئة الفرعية</InputLabel>
+            <Select
+              name="subcategory_id"
+              value={product.subcategory_id || ""}
+              onChange={handleSubCategoryChange}
+              disabled={!product.category_id}
+            >
+              {filteredSubcategories.length > 0 ? (
+                filteredSubcategories.map((subcategory) => (
+                  <MenuItem key={subcategory.id} value={String(subcategory.id)}>
+                    {subcategory.name}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>لا توجد فئات فرعية متاحة</MenuItem>
+              )}
+            </Select>
+          </FormControl>
+        </MDBox>
+
+        <MDBox mb={2}>
+          <input type="file" accept="image/*" onChange={handleImageChange} />
+          {product.image && (
+            <MDBox mt={1}>
+              <img src={product.image} alt="معاينة الصورة" width="100" height="100" />
+            </MDBox>
+          )}
+        </MDBox>
+
+        {error && <MDTypography color="error">{error}</MDTypography>}
+
         <MDBox display="flex" justifyContent="space-between">
-          <MDButton variant="gradient" color="success" type="submit">
-            حفظ التعديلات
+          <MDButton variant="gradient" color="success" type="submit" disabled={loading}>
+            {loading ? "جاري الحفظ..." : "حفظ التعديلات"}
           </MDButton>
-          <MDButton
-            variant="gradient"
-            color="error"
-            onClick={() => onUpdate(productId ? product : null)} // Ensure to handle cancellation
-          >
+          <MDButton variant="gradient" color="error" onClick={() => onUpdate(null)}>
             إلغاء
           </MDButton>
         </MDBox>
       </form>
     </MDBox>
   );
-};
+}
 
 UpdateProduct.propTypes = {
-  initialRows: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-      author: PropTypes.string.isRequired,
-      Category: PropTypes.string.isRequired,
-      subcategory: PropTypes.string.isRequired, // Added subcategory
-      image: PropTypes.string.isRequired,
-      price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-      discount: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-      description: PropTypes.string.isRequired,
-    })
-  ).isRequired,
-  productId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  initialRows: PropTypes.array.isRequired,
+  productId: PropTypes.number.isRequired,
   onUpdate: PropTypes.func.isRequired,
 };
 

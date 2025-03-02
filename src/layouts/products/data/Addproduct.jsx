@@ -1,219 +1,155 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 import MDInput from "components/MDInput";
-import MDIconButton from "@mui/material/IconButton";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { useDropzone } from "react-dropzone";
+import { useDispatch, useSelector } from "react-redux";
+import axiosFetching from "../../../API/axiosFetching";
+import { useNavigate } from "react-router-dom";
+import { fetchCategories } from "../../../Store/Slices/mainCategory/mainCategoryAction";
+import { fetchSubCategories } from "../../../Store/Slices/subCategory/subCategoryAction";
 
-const AddProduct = ({ initialRows, onAdd, onCancel, onDelete }) => {
-  const [newProduct, setNewProduct] = useState({
-    id: "",
-    author: "",
-    Category: "",
-    subcategory: "", // Added subcategory
-    image: "",
-    price: "",
-    discount: "",
-    description: "",
-  });
+const AddProduct = ({ onCancel }) => {
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const [discount, setDiscount] = useState("");
+  const [image, setImage] = useState(null);
+  const [categoryId, setCategoryId] = useState("");
+  const [subcategoryId, setSubcategoryId] = useState("");
+  const [localError, setLocalError] = useState(null);
 
-  const [error, setError] = useState("");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { categories } = useSelector((state) => state.categories);
+  const { subCategories } = useSelector((state) => state.subCategories);
 
   useEffect(() => {
-    const highestExistingId =
-      initialRows.length > 0 ? Math.max(...initialRows.map((row) => row.id)) : 0;
-    setNewProduct((prev) => ({
-      ...prev,
-      id: highestExistingId + 1,
-    }));
-  }, [initialRows]);
+    dispatch(fetchCategories());
+    dispatch(fetchSubCategories());
+  }, [dispatch]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewProduct((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) setImage(file);
   };
 
-  const handleDrop = (acceptedFiles) => {
-    const file = acceptedFiles[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setNewProduct((prev) => ({ ...prev, image: reader.result }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop: handleDrop,
-    accept: "image/*",
-    multiple: false,
-  });
-
-  const validateForm = () => {
-    return Object.values(newProduct).every((value) => {
-      return String(value).trim() !== "";
-    });
-  };
-
-  const handleSubmit = (e) => {
+  const handleAddProduct = async (e) => {
     e.preventDefault();
+    setLocalError(null);
 
-    if (!validateForm()) {
-      setError("من فضلك قم بملء جميع الحقول بشكل صحيح.");
+    if (!name.trim() || !price.trim() || !categoryId || !image) {
+      setLocalError("الرجاء ملء جميع الحقول المطلوبة.");
       return;
     }
 
-    setError("");
-    const newProductData = {
-      ...newProduct,
-      actions: (
-        <MDBox display="flex" justifyContent="center" alignItems="center">
-          <MDIconButton
-            color="success"
-            onClick={() => console.log(`Editing product with ID: ${newProduct.id}`)}
-          >
-            <EditIcon />
-          </MDIconButton>
-          <MDBox mx={1} />
-          <MDIconButton color="error" onClick={() => onDelete && onDelete(newProduct.id)}>
-            <DeleteIcon />
-          </MDIconButton>
-        </MDBox>
-      ),
-    };
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("description", description);
+    formData.append("price", price);
+    formData.append("discount", discount);
+    formData.append("image", image);
+    formData.append("category_id", categoryId);
+    formData.append("subcategory_id", subcategoryId);
 
-    onAdd(newProductData);
-    resetForm();
+    try {
+      await axiosFetching.post("/products", formData);
+      navigate("/products");
+    } catch (error) {
+      console.log("Server Error:", error.response?.data);
+      setLocalError(error.response?.data?.message || "حدث خطأ أثناء الإضافة.");
+    }
   };
 
-  const resetForm = () => {
-    setNewProduct({
-      id: "",
-      author: "",
-      Category: "",
-      subcategory: "", // Reset subcategory
-      image: "",
-      price: "",
-      discount: "",
-      description: "",
-    });
-    setError("");
-  };
-
-  const handleCancel = () => {
-    resetForm();
-    onCancel();
-  };
+  const filteredSubcategories = useMemo(() => {
+    return categoryId
+      ? subCategories?.data?.filter((sub) => sub.category_id === categoryId) || []
+      : [];
+  }, [categoryId, subCategories]);
 
   return (
     <MDBox p={3}>
       <MDTypography variant="h5" mb={2}>
         إضافة منتج جديد
       </MDTypography>
-      <form onSubmit={handleSubmit}>
-        <MDBox mb={2}>
-          <MDInput label="الرقم التعريفي" name="id" value={newProduct.id} fullWidth disabled />
-        </MDBox>
+      <form onSubmit={handleAddProduct}>
         <MDBox mb={2}>
           <MDInput
-            label="الاسم"
-            name="author"
-            value={newProduct.author}
-            onChange={handleInputChange}
-            fullWidth
-          />
-        </MDBox>
-        <MDBox mb={2}>
-          <MDInput
-            label="الفئة"
-            name="Category"
-            value={newProduct.Category}
-            onChange={handleInputChange}
-            fullWidth
-          />
-        </MDBox>
-        <MDBox mb={2}>
-          <MDInput
-            label="الفئة الفرعية" // Added subcategory field
-            name="subcategory"
-            value={newProduct.subcategory}
-            onChange={handleInputChange}
-            fullWidth
-          />
-        </MDBox>
-        <MDBox
-          mb={2}
-          border="1px dashed #ccc"
-          p={2}
-          textAlign="center"
-          onClick={getRootProps().onClick}
-          onDragOver={getRootProps().onDragOver}
-          onDragEnter={getRootProps().onDragEnter}
-          onDragLeave={getRootProps().onDragLeave}
-          onDrop={getRootProps().onDrop}
-        >
-          <input
-            type="file"
-            accept="image/*"
-            onChange={getInputProps().onChange}
-            style={{ display: "none" }}
-          />
-          {isDragActive ? (
-            <MDTypography>أسقط الصورة هنا...</MDTypography>
-          ) : (
-            <MDTypography>اسحب وأسقط الصورة هنا، أو انقر لاختيار صورة</MDTypography>
-          )}
-        </MDBox>
-        <MDBox mb={2}>
-          {newProduct.image && (
-            <img
-              src={newProduct.image}
-              alt="Preview"
-              style={{ maxWidth: "100%", height: "auto", borderRadius: "8px" }}
-            />
-          )}
-        </MDBox>
-        <MDBox mb={2}>
-          <MDInput
-            label="السعر"
-            name="price"
-            type="number"
-            value={newProduct.price}
-            onChange={handleInputChange}
-            fullWidth
-          />
-        </MDBox>
-        <MDBox mb={2}>
-          <MDInput
-            label="الخصم"
-            name="discount"
-            type="number"
-            value={newProduct.discount}
-            onChange={handleInputChange}
+            label="اسم المنتج"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             fullWidth
           />
         </MDBox>
         <MDBox mb={2}>
           <MDInput
             label="الوصف"
-            name="description"
-            value={newProduct.description}
-            onChange={handleInputChange}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            fullWidth
+          />
+        </MDBox>
+        <MDBox mb={2}>
+          <MDInput
+            label="السعر"
+            type="number"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            fullWidth
+          />
+        </MDBox>
+        <MDBox mb={2}>
+          <MDInput
+            label="الخصم"
+            type="number"
+            value={discount}
+            onChange={(e) => setDiscount(e.target.value)}
             fullWidth
           />
         </MDBox>
 
-        {error && (
+        <MDBox mb={2}>
+          <FormControl fullWidth>
+            <InputLabel>اختر الفئة</InputLabel>
+            <Select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
+              {categories?.data?.length > 0 ? (
+                categories.data.map((category) => (
+                  <MenuItem key={category.id} value={category.id}>
+                    {category.name}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>لا توجد فئات متاحة</MenuItem>
+              )}
+            </Select>
+          </FormControl>
+        </MDBox>
+
+        <MDBox mb={2}>
+          <FormControl fullWidth>
+            <InputLabel>اختر الفئة الفرعية</InputLabel>
+            <Select value={subcategoryId} onChange={(e) => setSubcategoryId(e.target.value)}>
+              {filteredSubcategories.length > 0 ? (
+                filteredSubcategories.map((subcategory) => (
+                  <MenuItem key={subcategory.id} value={subcategory.id}>
+                    {subcategory.name}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>لا توجد فئات فرعية متاحة</MenuItem>
+              )}
+            </Select>
+          </FormControl>
+        </MDBox>
+
+        <MDBox mb={2}>
+          <MDInput type="file" onChange={handleImageChange} fullWidth />
+        </MDBox>
+        {localError && (
           <MDTypography color="error" mb={2}>
-            {error}
+            {localError}
           </MDTypography>
         )}
 
@@ -221,7 +157,7 @@ const AddProduct = ({ initialRows, onAdd, onCancel, onDelete }) => {
           <MDButton variant="gradient" color="success" type="submit">
             حفظ
           </MDButton>
-          <MDButton variant="gradient" color="error" onClick={handleCancel}>
+          <MDButton variant="gradient" color="error" onClick={onCancel}>
             إلغاء
           </MDButton>
         </MDBox>
@@ -231,19 +167,7 @@ const AddProduct = ({ initialRows, onAdd, onCancel, onDelete }) => {
 };
 
 AddProduct.propTypes = {
-  initialRows: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-    })
-  ),
-  onAdd: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
-  onDelete: PropTypes.func,
-};
-
-AddProduct.defaultProps = {
-  initialRows: [],
-  onDelete: null,
 };
 
 export default AddProduct;
