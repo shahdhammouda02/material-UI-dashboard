@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
@@ -7,32 +8,40 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import Addproduct from "./data/Addproduct";
-import TableData from "./data/TableData";
 import UpdateProduct from "./data/UpdateProduct";
+import {
+  fetchProducts,
+  addProduct,
+  updateProduct,
+  deleteProduct,
+} from "../../Store/Slices/productsSlice/productsAction";
 import DataproductBodyCell from "../../examples/products/Dataproduct/DataproductBodyCell";
 import DataproductHeadCell from "../../examples/products/Dataproduct/DataproductHeadCell";
 import MDButton from "components/MDButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const Products = () => {
+function Products() {
+  const dispatch = useDispatch();
+  const { products, loading } = useSelector((state) => state.products);
   const [editingId, setEditingId] = useState(null);
-  const [productRows, setProductRows] = useState([]);
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
+
+  useEffect(() => {
+    dispatch(fetchProducts());
+  }, [dispatch]);
 
   const handleEdit = (id) => {
     setEditingId(id);
   };
 
   const handleUpdate = (updatedProduct) => {
-    setProductRows((prevRows) =>
-      prevRows.map((row) => (row.id === updatedProduct.id ? updatedProduct : row))
-    );
+    dispatch(updateProduct(updatedProduct));
     setEditingId(null);
   };
 
   const handleDelete = (id) => {
-    setProductRows((prevRows) => prevRows.filter((row) => row.id !== id));
+    dispatch(deleteProduct(id));
   };
 
   const handleAddProductOpen = () => {
@@ -44,15 +53,9 @@ const Products = () => {
   };
 
   const handleAddProduct = (newProduct) => {
-    setProductRows((prevRows) => [...prevRows, newProduct]);
+    dispatch(addProduct(newProduct));
     setIsAddProductOpen(false);
   };
-
-  const { columns, rows } = TableData({ handleEdit, handleDelete });
-
-  useEffect(() => {
-    setProductRows(rows);
-  }, [rows]);
 
   return (
     <DashboardLayout>
@@ -76,19 +79,15 @@ const Products = () => {
                   جدول المنتجات
                 </MDTypography>
                 <MDButton variant="gradient" color="success" onClick={handleAddProductOpen}>
-                  اضافة منتج
+                  إضافة منتج
                 </MDButton>
               </MDBox>
               <MDBox pt={3}>
                 {isAddProductOpen ? (
-                  <Addproduct
-                    initialRows={rows}
-                    onAdd={handleAddProduct}
-                    onCancel={handleAddProductClose}
-                  />
+                  <Addproduct onAdd={handleAddProduct} onCancel={handleAddProductClose} />
                 ) : editingId ? (
                   <UpdateProduct
-                    initialRows={productRows}
+                    initialRows={products}
                     productId={editingId}
                     onUpdate={handleUpdate}
                   />
@@ -96,56 +95,70 @@ const Products = () => {
                   <table style={{ width: "100%" }}>
                     <thead>
                       <tr>
-                        {columns.map((column, index) => (
-                          <DataproductHeadCell key={index} align={column.align}>
-                            {column.Header}
-                          </DataproductHeadCell>
-                        ))}
+                        <DataproductHeadCell>كود المنتج</DataproductHeadCell>
+                        <DataproductHeadCell>الفئة</DataproductHeadCell>
+                        <DataproductHeadCell>الفئة الفرعية</DataproductHeadCell>
+                        <DataproductHeadCell>الصورة</DataproductHeadCell>
+                        <DataproductHeadCell>السعر</DataproductHeadCell>
+                        <DataproductHeadCell>الخصم</DataproductHeadCell>
+                        <DataproductHeadCell>الوصف</DataproductHeadCell>
+                        <DataproductHeadCell>الإجراءات</DataproductHeadCell>
                       </tr>
                     </thead>
                     <tbody>
-                      {productRows.map((row, index) => (
-                        <tr key={index}>
-                          <DataproductBodyCell align="center">{row.id}</DataproductBodyCell>
-                          <DataproductBodyCell align="center">{row.author}</DataproductBodyCell>
-                          <DataproductBodyCell align="center">{row.Category}</DataproductBodyCell>
-                          <DataproductBodyCell align="center">
-                            {row.subcategory}
-                          </DataproductBodyCell>
-                          <DataproductBodyCell align="center">{row.images}</DataproductBodyCell>
-                          <DataproductBodyCell align="center">{row.price}</DataproductBodyCell>
-                          <DataproductBodyCell align="center">{row.discount}</DataproductBodyCell>
-                          <DataproductBodyCell align="center">
-                            {row.description}
-                          </DataproductBodyCell>
-                          <DataproductBodyCell>
-                            <MDBox
-                              display="flex"
-                              justifyContent="center"
-                              alignItems="center"
-                              sx={{ padding: "0 !important" }}
-                            >
+                      {loading ? (
+                        <tr>
+                          <td colSpan="8" style={{ textAlign: "center" }}>
+                            جار التحميل...
+                          </td>
+                        </tr>
+                      ) : products.length > 0 ? (
+                        products.map((row) => (
+                          <tr key={row.id}>
+                            <DataproductBodyCell align="center">{row.id}</DataproductBodyCell>
+                            <DataproductBodyCell align="center">
+                              {row.category?.name || row.category}
+                            </DataproductBodyCell>
+                            <DataproductBodyCell align="center">
+                              {row.subcategory?.name || row.subcategory}
+                            </DataproductBodyCell>
+                            <DataproductBodyCell align="center">
+                              {row.images && typeof row.images === "object" ? (
+                                <img src={row.images.url} alt="product" width="50" height="50" />
+                              ) : (
+                                "لا توجد صورة"
+                              )}
+                            </DataproductBodyCell>
+                            <DataproductBodyCell align="center">{row.price}</DataproductBodyCell>
+                            <DataproductBodyCell align="center">{row.discount}</DataproductBodyCell>
+                            <DataproductBodyCell align="center">
+                              {row.description}
+                            </DataproductBodyCell>
+                            <DataproductBodyCell align="center">
                               <MDButton
                                 variant="text"
                                 color="success"
                                 onClick={() => handleEdit(row.id)}
-                                sx={{ padding: "0 !important" }}
                               >
                                 <EditIcon sx={{ height: "1.5rem", width: "1.5rem" }} />
                               </MDButton>
                               <MDButton
-                                mx={1}
                                 variant="text"
                                 color="error"
                                 onClick={() => handleDelete(row.id)}
-                                sx={{ padding: "0 !important" }}
                               >
                                 <DeleteIcon sx={{ height: "1.5rem", width: "1.5rem" }} />
                               </MDButton>
-                            </MDBox>
-                          </DataproductBodyCell>
+                            </DataproductBodyCell>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="8" style={{ textAlign: "center" }}>
+                            لا توجد بيانات متاحة
+                          </td>
                         </tr>
-                      ))}
+                      )}
                     </tbody>
                   </table>
                 )}
@@ -157,6 +170,6 @@ const Products = () => {
       <Footer />
     </DashboardLayout>
   );
-};
+}
 
 export default Products;

@@ -8,6 +8,7 @@ import subCategoriesReducer from "./Slices/subCategory/subCategorySlice";
 import productReducer from "./Slices/productsSlice/productsSlice"; // ✅ تأكد من استيراد المنتج بشكل صحيح
 import customersReducer from "./Slices/customerSlice/customerSlice";
 import deliveryReducer from "./Slices/deliverySlice/deliverySlice";
+import orderReducer from "./Slices/orderSlice/orderSlice";
 export const store = configureStore({
   reducer: {
     login: loginReducer,
@@ -19,6 +20,7 @@ export const store = configureStore({
     products: productReducer, // ✅ إضافة مفقودة
     customers: customersReducer,
     deliveries: deliveryReducer,
+    orders: orderReducer,
   },
 });
 

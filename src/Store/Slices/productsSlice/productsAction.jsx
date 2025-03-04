@@ -32,7 +32,7 @@ export const updateProduct = createAsyncThunk(
   "products/updateProduct",
   async ({ id, updatedData }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`http://localhost:8000/api/products/${id}`, updatedData);
+      const response = await axios.post(`/products/${id}`, updatedData);
       return response.data; // تأكد من إعادة الاستجابة الصحيحة
     } catch (error) {
       return rejectWithValue(error.response.data);

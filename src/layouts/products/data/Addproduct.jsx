@@ -45,6 +45,9 @@ const AddProduct = ({ onCancel }) => {
       return;
     }
 
+    // توليد slug فريد باستخدام الوقت الحالي
+    const slug = `${name.trim().toLowerCase().replace(/\s+/g, "-")}-${Date.now()}`;
+
     const formData = new FormData();
     formData.append("name", name);
     formData.append("description", description);
@@ -53,6 +56,7 @@ const AddProduct = ({ onCancel }) => {
     formData.append("image", image);
     formData.append("category_id", categoryId);
     formData.append("subcategory_id", subcategoryId);
+    formData.append("slug", slug); // إضافة slug الفريد
 
     try {
       await axiosFetching.post("/products", formData);

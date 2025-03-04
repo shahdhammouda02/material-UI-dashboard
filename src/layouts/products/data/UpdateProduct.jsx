@@ -6,15 +6,15 @@ import MDButton from "components/MDButton";
 import MDInput from "components/MDInput";
 import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { updateProduct } from "../../../Store/Slices/productsSlice/productsAction";
+import { updateProduct, fetchProducts } from "../../../Store/Slices/productsSlice/productsAction";
 import { fetchCategories } from "../../../Store/Slices/mainCategory/mainCategoryAction";
 import { fetchSubCategories } from "../../../Store/Slices/subCategory/subCategoryAction";
 
 function UpdateProduct({ initialRows, productId, onUpdate }) {
   const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.products);
   const { categories = { data: [] } } = useSelector((state) => state.categories);
   const { subCategories = { data: [] } } = useSelector((state) => state.subCategories);
-  const { loading, error } = useSelector((state) => state.products);
 
   const [product, setProduct] = useState({
     id: productId || null,
@@ -27,11 +27,13 @@ function UpdateProduct({ initialRows, productId, onUpdate }) {
     subcategory_id: "",
   });
 
+  // Fetch categories and subcategories when the component mounts
   useEffect(() => {
     dispatch(fetchCategories());
     dispatch(fetchSubCategories());
   }, [dispatch]);
 
+  // Load product data based on productId
   useEffect(() => {
     if (!productId) {
       console.error("❌ خطأ: رقم المنتج غير صالح.");
@@ -55,6 +57,13 @@ function UpdateProduct({ initialRows, productId, onUpdate }) {
     }
   }, [initialRows, productId]);
 
+  // Filter subcategories based on selected category
+  const filteredSubcategories = useMemo(
+    () => subCategories?.data?.filter((sub) => sub.category_id === product.category_id) || [],
+    [subCategories, product.category_id]
+  );
+
+  // Handle input change for text fields
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setProduct((prevProduct) => ({
@@ -63,6 +72,7 @@ function UpdateProduct({ initialRows, productId, onUpdate }) {
     }));
   };
 
+  // Handle image file selection
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -77,6 +87,7 @@ function UpdateProduct({ initialRows, productId, onUpdate }) {
     }
   };
 
+  // Handle category selection
   const handleCategoryChange = (e) => {
     const selectedCategoryId = e.target.value;
     setProduct((prevProduct) => ({
@@ -86,6 +97,7 @@ function UpdateProduct({ initialRows, productId, onUpdate }) {
     }));
   };
 
+  // Handle subcategory selection
   const handleSubCategoryChange = (e) => {
     setProduct((prevProduct) => ({
       ...prevProduct,
@@ -93,6 +105,7 @@ function UpdateProduct({ initialRows, productId, onUpdate }) {
     }));
   };
 
+  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!product.name || !product.description || !product.price || !product.category_id) {
@@ -100,34 +113,19 @@ function UpdateProduct({ initialRows, productId, onUpdate }) {
       return;
     }
 
-    const updatedProduct = {
-      ...product,
-      price: Number(product.price),
-      discount: Number(product.discount) || 0,
-      category_id: Number(product.category_id),
-      subcategory_id: product.subcategory_id ? Number(product.subcategory_id) : null,
-    };
+    // Validate price and discount as numbers
+    if (isNaN(product.price) || (product.discount && isNaN(product.discount))) {
+      alert("❌ يجب أن يكون السعر والخصم أرقامًا صحيحة.");
+      return;
+    }
 
-    dispatch(updateProduct({ id: product.id, updatedData: updatedProduct })).then((result) => {
+    dispatch(updateProduct({ id: product.id, updatedData: product })).then((result) => {
       if (result.meta.requestStatus === "fulfilled") {
-        onUpdate(updatedProduct);
-      } else {
-        console.error("❌ تحديث المنتج فشل:", result.error?.message || result);
+        onUpdate(product);
+        dispatch(fetchProducts());
       }
     });
   };
-
-  const filteredSubcategories = useMemo(() => {
-    return product.category_id
-      ? subCategories?.data?.filter(
-          (sub) => String(sub.category_id) === String(product.category_id)
-        ) || []
-      : [];
-  }, [product.category_id, subCategories]);
-
-  if (!categories?.data || !subCategories?.data) {
-    return <MDTypography color="textSecondary">تحميل البيانات...</MDTypography>;
-  }
 
   return (
     <MDBox p={3}>

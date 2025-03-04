@@ -1,75 +1,78 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axiosFetching from "../../../API/axiosFetching";
-
-// ✅ الحالة الابتدائية
+import { createSlice } from "@reduxjs/toolkit";
+import { fetchProducts, addProduct, updateProduct, deleteProduct } from "./productsAction";
 const initialState = {
-  shippings: [], // تأكد من أن المفتاح shippings موجود
+  products: [],
   loading: false,
   error: null,
 };
-
-// ✅ جلب جميع الشحنات
-export const fetchDeliveries = createAsyncThunk(
-  "shippings/fetchDeliveries",
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await axiosFetching.get("/shippings");
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "فشل جلب الشحنات");
-    }
-  }
-);
-
-// ✅ تحديث الشحنة
-export const updateDelivery = createAsyncThunk(
-  "shippings/updateDelivery",
-  async ({ id, updatedData }, { rejectWithValue }) => {
-    try {
-      const response = await axiosFetching.put(`/shippings/${id}`, updatedData);
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "فشل تحديث الشحنة");
-    }
-  }
-);
-
-// ✅ إنشاء `slice`
-const deliverySlice = createSlice({
-  name: "shippings",
+const productsSlice = createSlice({
+  name: "products",
   initialState,
   reducers: {
-    reset: () => initialState,
+    reset: () => initialState, // إعادة الحالة إلى حالتها الأولية
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchDeliveries.pending, (state) => {
+      // ✅ Fetch products
+      .addCase(fetchProducts.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchDeliveries.fulfilled, (state, action) => {
+      .addCase(fetchProducts.fulfilled, (state, action) => {
         state.loading = false;
-        state.shippings = action.payload;
+        state.products = action.payload;
       })
-      .addCase(fetchDeliveries.rejected, (state, action) => {
+      .addCase(fetchProducts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-      .addCase(updateDelivery.pending, (state) => {
+
+      // ✅ Add product
+      .addCase(addProduct.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(updateDelivery.fulfilled, (state, action) => {
+      .addCase(addProduct.fulfilled, (state, action) => {
         state.loading = false;
-        const index = state.shippings.findIndex((s) => s.id === action.payload.id);
-        if (index !== -1) state.shippings[index] = action.payload;
+        state.products.push(action.payload);
       })
-      .addCase(updateDelivery.rejected, (state, action) => {
+      .addCase(addProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    // ✅ Update product
+    builder
+      .addCase(updateProduct.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        const updatedproduct = action.payload;
+        if (Array.isArray(state.products)) {
+          state.products = state.products.map((product) =>
+            product.id === updatedproduct.id ? updatedproduct : product
+          );
+        }
+      });
+
+    // ✅ Delete product
+    builder
+      .addCase(deleteProduct.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        state.products = state.products.filter((product) => product.id !== action.payload);
+      })
+      .addCase(deleteProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
   },
 });
 
-export const { reset } = deliverySlice.actions;
-export default deliverySlice.reducer;
+export const { reset } = productsSlice.actions;
+export default productsSlice.reducer;
