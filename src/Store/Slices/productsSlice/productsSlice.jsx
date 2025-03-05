@@ -1,10 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { fetchProducts, addProduct, updateProduct, deleteProduct } from "./productsAction";
+
 const initialState = {
   products: [],
   loading: false,
   error: null,
 };
+
 const productsSlice = createSlice({
   name: "products",
   initialState,
@@ -39,26 +41,28 @@ const productsSlice = createSlice({
       .addCase(addProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });
+      })
 
-    // ✅ Update product
-    builder
+      // ✅ Update product
       .addCase(updateProduct.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(updateProduct.fulfilled, (state, action) => {
         state.loading = false;
-        const updatedproduct = action.payload;
+        const updatedProduct = action.payload;
         if (Array.isArray(state.products)) {
           state.products = state.products.map((product) =>
-            product.id === updatedproduct.id ? updatedproduct : product
+            product.id === updatedProduct.id ? updatedProduct : product
           );
         }
-      });
+      })
+      .addCase(updateProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
 
-    // ✅ Delete product
-    builder
+      // ✅ Delete product
       .addCase(deleteProduct.pending, (state) => {
         state.loading = true;
         state.error = null;

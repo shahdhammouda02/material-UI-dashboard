@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axiosFetching from "../../../API/axiosFetching";
+import axios from "axios"; // Import axios
 
 // ✅ جلب المنتجات
 export const fetchProducts = createAsyncThunk(
@@ -32,10 +33,10 @@ export const updateProduct = createAsyncThunk(
   "products/updateProduct",
   async ({ id, updatedData }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`/products/${id}`, updatedData);
-      return response.data; // تأكد من إعادة الاستجابة الصحيحة
+      const response = await axiosFetching.post(`/products/${id}`, updatedData); // Use axiosFetching.put
+      return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data?.message || "فشل تحديث المنتج");
     }
   }
 );

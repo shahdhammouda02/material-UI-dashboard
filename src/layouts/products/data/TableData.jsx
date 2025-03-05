@@ -1,28 +1,37 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import MDBox from "components/MDBox";
 import MDIconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import food from "assets/images/food.jpg";
-import clothes from "assets/images/clothes.jpg";
-import handcraft from "assets/images/handcraft.jpg";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchProducts,
+  deleteProduct,
+  updateProduct,
+} from "../../../Store/Slices/productsSlice/productsAction";
 
-const TableData = ({ handleEdit, handleDelete }) => {
-  // Edit button handler
-  const handleEditClick = (id) => {
-    console.log(`Editing product with ID: ${id}`);
-    handleEdit(id); // Call the passed handleEdit function
-  };
+const TableData = ({ handleEdit }) => {
+  const dispatch = useDispatch();
+  const { products: productList, loading, error } = useSelector((state) => state.products);
+
+  useEffect(() => {
+    dispatch(fetchProducts());
+  }, [dispatch]);
 
   const handleDeleteClick = (id) => {
-    handleDelete(id); // Call the passed handleDelete function
+    dispatch(deleteProduct(id));
+  };
+
+  const handleUpdateProduct = (updatedProduct) => {
+    dispatch(updateProduct({ id: updatedProduct.id, updatedData: updatedProduct }));
   };
 
   const [columns] = useState([
     { Header: "الرقم التعريفي", accessor: "id", align: "center" },
-    { Header: "الاسم", accessor: "author", align: "center" },
-    { Header: "الفئة", accessor: "category", align: "center" },
-    { Header: "الفئة الفرعية", accessor: "subcategory", align: "center" },
+    { Header: "الاسم", accessor: "name", align: "center" },
+    { Header: "الفئة", accessor: "category_name", align: "center" },
+    { Header: "الفئة الفرعية", accessor: "subcategory_name", align: "center" },
     { Header: "الصورة", accessor: "image", align: "center" },
     { Header: "السعر", accessor: "price", align: "center" },
     { Header: "الخصم", accessor: "discount", align: "center" },
@@ -30,96 +39,43 @@ const TableData = ({ handleEdit, handleDelete }) => {
     { Header: "الإجراءات", accessor: "actions", align: "center" },
   ]);
 
-  const [initialRows, setInitialRows] = useState([
-    {
-      author: "زيت زيتون",
-      Category: "المنتجات الغذائية",
-      subcategory: "الاكل الفلسطيني",
-      images: (
-        <MDBox ml={-1}>
-          <img
-            src={food}
-            alt="image description"
-            style={{
-              width: "100px",
-              height: "100px",
-              borderRadius: "50%",
-            }}
-          />
-        </MDBox>
-      ),
-      price: "$50",
-      discount: "10%",
-      description: "الاكل الفلسطيني له طعم مميز",
-    },
-    {
-      author: "ثوب فلاحي",
-      Category: "الملابس والاكسسوارات",
-      subcategory: "الملابس",
-      images: (
-        <MDBox ml={-1}>
-          <img
-            src={clothes}
-            alt="image description"
-            style={{
-              width: "100px",
-              height: "100px",
-              borderRadius: "50%",
-            }}
-          />
-        </MDBox>
-      ),
-      price: "$50",
-      discount: "10%",
-      description: "الملابس الفلسطينية لها طابع تراثي اصيل",
-    },
-    {
-      author: "فخار",
-      Category: "الحرف اليدوية",
-      subcategory: "التراث",
-      images: (
-        <MDBox ml={-1}>
-          <img
-            src={handcraft}
-            alt="image description"
-            style={{
-              width: "100px",
-              height: "100px",
-              borderRadius: "50%",
-            }}
-          />
-        </MDBox>
-      ),
-      price: "$50",
-      discount: "10%",
-      description: "الحرف اليدوية تمثل التاريخ الفلسطيني القديم المميز",
-    },
-  ]);
-
-  const products = initialRows.map((row, index) => ({
-    id: index + 1,
-    ...row,
-  }));
-
   const rows = useMemo(() => {
-    return initialRows.map((row, index) => ({
-      id: index + 1,
-      ...row,
+    return productList.map((row) => ({
+      id: row.id,
+      name: row.name,
+      category_name: row.category_name,
+      subcategory_name: row.subcategory_name,
+      image: (
+        <MDBox ml={-1}>
+          <img
+            src={row.image || food} // Use row.image if available, otherwise default to food
+            alt={row.name}
+            style={{
+              width: "100px",
+              height: "100px",
+              borderRadius: "50%",
+            }}
+          />
+        </MDBox>
+      ),
+      price: row.price,
+      discount: row.discount,
+      description: row.description,
       actions: (
         <MDBox display="flex" justifyContent="center" alignItems="center">
-          <MDIconButton color="success" onClick={() => handleEditClick(index + 1)}>
+          <MDIconButton color="success" onClick={() => handleEdit(row.id)}>
             <EditIcon />
           </MDIconButton>
           <MDBox mx={1} />
-          <MDIconButton color="error" onClick={() => handleDeleteClick(index + 1)}>
+          <MDIconButton color="error" onClick={() => handleDeleteClick(row.id)}>
             <DeleteIcon />
           </MDIconButton>
         </MDBox>
       ),
     }));
-  }, [initialRows]);
+  }, [productList, handleEdit]);
 
-  return { columns, rows, products };
+  return { columns, rows, products: productList, handleUpdateProduct };
 };
 
 export default TableData;

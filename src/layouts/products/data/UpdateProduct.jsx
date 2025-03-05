@@ -15,7 +15,7 @@ function UpdateProduct({ initialRows, productId, onUpdate }) {
   const { loading, error } = useSelector((state) => state.products);
   const { categories = { data: [] } } = useSelector((state) => state.categories);
   const { subCategories = { data: [] } } = useSelector((state) => state.subCategories);
-
+  const [categoryId, setCategoryId] = useState("");
   const [product, setProduct] = useState({
     id: productId || null,
     name: "",
@@ -58,10 +58,11 @@ function UpdateProduct({ initialRows, productId, onUpdate }) {
   }, [initialRows, productId]);
 
   // Filter subcategories based on selected category
-  const filteredSubcategories = useMemo(
-    () => subCategories?.data?.filter((sub) => sub.category_id === product.category_id) || [],
-    [subCategories, product.category_id]
-  );
+  const filteredSubcategories = useMemo(() => {
+    return categoryId
+      ? subCategories?.data?.filter((sub) => sub.category_id === categoryId) || []
+      : [];
+  }, [categoryId, subCategories]);
 
   // Handle input change for text fields
   const handleInputChange = (e) => {
@@ -80,10 +81,10 @@ function UpdateProduct({ initialRows, productId, onUpdate }) {
       reader.onloadend = () => {
         setProduct((prevProduct) => ({
           ...prevProduct,
-          image: reader.result,
+          image: reader.result, // حفظ الصورة كـ Base64
         }));
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(file); // تحويل الملف إلى Base64
     }
   };
 
@@ -108,10 +109,27 @@ function UpdateProduct({ initialRows, productId, onUpdate }) {
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
+
     if (!product.name || !product.description || !product.price || !product.category_id) {
       alert("❌ يرجى ملء جميع الحقول المطلوبة.");
       return;
     }
+
+    // التأكد أن السعر والخصم عبارة عن أرقام
+    if (isNaN(product.price) || (product.discount && isNaN(product.discount))) {
+      alert("❌ يجب أن يكون السعر والخصم أرقامًا صحيحة.");
+      return;
+    }
+
+    // ✅ طباعة الصورة قبل الإرسال للتأكد من أنها Base64
+    console.log("🖼️ بيانات المنتج قبل الإرسال:", product);
+
+    dispatch(updateProduct({ id: product.id, updatedData: product })).then((result) => {
+      if (result.meta.requestStatus === "fulfilled") {
+        onUpdate(product);
+        dispatch(fetchProducts());
+      }
+    });
 
     // Validate price and discount as numbers
     if (isNaN(product.price) || (product.discount && isNaN(product.discount))) {
@@ -178,14 +196,10 @@ function UpdateProduct({ initialRows, productId, onUpdate }) {
         <MDBox mb={2}>
           <FormControl fullWidth>
             <InputLabel>اختر الفئة</InputLabel>
-            <Select
-              name="category_id"
-              value={product.category_id || ""}
-              onChange={handleCategoryChange}
-            >
+            <Select value={product.category_id} onChange={(e) => setCategoryId(e.target.value)}>
               {categories?.data?.length > 0 ? (
                 categories.data.map((category) => (
-                  <MenuItem key={category.id} value={String(category.id)}>
+                  <MenuItem key={category.id} value={category.id}>
                     {category.name}
                   </MenuItem>
                 ))
