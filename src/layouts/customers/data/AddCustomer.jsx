@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
+import { useDispatch, useSelector } from "react-redux";
+import { addCustomer } from "../../../Store/Slices/customerSlice/customerAction";
 import {
   TextField,
   Button,
   Box,
-  Typography,
   Grid,
   Dialog,
   DialogTitle,
@@ -14,233 +15,158 @@ import {
   MenuItem,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 
-function AddCustomer({ initialRows, onAddCustomer }) {
-  const [newCustomer, setNewCustomer] = useState({
-    id: null,
+function AddCustomer({ onCancel }) {
+  const dispatch = useDispatch();
+  const { customers } = useSelector((state) => state.customers);
+
+  const [formData, setFormData] = useState({
     name: "",
     gender: "",
-    mobile: "",
+    phone: "",
     email: "",
-    dateOfBirth: "",
-    products: [], // Initialize products as an empty array
+    birthdate: "",
+    password: "",
   });
-
-  const [error, setError] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  // Auto-increment the ID based on the highest existing ID
-  useEffect(() => {
-    if (initialRows.length > 0) {
-      const highestExistingId = Math.max(...initialRows.map((row) => row.id));
-      setNewCustomer((prev) => ({
-        ...prev,
-        id: highestExistingId + 1,
-      }));
-    } else {
-      // If no rows exist, start with ID 1
-      setNewCustomer((prev) => ({
-        ...prev,
-        id: 1,
-      }));
-    }
-  }, [initialRows]);
+  const [error, setError] = useState("");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewCustomer((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = () => {
-    const { name, gender, mobile, email, dateOfBirth } = newCustomer;
-
-    // Validate required fields
-    if (!name.trim() || !gender.trim() || !mobile.trim() || !email.trim() || !dateOfBirth.trim()) {
-      setError("Please fill in all fields correctly.");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (Object.values(formData).some((value) => !value)) {
+      setError("من فضلك قم بملء جميع الحقول بشكل صحيح.");
       return;
     }
-
-    // Add actions and viewProducts button automatically
-    const customerWithActions = {
-      ...newCustomer,
-      products: {
-        productCount: newCustomer.products.length, // Number of products
-        viewProducts: (
-          <IconButton color="primary" title="عرض المنتجات">
-            <VisibilityIcon />
-          </IconButton>
-        ),
-      },
-      actions: (
-        <Box display="flex" justifyContent="center" alignItems="center">
-          <IconButton color="success" title="تعديل">
-            <EditIcon />
-          </IconButton>
-          <Box mx={1} />
-          <IconButton color="error" title="حذف">
-            <DeleteIcon />
-          </IconButton>
-        </Box>
-      ),
-    };
-
-    // Pass the new customer data to the parent component
-    onAddCustomer(customerWithActions);
-
-    // Reset form
-    setNewCustomer((prev) => ({
-      id: prev.id + 1, // Auto-increment ID for the next customer
-      name: "",
-      gender: "",
-      mobile: "",
-      email: "",
-      dateOfBirth: "",
-      products: [],
-    }));
-
     setError("");
-    setIsDialogOpen(false);
-  };
 
-  const handleDialogOpen = () => {
-    setIsDialogOpen(true);
-  };
+    try {
+      const highestExistingId =
+        customers.length > 0 ? Math.max(...customers.map((row) => row.id)) : 0;
+      const newCustomer = { ...formData, id: highestExistingId + 1 };
 
-  const handleDialogClose = () => {
-    setIsDialogOpen(false);
-    setError("");
-    setNewCustomer((prev) => ({
-      id: prev.id,
-      name: "",
-      gender: "",
-      mobile: "",
-      email: "",
-      dateOfBirth: "",
-      products: [],
-    }));
+      const res = await dispatch(addCustomer(newCustomer)).unwrap();
+      if (res?.message === "Delivery created successfully") {
+        alert("تم إضافة العميل بنجاح!");
+        setIsDialogOpen(false);
+      } else {
+        alert("تم إضافة العميل بنجاح!");
+      }
+    } catch (error) {
+      console.error("❌ Error:", error);
+      alert("حدث خطأ غير متوقع.");
+    }
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Box flexDirection="column" display="flex" justifyContent="center" alignItems="center">
-        <Button
-          onClick={handleDialogOpen}
-          sx={{
-            bgcolor: "#ffffff",
-            color: "#1e8234",
-            "&:hover": {
-              bgcolor: "#000000",
-              color: "#ffffff", // Darker color on hover
-            },
-            transition: "all 0.3s ease-in-out",
-          }}
-        >
-          اضافة عميل جديد
-          <AddIcon />
-        </Button>
+    <Box display="flex" justifyContent="center" alignItems="center">
+      <Button
+        onClick={() => setIsDialogOpen(true)}
+        sx={{
+          bgcolor: "#ffffff",
+          color: "#1e8234",
+          "&:hover": { bgcolor: "#000000", color: "#ffffff" },
+        }}
+      >
+        اضافة عميل جديد <AddIcon />
+      </Button>
 
-        {/* Dialog for customer input */}
-        <Dialog open={isDialogOpen} onClose={handleDialogClose}>
-          <DialogTitle>اضافة عميل جديد</DialogTitle>
-          <DialogContent>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField disabled label="الرقم التعريفي" value={newCustomer.id || ""} fullWidth />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="اسم العميل"
-                  name="name"
-                  value={newCustomer.name}
-                  onChange={handleInputChange}
-                  fullWidth
-                  required
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="الجنس"
-                  name="gender"
-                  value={newCustomer.gender}
-                  onChange={handleInputChange}
-                  fullWidth
-                  required
-                  select
-                >
-                  <MenuItem value="ذكر">ذكر</MenuItem>
-                  <MenuItem value="أنثى">أنثى</MenuItem>
-                </TextField>
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="رقم الجوال"
-                  name="mobile"
-                  value={newCustomer.mobile}
-                  onChange={handleInputChange}
-                  fullWidth
-                  required
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="البريد الإلكتروني"
-                  name="email"
-                  value={newCustomer.email}
-                  onChange={handleInputChange}
-                  fullWidth
-                  required
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="تاريخ الميلاد"
-                  name="dateOfBirth"
-                  type="date"
-                  value={newCustomer.dateOfBirth}
-                  onChange={handleInputChange}
-                  fullWidth
-                  required
-                  InputLabelProps={{ shrink: true }}
-                />
-              </Grid>
-              {error && (
-                <Grid item xs={12}>
-                  <Typography color="error">{error}</Typography>
-                </Grid>
-              )}
+      <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
+        <DialogTitle>اضافة عميل جديد</DialogTitle>
+        <DialogContent>
+          <Grid container spacing={2} component="form" onSubmit={handleSubmit}>
+            <Grid item xs={12}>
+              <TextField
+                label="اسم العميل"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                fullWidth
+                required
+              />
             </Grid>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleDialogClose}>الغاء</Button>
-            <Button variant="contained" sx={{ color: "#ffffff" }} onClick={handleSubmit}>
-              إضافة
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Box>
-    </div>
+            <Grid item xs={12}>
+              <TextField
+                label="الجنس"
+                name="gender"
+                value={formData.gender}
+                onChange={handleInputChange}
+                fullWidth
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="كلمة السر"
+                name="password"
+                type="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                fullWidth
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="رقم الجوال"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                fullWidth
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="البريد الإلكتروني"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                fullWidth
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="تاريخ الميلاد"
+                name="birthdate"
+                type="date"
+                value={formData.birthdate}
+                onChange={handleInputChange}
+                fullWidth
+                required
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+            {error && (
+              <Grid item xs={12}>
+                <Box color="error.main" textAlign="center">
+                  {error}
+                </Box>
+              </Grid>
+            )}
+            <DialogActions>
+              <Button variant="contained" color="success" type="submit">
+                حفظ
+              </Button>
+              <Button variant="contained" color="error" onClick={() => setIsDialogOpen(false)}>
+                إلغاء
+              </Button>
+            </DialogActions>
+          </Grid>
+        </DialogContent>
+      </Dialog>
+    </Box>
   );
 }
 
 AddCustomer.propTypes = {
-  initialRows: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-    })
-  ).isRequired,
-  onAddCustomer: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };
 
 export default AddCustomer;

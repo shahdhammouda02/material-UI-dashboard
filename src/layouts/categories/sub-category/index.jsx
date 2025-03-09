@@ -78,7 +78,7 @@ const SubCategories = () => {
     );
     setEditingCategory(null);
   };
-
+  const handleCancel = () => setEditingCategory(null);
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -116,7 +116,7 @@ const SubCategories = () => {
                     initialRows={subCategories.data} // تأكد من أن هذه البيانات موجودة بشكل صحيح
                     categoryId={editingCategory.id} // تأكد من أن editingCategory.id يحتوي على قيمة صالحة
                     onUpdate={handleUpdate} // تأكد من أن هذه الدالة موجودة وتعمل بشكل صحيح
-                    categories={categories} // تأكد من أن categories تحتوي على البيانات الصحيحة
+                    onCancel={handleCancel} // تأكد من أن categories تحتوي على البيانات الصحيحة
                   />
                 ) : Array.isArray(subCategories?.data) && subCategories.data.length > 0 ? (
                   <table style={{ width: "100%" }}>

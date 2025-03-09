@@ -14,6 +14,19 @@ export const fetchCustomers = createAsyncThunk(
   }
 );
 
+// ✅ Fetch Customer Products (Details)
+export const fetchCustomerProducts = createAsyncThunk(
+  "customers/fetchCustomerProducts",
+  async (customerId, { rejectWithValue }) => {
+    try {
+      const response = await axiosFetching.get(`/customers/${customerId}`);
+      return response.data; // بيانات المنتجات الخاصة بالعميل
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "فشل جلب تفاصيل المنتجات");
+    }
+  }
+);
+
 // ✅ Add Customer
 export const addCustomer = createAsyncThunk(
   "customers/addCustomer",

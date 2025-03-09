@@ -90,6 +90,7 @@ function Delivery() {
                     initialRows={deliveries} // تم استبدال DeliveryRows بـ deliveries
                     ShippingId={editingId}
                     onUpdate={handleUpdate}
+                    onCancel={handleAddShippingClose}
                   />
                 ) : (
                   <table style={{ width: "100%" }}>

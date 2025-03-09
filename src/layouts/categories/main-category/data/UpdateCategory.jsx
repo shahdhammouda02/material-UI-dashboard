@@ -7,37 +7,34 @@ import MDInput from "components/MDInput";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCategory } from "../../../../Store/Slices/mainCategory/mainCategoryAction";
 
-function UpdateCategory({ initialRows, categoryId, onUpdate }) {
+function UpdateCategory({ initialRows, categoryId, onUpdate, onCancel }) {
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.categories);
-  const [category, setCategory] = useState({
-    id: categoryId || null,
-    name: "",
-    description: "",
-  });
+  const [category, setCategory] = useState(null);
 
   useEffect(() => {
-    if (!categoryId) {
-      console.error("Invalid categoryId");
+    if (!categoryId || typeof categoryId !== "number") {
+      console.error("❌ categoryId غير صالح:", categoryId);
       return;
     }
 
-    // البحث عن الفئة المطلوبة
-    const existingCategory = initialRows.find((row) => row.id === categoryId);
-    console.log("Existing category:", existingCategory);
+    const existingCategory = initialRows?.find((row) => row.id === categoryId);
 
-    if (existingCategory) {
-      setCategory({
-        id: existingCategory.id,
-        name: existingCategory.name || "", // تغيير من categoryName إلى name
-        description: existingCategory.description || "",
-      });
-    } else {
-      console.error(`Category with ID ${categoryId} not found`);
+    if (!existingCategory) {
+      console.error(`❌ لم يتم العثور على فئة بالمعرف: ${categoryId}`);
+      setCategory(null);
+      return;
     }
+
+    setCategory({
+      id: existingCategory.id,
+      name: existingCategory.name || "",
+      description: existingCategory.description || "",
+    });
   }, [initialRows, categoryId]);
 
   const handleInputChange = (e) => {
+    if (!category) return;
     const { name, value } = e.target;
     setCategory((prevCategory) => ({
       ...prevCategory,
@@ -47,11 +44,18 @@ function UpdateCategory({ initialRows, categoryId, onUpdate }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!category.name || !category.description) {
+
+    if (!category || !category.id) {
+      console.error("❌ لا يمكن التحديث: الفئة غير موجودة");
       return;
     }
 
-    console.log("Submitting category data:", category);
+    if (!category.name || !category.description) {
+      console.error("❌ الحقول لا يمكن أن تكون فارغة");
+      return;
+    }
+
+    console.log("✅ إرسال بيانات التحديث:", category);
 
     dispatch(updateCategory({ id: category.id, updatedData: category })).then((result) => {
       if (result.meta.requestStatus === "fulfilled") {
@@ -60,63 +64,67 @@ function UpdateCategory({ initialRows, categoryId, onUpdate }) {
     });
   };
 
+  const handleCancelClick = (e) => {
+    e.preventDefault();
+    if (onCancel) onCancel();
+  };
+
   return (
     <MDBox p={3}>
       <MDTypography variant="h5" mb={2}>
         تحديث الفئة
       </MDTypography>
-      <form onSubmit={handleSubmit}>
-        <MDBox mb={2}>
-          <MDInput label="رقم الفئة" name="id" value={category.id} disabled fullWidth />
-        </MDBox>
-        <MDBox mb={2}>
-          <MDInput
-            label="اسم الفئة"
-            name="name"
-            value={category.name} // تأكد من استخدام name بدلاً من categoryName
-            onChange={handleInputChange}
-            fullWidth
-          />
-        </MDBox>
-        <MDBox mb={2}>
-          <MDInput
-            label="الوصف"
-            name="description"
-            value={category.description}
-            onChange={handleInputChange}
-            fullWidth
-            multiline
-            rows={4}
-          />
-        </MDBox>
-        {error && (
+      {!category ? (
+        <MDTypography color="error">❌ لا يمكن تحميل الفئة المطلوبة.</MDTypography>
+      ) : (
+        <form onSubmit={handleSubmit}>
           <MDBox mb={2}>
-            <MDTypography color="error">{error}</MDTypography>
+            <MDInput label="رقم الفئة" name="id" value={category.id} disabled fullWidth />
           </MDBox>
-        )}
-        <MDBox display="flex" justifyContent="space-between">
-          <MDButton variant="gradient" color="success" type="submit" disabled={loading}>
-            {loading ? "جاري الحفظ..." : "حفظ التعديلات"}
-          </MDButton>
-          <MDButton variant="gradient" color="error" onClick={() => onUpdate(null)}>
-            إلغاء
-          </MDButton>
-        </MDBox>
-      </form>
+          <MDBox mb={2}>
+            <MDInput
+              label="اسم الفئة"
+              name="name"
+              value={category.name}
+              onChange={handleInputChange}
+              fullWidth
+            />
+          </MDBox>
+          <MDBox mb={2}>
+            <MDInput
+              label="الوصف"
+              name="description"
+              value={category.description}
+              onChange={handleInputChange}
+              fullWidth
+              multiline
+              rows={4}
+            />
+          </MDBox>
+          {error && (
+            <MDBox mb={2}>
+              <MDTypography color="error">{error}</MDTypography>
+            </MDBox>
+          )}
+          <MDBox display="flex" justifyContent="space-between">
+            <MDButton variant="gradient" color="success" type="submit" disabled={loading}>
+              {loading ? "جاري الحفظ..." : "حفظ التعديلات"}
+            </MDButton>
+            <MDButton variant="gradient" color="error" onClick={handleCancelClick}>
+              إلغاء
+            </MDButton>
+          </MDBox>
+        </form>
+      )}
     </MDBox>
   );
 }
 
 UpdateCategory.propTypes = {
-  initialRows: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      name: PropTypes.string.isRequired, // تغيير من categoryName إلى name
-      description: PropTypes.string.isRequired,
-    })
-  ).isRequired,
+  initialRows: PropTypes.array.isRequired,
   categoryId: PropTypes.number.isRequired,
   onUpdate: PropTypes.func.isRequired,
+  onCancel: PropTypes.func, // إضافة onCancel هنا
 };
 
 export default UpdateCategory;

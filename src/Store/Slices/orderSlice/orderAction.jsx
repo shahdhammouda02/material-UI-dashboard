@@ -1,17 +1,16 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axiosFetching from "../../../API/axiosFetching";
-
-// ✅ جلب الطلبات (حسب userId)
-export const fetchOrders = createAsyncThunk(
-  "orders/fetchOrders",
-  async ({ userId }, { rejectWithValue }) => {
+export const fetchOrderDetails = createAsyncThunk(
+  "orders/fetchOrderDetails",
+  async ({ orderId }, { rejectWithValue }) => {
     try {
-      const response = await axiosFetching.get(`/users/${userId}/orders`);
-      console.log(" الطلبات التي تم جلبها:", response.data); // ✅ طباعة البيانات في الـ console
-      return response.data;
+      const response = await fetch(`http://localhost:8000/api/orders/${orderId}`);
+      if (!response.ok) {
+        throw new Error("Order not found");
+      }
+      return response.json(); // Return the order details
     } catch (error) {
-      console.error("❌ خطأ في جلب الطلبات:", error.response?.data?.message || error.message);
-      return rejectWithValue(error.response?.data?.message || "فشل جلب الطلبات");
+      return rejectWithValue(error.message); // Reject with error message if something goes wrong
     }
   }
 );

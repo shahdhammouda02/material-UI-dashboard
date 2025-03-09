@@ -1,5 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchCustomers, addCustomer, updateCustomer, deleteCustomer } from "./customerAction";
+import {
+  fetchCustomers,
+  addCustomer,
+  updateCustomer,
+  deleteCustomer,
+  fetchCustomerProducts,
+} from "./customerAction";
 
 // ✅ Initial State
 const initialState = {
@@ -27,6 +33,24 @@ const customerSlice = createSlice({
         state.customers = action.payload;
       })
       .addCase(fetchCustomers.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // ✅ Fetch Customer Products (Details)
+      .addCase(fetchCustomerProducts.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchCustomerProducts.fulfilled, (state, action) => {
+        state.loading = false;
+        const customerId = action.meta.arg;
+        const customerIndex = state.customers.findIndex((customer) => customer.id === customerId);
+        if (customerIndex !== -1) {
+          state.customers[customerIndex].products = action.payload; // إضافة المنتجات للعميل
+        }
+      })
+      .addCase(fetchCustomerProducts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

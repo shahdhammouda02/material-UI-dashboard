@@ -1,9 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchOrders, fetchAllOrders } from "./orderAction";
+import { fetchAllOrders, fetchOrderDetails } from "./orderAction"; // حذف fetchOrders
 
 // ✅ تعريف الحالة الابتدائية
 const initialState = {
   orders: [],
+  orderDetails: null,
   loading: false,
   error: null,
 };
@@ -17,20 +18,6 @@ const orderSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // ✅ Fetch Orders (حسب userId)
-      .addCase(fetchOrders.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchOrders.fulfilled, (state, action) => {
-        state.loading = false;
-        state.orders = action.payload;
-      })
-      .addCase(fetchOrders.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-
       // ✅ Fetch All Orders
       .addCase(fetchAllOrders.pending, (state) => {
         state.loading = true;
@@ -41,6 +28,21 @@ const orderSlice = createSlice({
         state.orders = action.payload;
       })
       .addCase(fetchAllOrders.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // ✅ Fetch Order Details
+      .addCase(fetchOrderDetails.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(fetchOrderDetails.fulfilled, (state, action) => {
+        state.loading = false;
+        state.orderDetails = action.payload; // تخزين تفاصيل الطلب هنا
+      })
+      .addCase(fetchOrderDetails.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

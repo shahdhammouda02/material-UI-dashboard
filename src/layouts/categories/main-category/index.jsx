@@ -46,10 +46,11 @@ const MainCategories = () => {
   };
 
   const handleUpdate = (updatedCategory) => {
-    // Dispatch action to update category in the store
     dispatch(updateCategory({ id: updatedCategory.id, updatedData: updatedCategory }));
     setEditingCategory(null); // Close the update form after saving
   };
+
+  const handleCancel = () => setEditingCategory(null); // Close the editing form
 
   return (
     <DashboardLayout>
@@ -86,9 +87,9 @@ const MainCategories = () => {
                     initialRows={categories.data} // استخدم categories.data هنا
                     categoryId={editingCategory.id} // تمرير ID الفئة التي تعدلها
                     onUpdate={handleUpdate} // تمرير الدالة handleUpdate هنا
+                    onCancel={handleCancel} // تمرير دالة handleCancel هنا
                   />
-                ) : // Ensure categories is an array before calling .map
-                Array.isArray(categories?.data) && categories.data.length > 0 ? (
+                ) : Array.isArray(categories?.data) && categories.data.length > 0 ? (
                   <table style={{ width: "100%" }}>
                     <thead>
                       <tr>

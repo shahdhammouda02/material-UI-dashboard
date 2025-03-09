@@ -151,13 +151,13 @@ const Customers = () => {
                             {row.gender}
                           </DataproductBodyCell>
                           <DataproductBodyCell align="center" style={{ fontSize: "12px" }}>
-                            {row.phone}
+                            {row.mobile}
                           </DataproductBodyCell>
                           <DataproductBodyCell align="center" style={{ fontSize: "12px" }}>
                             {row.email}
                           </DataproductBodyCell>
                           <DataproductBodyCell align="center" style={{ fontSize: "12px" }}>
-                            {row.birthdate}
+                            {row.dateOfBirth}
                           </DataproductBodyCell>
                           <DataproductBodyCell align="center" style={{ fontSize: "12px" }}>
                             {row.products.productCount}

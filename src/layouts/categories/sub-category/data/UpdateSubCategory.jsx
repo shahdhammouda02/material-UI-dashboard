@@ -8,7 +8,7 @@ import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { updateSubCategory } from "../../../../Store/Slices/subCategory/subCategoryAction";
 
-function UpdateSubCategory({ initialRows, categoryId, onUpdate, categories }) {
+function UpdateSubCategory({ initialRows, categoryId, onUpdate, categories, onCancel }) {
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.categories);
   const [category, setCategory] = useState({
@@ -46,7 +46,10 @@ function UpdateSubCategory({ initialRows, categoryId, onUpdate, categories }) {
       [name]: value,
     }));
   };
-
+  const handleCancelClick = (e) => {
+    e.preventDefault();
+    if (onCancel) onCancel();
+  };
   const handleCategoryChange = (e) => {
     const selectedValue = e.target.value;
     console.log("✅ Selected category_id:", selectedValue); // تسجيل القيمة
@@ -146,7 +149,7 @@ function UpdateSubCategory({ initialRows, categoryId, onUpdate, categories }) {
           <MDButton variant="gradient" color="success" type="submit" disabled={loading}>
             {loading ? "جاري الحفظ..." : "حفظ التعديلات"}
           </MDButton>
-          <MDButton variant="gradient" color="error" onClick={() => onUpdate(null)}>
+          <MDButton variant="gradient" color="error" onClick={handleCancelClick}>
             إلغاء
           </MDButton>
         </MDBox>
@@ -161,11 +164,12 @@ UpdateSubCategory.propTypes = {
       id: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,
       description: PropTypes.string.isRequired,
-      category_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), // ✅ تعديل هنا
+      category_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     })
   ).isRequired,
   categoryId: PropTypes.number.isRequired,
   onUpdate: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired, // Add this line for onCancel
   categories: PropTypes.object.isRequired,
 };
 

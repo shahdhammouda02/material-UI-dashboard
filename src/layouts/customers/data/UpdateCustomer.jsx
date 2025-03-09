@@ -10,36 +10,54 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  IconButton,
-  MenuItem,
 } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
+import { useDispatch, useSelector } from "react-redux";
+import { updateCustomer, fetchCustomers } from "../../../Store/Slices/customerSlice/customerAction";
 
 function UpdateCustomer({ initialRows, customerId, onUpdate, onClose }) {
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.customers);
   const [customer, setCustomer] = useState({
-    id: customerId,
+    id: customerId || null,
     name: "",
     gender: "",
-    mobile: "",
+    phone: "",
     email: "",
-    dateOfBirth: "",
+    birthdate: "",
   });
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const [error, setError] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(true);
-
-  // Load existing customer data when the component mounts
   useEffect(() => {
+    if (!customerId) {
+      setErrorMessage("Invalid customerId");
+      return;
+    }
+
+    // البحث عن العميل المحدد
     const existingCustomer = initialRows.find((row) => row.id === customerId);
     if (existingCustomer) {
-      setCustomer(existingCustomer);
+      setCustomer({
+        id: existingCustomer.id,
+        name: existingCustomer.name || "",
+        gender: existingCustomer.gender || "",
+        phone: existingCustomer.phone || "",
+        email: existingCustomer.email || "",
+        birthdate: existingCustomer.birthdate || "",
+      });
     } else {
-      console.error(`Customer with ID ${customerId} not found`);
-      setError("Customer not found.");
+      setErrorMessage(`Customer with ID ${customerId} not found`);
     }
   }, [initialRows, customerId]);
 
-  // Handle input changes
+  const [isDialogOpen, setIsDialogOpen] = useState(true);
+
+  const handleDialogClose = () => {
+    setIsDialogOpen(false);
+    onClose(); // استدعاء دالة الإغلاق القادمة من `props`
+  };
+
+  // التعامل مع تغييرات المدخلات
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setCustomer((prevCustomer) => ({
@@ -48,25 +66,26 @@ function UpdateCustomer({ initialRows, customerId, onUpdate, onClose }) {
     }));
   };
 
-  // Handle form submission
-  const handleSubmit = () => {
-    const { name, gender, mobile, email, dateOfBirth } = customer;
-
-    // Validate required fields
-    if (!name.trim() || !gender.trim() || !mobile.trim() || !email.trim() || !dateOfBirth.trim()) {
-      setError("Please fill in all fields correctly.");
+  // التعامل مع إرسال النموذج
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (
+      !customer.name ||
+      !customer.gender ||
+      !customer.phone ||
+      !customer.email ||
+      !customer.birthdate
+    ) {
       return;
     }
 
-    setError("");
-    onUpdate(customer); // Call the update function passed as a prop
-    setIsDialogOpen(false); // Close the dialog
-  };
-
-  // Handle dialog close
-  const handleDialogClose = () => {
-    setIsDialogOpen(false);
-    onClose(); // Call the onClose function passed as a prop
+    dispatch(updateCustomer({ id: customer.id, updatedData: customer })).then((result) => {
+      if (result.meta.requestStatus === "fulfilled") {
+        onUpdate(customer); // تحديث البيانات في واجهة المستخدم
+        dispatch(fetchCustomers()); // إعادة تحميل البيانات بعد التحديث
+        handleDialogClose(); // إغلاق النافذة
+      }
+    });
   };
 
   return (
@@ -103,17 +122,13 @@ function UpdateCustomer({ initialRows, customerId, onUpdate, onClose }) {
               fullWidth
               aria-label="الجنس"
               required
-              select
-            >
-              <MenuItem value="ذكر">ذكر</MenuItem>
-              <MenuItem value="أنثى">أنثى</MenuItem>
-            </TextField>
+            />
           </Grid>
           <Grid item xs={12}>
             <TextField
               label="رقم الجوال"
-              name="mobile"
-              value={customer.mobile}
+              name="phone"
+              value={customer.phone}
               onChange={handleInputChange}
               fullWidth
               aria-label="رقم الجوال"
@@ -134,9 +149,9 @@ function UpdateCustomer({ initialRows, customerId, onUpdate, onClose }) {
           <Grid item xs={12}>
             <TextField
               label="تاريخ الميلاد"
-              name="dateOfBirth"
+              name="birthdate"
               type="date"
-              value={customer.dateOfBirth}
+              value={customer.birthdate}
               onChange={handleInputChange}
               fullWidth
               aria-label="تاريخ الميلاد"
@@ -145,11 +160,11 @@ function UpdateCustomer({ initialRows, customerId, onUpdate, onClose }) {
             />
           </Grid>
 
-          {/* Error Message */}
-          {error && (
+          {/* عرض رسالة الخطأ */}
+          {errorMessage && (
             <Grid item xs={12}>
               <Typography color="error" align="center">
-                {error}
+                {errorMessage}
               </Typography>
             </Grid>
           )}
@@ -163,7 +178,7 @@ function UpdateCustomer({ initialRows, customerId, onUpdate, onClose }) {
           variant="contained"
           sx={{ color: "#ffffff" }}
           onClick={handleSubmit}
-          aria-label="حفظ"
+          disabled={loading}
           startIcon={<SaveIcon />}
         >
           حفظ
@@ -179,9 +194,9 @@ UpdateCustomer.propTypes = {
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
       name: PropTypes.string.isRequired,
       gender: PropTypes.string.isRequired,
-      mobile: PropTypes.string.isRequired,
+      phone: PropTypes.string.isRequired,
       email: PropTypes.string.isRequired,
-      dateOfBirth: PropTypes.string.isRequired,
+      birthdate: PropTypes.string.isRequired,
     })
   ).isRequired,
   customerId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
