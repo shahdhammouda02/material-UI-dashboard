@@ -54,7 +54,7 @@ function UpdateCustomer({ initialRows, customerId, onUpdate, onClose }) {
 
   const handleDialogClose = () => {
     setIsDialogOpen(false);
-    onClose(); // استدعاء دالة الإغلاق القادمة من `props`
+    onClose(); // استدعاء دالة الإغلاق القادمة من props
   };
 
   // التعامل مع تغييرات المدخلات

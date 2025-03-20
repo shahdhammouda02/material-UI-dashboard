@@ -123,31 +123,51 @@ function Products() {
                               {row.subcategory?.name || row.subcategory}
                             </DataproductBodyCell>
                             <DataproductBodyCell align="center">
-                              {row.images && typeof row.images === "object" ? (
-                                <img src={row.images.url} alt="product" width="50" height="50" />
-                              ) : (
-                                "لا توجد صورة"
-                              )}
+                              <img
+                                src={`http://127.0.0.1:8000${row.image}`}
+                                alt="product"
+                                width="50"
+                                height="50"
+                                onError={(e) => console.error("Image load error:", e.target.src)}
+                              />
                             </DataproductBodyCell>
                             <DataproductBodyCell align="center">{row.price}</DataproductBodyCell>
                             <DataproductBodyCell align="center">{row.discount}</DataproductBodyCell>
                             <DataproductBodyCell align="center">
                               {row.description}
                             </DataproductBodyCell>
-                            <DataproductBodyCell align="center">
+                            <DataproductBodyCell
+                              align="center"
+                              display="flex !important"
+                              flexDirection="row" // فقط هنا لضبط اتجاه العناصر
+                              justifyContent="center"
+                              sx={{ padding: "0 !important" }}
+                            >
                               <MDButton
-                                variant="text"
-                                color="success"
+                                display="flex !important"
+                                justifyContent="center"
+                                alignItems="center"
+                                sx={{ padding: "0 !important" }}
                                 onClick={() => handleEdit(row.id)}
                               >
-                                <EditIcon sx={{ height: "1.5rem", width: "1.5rem" }} />
+                                <EditIcon
+                                  color="success"
+                                  sx={{
+                                    height: "1.5rem !important",
+                                    width: "1.5rem !important",
+                                    padding: "0 !important",
+                                  }}
+                                />
                               </MDButton>
-                              <MDButton
-                                variant="text"
-                                color="error"
-                                onClick={() => handleDelete(row.id)}
-                              >
-                                <DeleteIcon sx={{ height: "1.5rem", width: "1.5rem" }} />
+                              <MDButton onClick={() => handleDelete(row.id)}>
+                                <DeleteIcon
+                                  color="error"
+                                  sx={{
+                                    height: "1.5rem !important",
+                                    width: "1.5rem !important",
+                                    padding: "0 !important",
+                                  }}
+                                />
                               </MDButton>
                             </DataproductBodyCell>
                           </tr>

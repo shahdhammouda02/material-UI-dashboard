@@ -49,7 +49,9 @@ function AddCustomer({ onCancel }) {
         customers.length > 0 ? Math.max(...customers.map((row) => row.id)) : 0;
       const newCustomer = { ...formData, id: highestExistingId + 1 };
 
+      // محاولة إرسال الطلب
       const res = await dispatch(addCustomer(newCustomer)).unwrap();
+      console.log("Response from API: ", res); // سجل استجابة الـ API
       if (res?.message === "Delivery created successfully") {
         alert("تم إضافة العميل بنجاح!");
         setIsDialogOpen(false);
@@ -58,7 +60,16 @@ function AddCustomer({ onCancel }) {
       }
     } catch (error) {
       console.error("❌ Error:", error);
-      alert("حدث خطأ غير متوقع.");
+      if (error.response) {
+        // إذا كان الخطأ من الخادم
+        alert(`خطأ من الخادم: ${error.response.data.message || "حدث خطأ غير متوقع."}`);
+      } else if (error.request) {
+        // إذا كان لا يوجد رد من الخادم
+        alert("لم يتم الحصول على رد من الخادم. يرجى المحاولة لاحقًا.");
+      } else {
+        // في حالة الخطأ غير المتوقع (مثل مشاكل في الشبكة)
+        alert("حدث خطأ في الاتصال بالشبكة. يرجى المحاولة لاحقًا.");
+      }
     }
   };
 

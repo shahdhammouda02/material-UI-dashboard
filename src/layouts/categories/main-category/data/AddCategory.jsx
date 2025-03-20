@@ -40,7 +40,7 @@ const AddCategory = ({ initialRows, onAdd, onCancel }) => {
       }
     } catch (error) {
       console.error("❌ Error:", error);
-      alert("حدث خطأ غير متوقع.");
+      // alert("حدث خطأ غير متوقع.");
     }
   };
 

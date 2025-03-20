@@ -14,7 +14,7 @@ const initialState = {
   error: null,
 };
 
-// 🔹 Create `slice`
+// 🔹 Create slice
 const customerSlice = createSlice({
   name: "customers",
   initialState,
@@ -38,17 +38,14 @@ const customerSlice = createSlice({
       })
 
       // ✅ Fetch Customer Products (Details)
+      // ✅ Fetch Customer Products (Details)
       .addCase(fetchCustomerProducts.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchCustomerProducts.fulfilled, (state, action) => {
         state.loading = false;
-        const customerId = action.meta.arg;
-        const customerIndex = state.customers.findIndex((customer) => customer.id === customerId);
-        if (customerIndex !== -1) {
-          state.customers[customerIndex].products = action.payload; // إضافة المنتجات للعميل
-        }
+        state.customerProducts = action.payload; // تخزين المنتجات هنا مباشرة
       })
       .addCase(fetchCustomerProducts.rejected, (state, action) => {
         state.loading = false;

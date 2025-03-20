@@ -11,15 +11,7 @@ import CustomerTable from "./data/CustomersTable";
 import UpdateCustomer from "./data/UpdateCustomer";
 import AddCustomer from "./data/AddCustomer";
 import DataproductBodyCell from "../../examples/products/Dataproduct/DataproductBodyCell";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Typography,
-  Box,
-} from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
 
 const Customers = () => {
   const [editingId, setEditingId] = useState(null);
@@ -42,25 +34,29 @@ const Customers = () => {
     setEditingId(null);
   };
 
-  // Handle adding a new customer
   const handleAddCustomer = (newCustomer) => {
     setCustomerRows((prevRows) => [
       ...prevRows,
       {
         ...newCustomer,
-        id: prevRows.length + 1, // Ensure unique ID
+        id: prevRows.length + 1,
       },
     ]);
   };
 
   const handleViewProductDetails = (id) => {
-    console.log("Navigating to product ID:", id); // Debugging
+    console.log("Navigating to product ID:", id);
     navigate(`/products/${id}`);
   };
 
   useEffect(() => {
     setCustomerRows(rows);
   }, [rows]);
+
+  // Debugging: Make sure selectedProducts is populated
+  useEffect(() => {
+    console.log("Selected Products:", selectedProducts); // Log selectedProducts to the console
+  }, [selectedProducts]);
 
   return (
     <DashboardLayout>
@@ -160,7 +156,7 @@ const Customers = () => {
                             {row.birthdate}
                           </DataproductBodyCell>
                           <DataproductBodyCell align="center" style={{ fontSize: "12px" }}>
-                            {row.products.productCount}
+                            {row.orders_count}
                           </DataproductBodyCell>
                           <DataproductBodyCell align="center" style={{ fontSize: "12px" }}>
                             {row.products.viewProducts}
@@ -192,40 +188,48 @@ const Customers = () => {
         </DialogTitle>
         <DialogContent>
           <Grid container spacing={2}>
-            {selectedProducts.map((product) => (
-              <Grid item xs={12} key={product.id}>
-                <Card sx={{ p: 1 }}>
-                  <Grid container spacing={1}>
-                    <Grid item xs={12} md={6}>
-                      <MDTypography variant="body2" fontWeight="bold" color="primary">
-                        الرقم التعريفي:
-                      </MDTypography>
-                      <MDTypography variant="body2">{product.id}</MDTypography>
+            {selectedProducts && selectedProducts.length > 0 ? (
+              selectedProducts.map((product) => (
+                <Grid item xs={12} key={product.id}>
+                  <Card sx={{ p: 1 }}>
+                    <Grid container spacing={1}>
+                      <Grid item xs={12} md={6}>
+                        <MDTypography variant="body2" fontWeight="bold" color="primary">
+                          الرقم التعريفي:
+                        </MDTypography>
+                        <MDTypography variant="body2">{product.id}</MDTypography>
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <MDTypography variant="body2" fontWeight="bold" color="primary">
+                          اسم المنتج:
+                        </MDTypography>
+                        <MDTypography variant="body2">{product.name}</MDTypography>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          size="small"
+                          onClick={() => handleViewProductDetails(product.id)}
+                        >
+                          عرض المنتج
+                        </Button>
+                      </Grid>
                     </Grid>
-                    <Grid item xs={12} md={6}>
-                      <MDTypography variant="body2" fontWeight="bold" color="primary">
-                        اسم المنتج:
-                      </MDTypography>
-                      <MDTypography variant="body2">{product.name}</MDTypography>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        size="small"
-                        onClick={() => handleViewProductDetails(product.id)}
-                      >
-                        عرض التفاصيل
-                      </Button>
-                    </Grid>
-                  </Grid>
-                </Card>
-              </Grid>
-            ))}
+                  </Card>
+                </Grid>
+              ))
+            ) : (
+              <MDTypography variant="body2" color="textSecondary">
+                لا توجد تفاصيل للمنتجات
+              </MDTypography>
+            )}
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setIsProductModalOpen(false)}>إغلاق</Button>
+          <Button onClick={() => setIsProductModalOpen(false)} color="primary">
+            إغلاق
+          </Button>
         </DialogActions>
       </Dialog>
 

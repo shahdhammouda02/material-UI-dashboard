@@ -31,11 +31,14 @@ const AddProduct = ({ onCancel }) => {
     dispatch(fetchSubCategories());
   }, [dispatch]);
 
+  // دالة معالجة تحميل الصورة
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) setImage(file);
+    if (e.target.files && e.target.files.length > 0) {
+      setImage(e.target.files[0]);
+    }
   };
 
+  // دالة إضافة المنتج
   const handleAddProduct = async (e) => {
     e.preventDefault();
     setLocalError(null);
@@ -45,7 +48,6 @@ const AddProduct = ({ onCancel }) => {
       return;
     }
 
-    // توليد slug فريد باستخدام الوقت الحالي
     const slug = `${name.trim().toLowerCase().replace(/\s+/g, "-")}-${Date.now()}`;
 
     const formData = new FormData();
@@ -56,7 +58,7 @@ const AddProduct = ({ onCancel }) => {
     formData.append("image", image);
     formData.append("category_id", categoryId);
     formData.append("subcategory_id", subcategoryId);
-    formData.append("slug", slug); // إضافة slug الفريد
+    formData.append("slug", slug);
 
     try {
       await axiosFetching.post("/products", formData);
@@ -67,6 +69,7 @@ const AddProduct = ({ onCancel }) => {
     }
   };
 
+  // تصفية الفئات الفرعية بناءً على الفئة المحددة
   const filteredSubcategories = useMemo(() => {
     return categoryId
       ? subCategories?.data?.filter((sub) => sub.category_id === categoryId) || []
@@ -148,9 +151,11 @@ const AddProduct = ({ onCancel }) => {
           </FormControl>
         </MDBox>
 
+        {/* إدخال الصورة */}
         <MDBox mb={2}>
-          <MDInput type="file" onChange={handleImageChange} fullWidth />
+          <input type="file" accept="image/*" onChange={handleImageChange} />
         </MDBox>
+
         {localError && (
           <MDTypography color="error" mb={2}>
             {localError}

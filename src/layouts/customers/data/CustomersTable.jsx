@@ -1,6 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchCustomers, deleteCustomer } from "../../../Store/Slices/customerSlice/customerAction";
+import {
+  fetchCustomers,
+  deleteCustomer,
+  fetchCustomerProducts,
+} from "../../../Store/Slices/customerSlice/customerAction";
 import MDBox from "components/MDBox";
 import MDIconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
@@ -18,6 +22,11 @@ const CustomerTable = ({ handleEdit }) => {
     dispatch(fetchCustomers());
   }, [dispatch]);
 
+  // Function to fetch products for a specific customer
+  const handleViewProducts = (customerId) => {
+    dispatch(fetchCustomerProducts(customerId));
+  };
+
   const handleDeleteClick = (id) => {
     dispatch(deleteCustomer(id));
   };
@@ -34,7 +43,7 @@ const CustomerTable = ({ handleEdit }) => {
       accessor: "products",
       align: "center",
       subColumns: [
-        { Header: "عدد المنتجات", accessor: "productCount", align: "center" },
+        { Header: "عدد المنتجات", accessor: "orders_count", align: "center" },
         { Header: "عرض المنتجات", accessor: "viewProducts", align: "center" },
       ],
     },
@@ -52,8 +61,10 @@ const CustomerTable = ({ handleEdit }) => {
             color="primary"
             title="عرض المنتجات"
             onClick={() => {
-              setSelectedProducts(customer.products || []); // ✅ إذا كانت المنتجات غير موجودة، نمرر مصفوفة فارغة
+              console.log("Selected Customer Products:", customer.products); // Debugging log to check products
+              setSelectedProducts(customer.products || []); // Default to empty array if products are undefined
               setIsProductModalOpen(true);
+              handleViewProducts(customer.id); // Fetch customer products on button click
             }}
           >
             <VisibilityIcon />
